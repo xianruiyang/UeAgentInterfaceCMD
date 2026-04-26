@@ -1,9 +1,9 @@
 # UeAgentInterfaceCMD
 
-`UeAgentInterfaceCMD` 是 `UeAgentInterface` 的外置命令行工具目录。  
+`UeAgentInterfaceCMD` 是 `UeAgentInterface` 的外置命令行工具目录。
 目标是通过 `run/batch + JSON` 模板化执行，减少重复输入、提高稳定性和可追踪性。
 
-本仓库是 `GptProjectTest` 项目中的独立 CLI 仓库，外层项目通过 submodule/gitlink 引用它。它与 `Plugins/UeAgentInterface` 插件仓库配套使用：插件运行在 UE Editor 内，CLI 在外部发起 doctor、run、batch、报告读取和清理等流程。
+它与 `UeAgentInterface` 插件仓库配套使用：插件运行在 UE Editor 内，CLI 在外部发起 doctor、run、batch、报告读取和清理等流程。
 
 ## 代码来源说明
 
