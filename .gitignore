@@ -1,0 +1,18 @@
+# 打包与运行产物
+dist/
+release/
+temp/
+tmp/
+*.log
+*.tmp
+build_tmp/
+logs/
+reports/*.json
+!reports/.gitkeep
+reports/_tmp/
+dist/reports/*.json
+dist/logs/*.log
+
+# Python 缓存
+__pycache__/
+*.pyc

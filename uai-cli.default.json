@@ -1,0 +1,14 @@
+{
+  "base_url": "http://127.0.0.1:17777",
+  "token": "",
+  "timeout_seconds": 60,
+  "clear_log_on_start": true,
+  "log_level": "info",
+  "niagara_guard_enabled": true,
+  "niagara_guard_strict": true,
+  "auto_cleanup_enabled": true,
+  "cleanup_tmp_max": 120,
+  "cleanup_tmp_keep": 40,
+  "cleanup_reports_max": 200,
+  "cleanup_reports_keep": 120
+}

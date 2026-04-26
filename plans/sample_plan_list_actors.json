@@ -1,0 +1,27 @@
+{
+  "task_id": "sample_plan_list_actors",
+  "defaults": {
+    "limit": 50,
+    "phase_name_a": "A_collect_world_snapshot"
+  },
+  "phases": [
+    {
+      "name": "{{phase_name_a}}",
+      "stop_on_error": true,
+      "commands": [
+        {
+          "command": "list_actors",
+          "params": {
+            "limit": "{{limit}}"
+          }
+        },
+        {
+          "command": "get_world_state",
+          "params": {}
+        }
+      ]
+    }
+  ],
+  "asserts": []
+}
+

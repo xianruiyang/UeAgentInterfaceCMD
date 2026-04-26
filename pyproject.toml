@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ueagentinterfacecmd"
+version = "0.1.0"
+description = "Packaged CLI for driving UeAgentInterface HTTP server"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "UeAgentInterfaceCMD" }]
+dependencies = []
+
+[project.scripts]
+uai-cli = "uai_cli.main:main"
+
+[tool.setuptools]
+package-dir = { "" = "cli" }
+
+[tool.setuptools.packages.find]
+where = ["cli"]
+

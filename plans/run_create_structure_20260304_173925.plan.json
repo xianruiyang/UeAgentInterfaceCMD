@@ -1,0 +1,49 @@
+﻿{
+  "task_id": "{{task_id}}",
+  "defaults": {},
+  "phases": [
+    {
+      "name": "A_create_structure",
+      "stop_on_error": true,
+      "commands": [
+        {"request_id":"create_bp","command":"blueprint_create","params":{"asset_path":"{{asset_path}}","parent_class":"/Script/Engine.Actor","compile_after_create":false,"open_editor":false,"save_after_create":false}},
+        {"request_id":"add_mesh","command":"blueprint_add_component","params":{"asset_path":"{{asset_path}}","component_class":"/Script/Engine.StaticMeshComponent","component_name":"CubeMesh","save_after_add":false}},
+        {"request_id":"set_mesh","command":"blueprint_set_component_property","params":{"asset_path":"{{asset_path}}","component_name":"CubeMesh","property_name":"StaticMesh","value_text":"StaticMesh'/Engine/BasicShapes/Cube.Cube'","compile_after_set":false,"save_after_set":false}},
+        {"request_id":"set_mobility","command":"blueprint_set_component_property","params":{"asset_path":"{{asset_path}}","component_name":"CubeMesh","property_name":"Mobility","value_text":"Movable","compile_after_set":false,"save_after_set":false}},
+
+        {"request_id":"var_base","command":"blueprint_add_variable","params":{"asset_path":"{{asset_path}}","variable_name":"BaseLocation","pin_category":"struct","pin_subcategory_object":"/Script/CoreUObject.Vector","default_value":"(X=0.0,Y=0.0,Z=0.0)","instance_editable":false,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"var_amp","command":"blueprint_add_variable","params":{"asset_path":"{{asset_path}}","variable_name":"FloatAmplitude","pin_category":"float","pin_subcategory":"float","default_value":"100.0","instance_editable":true,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"var_freq","command":"blueprint_add_variable","params":{"asset_path":"{{asset_path}}","variable_name":"FloatFrequency","pin_category":"float","pin_subcategory":"float","default_value":"1.0","instance_editable":true,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"var_rot","command":"blueprint_add_variable","params":{"asset_path":"{{asset_path}}","variable_name":"RotateSpeedYaw","pin_category":"float","pin_subcategory":"float","default_value":"120.0","instance_editable":true,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"var_time","command":"blueprint_add_variable","params":{"asset_path":"{{asset_path}}","variable_name":"ElapsedTime","pin_category":"float","pin_subcategory":"float","default_value":"0.0","instance_editable":false,"compile_after_add":false,"save_after_add":false}},
+
+        {"request_id":"ev_begin","command":"blueprint_add_event_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","event_class":"/Script/Engine.Actor","event_name":"ReceiveBeginPlay","pos_x":-1400,"pos_y":-200,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"ev_tick","command":"blueprint_add_event_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","event_class":"/Script/Engine.Actor","event_name":"ReceiveTick","pos_x":-1400,"pos_y":300,"compile_after_add":false,"save_after_add":false}},
+
+        {"request_id":"n_get_loc","command":"blueprint_add_call_function_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","function_owner_class":"/Script/Engine.Actor","function_name":"K2_GetActorLocation","node_comment":"N_GetActorLocation","pos_x":-1120,"pos_y":-180,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_set_base","command":"blueprint_add_variable_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","variable_name":"BaseLocation","node_type":"set","pos_x":-860,"pos_y":-200,"compile_after_add":false,"save_after_add":false}},
+
+        {"request_id":"n_get_time","command":"blueprint_add_variable_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","variable_name":"ElapsedTime","node_type":"get","pos_x":-1180,"pos_y":560,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_get_freq","command":"blueprint_add_variable_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","variable_name":"FloatFrequency","node_type":"get","pos_x":-1180,"pos_y":760,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_mul_dt_freq","command":"blueprint_add_call_function_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","function_owner_class":"/Script/Engine.KismetMathLibrary","function_name":"Multiply_DoubleDouble","node_comment":"N_MulDeltaFrequency","pos_x":-980,"pos_y":640,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_add_time","command":"blueprint_add_call_function_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","function_owner_class":"/Script/Engine.KismetMathLibrary","function_name":"Add_DoubleDouble","node_comment":"N_AddElapsedTime","pos_x":-760,"pos_y":620,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_set_time","command":"blueprint_add_variable_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","variable_name":"ElapsedTime","node_type":"set","pos_x":-500,"pos_y":560,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_sin","command":"blueprint_add_call_function_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","function_owner_class":"/Script/Engine.KismetMathLibrary","function_name":"Sin","node_comment":"N_Sin","pos_x":-520,"pos_y":780,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_get_amp","command":"blueprint_add_variable_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","variable_name":"FloatAmplitude","node_type":"get","pos_x":-520,"pos_y":940,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_mul_offset","command":"blueprint_add_call_function_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","function_owner_class":"/Script/Engine.KismetMathLibrary","function_name":"Multiply_DoubleDouble","node_comment":"N_MulSinAmplitude","pos_x":-320,"pos_y":840,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_make_vec","command":"blueprint_add_call_function_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","function_owner_class":"/Script/Engine.KismetMathLibrary","function_name":"MakeVector","node_comment":"N_MakeOffsetVector","pos_x":-120,"pos_y":820,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_get_base","command":"blueprint_add_variable_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","variable_name":"BaseLocation","node_type":"get","pos_x":-120,"pos_y":1020,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_add_vec","command":"blueprint_add_call_function_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","function_owner_class":"/Script/Engine.KismetMathLibrary","function_name":"Add_VectorVector","node_comment":"N_AddBaseOffset","pos_x":80,"pos_y":920,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_set_loc","command":"blueprint_add_call_function_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","function_owner_class":"/Script/Engine.Actor","function_name":"K2_SetActorLocation","node_comment":"N_SetActorLocation","pos_x":340,"pos_y":760,"compile_after_add":false,"save_after_add":false}},
+
+        {"request_id":"n_get_rotspd","command":"blueprint_add_variable_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","variable_name":"RotateSpeedYaw","node_type":"get","pos_x":-160,"pos_y":540,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_mul_rot","command":"blueprint_add_call_function_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","function_owner_class":"/Script/Engine.KismetMathLibrary","function_name":"Multiply_DoubleDouble","node_comment":"N_MulDeltaRotSpeed","pos_x":40,"pos_y":560,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_make_rot","command":"blueprint_add_call_function_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","function_owner_class":"/Script/Engine.KismetMathLibrary","function_name":"MakeRotator","node_comment":"N_MakeDeltaRotator","pos_x":260,"pos_y":560,"compile_after_add":false,"save_after_add":false}},
+        {"request_id":"n_add_rot","command":"blueprint_add_call_function_node","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","function_owner_class":"/Script/Engine.Actor","function_name":"K2_AddActorLocalRotation","node_comment":"N_AddActorLocalRotation","pos_x":560,"pos_y":500,"compile_after_add":false,"save_after_add":false}},
+
+        {"request_id":"inspect_nodes","command":"blueprint_inspect_nodes","params":{"asset_path":"{{asset_path}}","graph_name":"EventGraph","include_pins":false,"limit_per_graph":200}}
+      ]
+    }
+  ],
+  "asserts": []
+}
