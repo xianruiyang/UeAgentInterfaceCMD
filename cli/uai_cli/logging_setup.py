@@ -17,7 +17,9 @@ def setup_logging(logs_dir: Path, clear_on_start: bool, log_level: str) -> Path:
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 
     logger = logging.getLogger()
-    logger.handlers.clear()
+    for handler in list(logger.handlers):
+        handler.close()
+        logger.removeHandler(handler)
     logger.setLevel(level)
 
     file_handler = logging.FileHandler(log_path, encoding="utf-8")
@@ -30,4 +32,3 @@ def setup_logging(logs_dir: Path, clear_on_start: bool, log_level: str) -> Path:
 
     logging.info("VERSION_TAG=%s CLI_VERSION=%s", BUILD_TAG, __version__)
     return log_path
-

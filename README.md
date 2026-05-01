@@ -16,12 +16,22 @@
 - 命名简化：内置 `namegen`，默认生成短资产名
 - Niagara 护栏：自动 preflight + 编译/日志/emitter 校验
 - 自动清理：`tmp/reports` 超阈值自动裁剪
+- 命令清单：`manifest` 生成插件命令 manifest，并在执行前校验命令名
+- 参数校验：manifest 中包含轻量 `param_schema`，支持 warn/strict
+- 兼容检查：`compat` 检查 CLI 与 UE 插件服务状态
+- 失败现场：执行失败自动写入 `runtimeLogs/crashes/<run_id>/`
+- 失败复现：`crash signature|replay|bisect`
+- Golden E2E：`e2e local|ue-readonly`
+- 发布验证：`release coverage|pak-verify|examples|gate|all`
 
 ## 快速开始
 
 ```powershell
 .\dist\uai-cli.exe doctor --json-output
 .\dist\uai-cli.exe run --plan ".\plans\sample_plan_list_actors.json" --vars ".\vars\sample_vars.json" --json-output
+.\dist\uai-cli.exe manifest --summary --json-output
+.\dist\uai-cli.exe release all --json-output
+.\dist\uai-cli.exe release gate --json-output
 ```
 
 完整文档：`docs/USAGE.md`

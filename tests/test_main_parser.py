@@ -33,6 +33,29 @@ class MainParserTests(unittest.TestCase):
         self.assertEqual(args.tag_mode, "none")
         self.assertEqual(args.max_len, 20)
 
+    def test_manifest_parse(self):
+        args = self._parse(["manifest", "--summary"])
+        self.assertEqual(args.subcommand, "manifest")
+        self.assertTrue(args.summary)
+
+    def test_release_parse(self):
+        args = self._parse(["release", "all"])
+        self.assertEqual(args.action, "all")
+
+    def test_release_gate_parse(self):
+        args = self._parse(["release", "gate", "--run-tests"])
+        self.assertEqual(args.action, "gate")
+        self.assertTrue(args.run_tests)
+
+    def test_crash_parse(self):
+        args = self._parse(["crash", "replay", "--execute"])
+        self.assertEqual(args.action, "replay")
+        self.assertTrue(args.execute)
+
+    def test_e2e_parse(self):
+        args = self._parse(["e2e", "local"])
+        self.assertEqual(args.mode, "local")
+
     def test_resolve_config_namegen_without_token(self):
         args = SimpleNamespace(
             subcommand="namegen",
@@ -44,6 +67,8 @@ class MainParserTests(unittest.TestCase):
             allow_nonloopback=False,
             no_niagara_guard=False,
             allow_unsafe_niagara_mix=False,
+            skip_compat_check=False,
+            no_crash_capture=False,
         )
         config = cli_main._resolve_config(args)
         self.assertEqual(config.base_url, "http://127.0.0.1:17777")

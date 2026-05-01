@@ -7,6 +7,7 @@ tmp/
 *.tmp
 build_tmp/
 logs/
+runtimeLogs/
 reports/*.json
 !reports/.gitkeep
 reports/_tmp/

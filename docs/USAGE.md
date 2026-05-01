@@ -9,6 +9,7 @@
 - 避免在命令行内联长 JSON
 - 固化 `doctor / exec / batch / run / resume / namegen` 工作流
 - 统一报告输出，便于失败定位与复盘
+- 固化命令清单、兼容检查、崩溃现场收集、覆盖矩阵与 Pak 发布验证
 
 ## 2. 前置条件
 
@@ -38,7 +39,13 @@
   "cleanup_tmp_max": 120,
   "cleanup_tmp_keep": 40,
   "cleanup_reports_max": 200,
-  "cleanup_reports_keep": 120
+  "cleanup_reports_keep": 120,
+  "command_manifest_enabled": true,
+  "compatibility_check_enabled": true,
+  "expected_plugin_version_tag": "",
+  "crash_capture_enabled": true,
+  "runtime_index_enabled": true,
+  "param_validation_mode": "warn"
 }
 ```
 
@@ -107,6 +114,69 @@
 .\dist\uai-cli.exe namegen --kind blueprint --base Door --tag-mode none --max-len 20 --json-output
 ```
 
+### 4.7 命令清单：`manifest`
+
+```powershell
+.\dist\uai-cli.exe manifest --summary --json-output
+.\dist\uai-cli.exe manifest --output ".\docs\generated\command_manifest.json" --json-output
+```
+
+`manifest` 会从插件命令文档、C++ dispatch 和 smoke test 中生成机器可读清单。`exec / batch / run / resume` 默认会先用该清单检查命令名，避免把明显不存在的指令发给 UE。
+
+manifest 内同时包含从文档关键参数推导出的 `param_schema`。默认 `param_validation_mode=warn`，类型不匹配或未知参数会进入 report warning；设置为 `strict` 时 warning 会升级为执行失败。
+
+### 4.8 兼容检查：`compat`
+
+```powershell
+.\dist\uai-cli.exe compat --json-output
+```
+
+`doctor` 和写入类执行流程会带兼容检查结果。默认只把服务未运行、状态异常或显式配置的 `expected_plugin_version_tag` 不匹配视为硬失败；缺少版本字段会作为 warning 返回。
+
+### 4.9 失败现场：`crash`
+
+```powershell
+.\dist\uai-cli.exe crash collect --json-output
+.\dist\uai-cli.exe crash inspect --json-output
+.\dist\uai-cli.exe crash pack --json-output
+.\dist\uai-cli.exe crash signature --json-output
+.\dist\uai-cli.exe crash replay --json-output
+.\dist\uai-cli.exe crash bisect --json-output
+```
+
+`crash_capture_enabled=true` 时，`doctor / exec / batch / run / resume / release` 失败会自动在项目 `runtimeLogs/crashes/<run_id>/` 生成现场包，包含 report、最新 UE log、CrashContext、视觉输出有效性检查和 `crash-summary.md`。
+
+### 4.10 运行索引：`index`
+
+```powershell
+.\dist\uai-cli.exe index --limit 20 --json-output
+.\dist\uai-cli.exe index --failed-only --stats --json-output
+```
+
+每次写 report 后，CLI 会更新项目 `runtimeLogs/uai_cli_index.json`，用于快速查找最近失败命令、失败报告和执行结果。
+
+### 4.11 发布验证：`release`
+
+```powershell
+.\dist\uai-cli.exe release coverage --json-output
+.\dist\uai-cli.exe release pak-verify --json-output
+.\dist\uai-cli.exe release examples --json-output
+.\dist\uai-cli.exe release gate --json-output
+.\dist\uai-cli.exe release all --json-output
+```
+
+`release coverage` 生成 `docs/generated/command_coverage_matrix.json|md`，汇总 `命令 -> 文档 -> 实现 -> smoke` 覆盖关系。`release pak-verify` 检查 Pak 目录关键文件、skill、CLI 与基础 hash 差异。
+`release examples` 生成 `examples/generated/` 里的只读 golden E2E 示例。`release gate` 汇总 manifest、coverage、Pak verify，可加 `--run-tests` 同时运行 CLI 单测。
+
+### 4.12 Golden E2E：`e2e`
+
+```powershell
+.\dist\uai-cli.exe e2e local --json-output
+.\dist\uai-cli.exe e2e ue-readonly --json-output
+```
+
+`e2e local` 不依赖 UE，只生成并检查本地示例库。`e2e ue-readonly` 需要 UAI 服务在线，运行 `get_world_state/list_actors` 只读批次。
+
 ## 5. `run` vs `batch` 怎么选
 
 - 用 `run`：
@@ -132,6 +202,14 @@
 
 报告里会带 `failed_index/failed_command/failed_error` 等字段；不要只看最后一条报错字符串。
 
+失败现场位于项目根目录：
+
+- `runtimeLogs/crashes/<run_id>/manifest.json`
+- `runtimeLogs/crashes/<run_id>/crash-summary.md`
+- `runtimeLogs/uai_cli_index.json`
+- `examples/generated/`
+- `docs/generated/implemented_command_catalog.md`
+
 ## 7. 常见问题
 
 ### 7.1 `doctor` 失败
@@ -150,3 +228,11 @@
 - 确认请求头/配置里的 `token`
 - 在 UE 中使用 `Window -> UeAgentInterface -> Copy Connection Info` 获取当前会话的连接信息
 
+### 7.3 命令清单校验失败
+
+说明 batch/plan 中存在当前文档或插件 dispatch 均未发现的命令名。先检查拼写；如果是新插件命令，必须同步插件文档或确认 CLI 正在读取正确项目。
+
+### 7.4 截图文件存在但无效
+
+CLI 会检查 report 中的 PNG 路径。若图片全黑、全透明或像素方差过低，失败现场会标为 `BlackScreenshot`，不能把“文件存在”当作可视化验证通过。
+BMP 也会做像素统计；JPG/JPEG 当前做尺寸有效性检查。

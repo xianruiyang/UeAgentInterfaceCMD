@@ -23,6 +23,12 @@ class AppConfig:
     cleanup_tmp_keep: int
     cleanup_reports_max: int
     cleanup_reports_keep: int
+    command_manifest_enabled: bool
+    compatibility_check_enabled: bool
+    expected_plugin_version_tag: str
+    crash_capture_enabled: bool
+    runtime_index_enabled: bool
+    param_validation_mode: str
     app_root: Path
     reports_dir: Path
     logs_dir: Path
@@ -128,6 +134,14 @@ def load_app_config(
     final_cleanup_tmp_keep = int(config_data.get("cleanup_tmp_keep", 40))
     final_cleanup_reports_max = int(config_data.get("cleanup_reports_max", 200))
     final_cleanup_reports_keep = int(config_data.get("cleanup_reports_keep", 120))
+    final_command_manifest_enabled = bool(config_data.get("command_manifest_enabled", True))
+    final_compatibility_check_enabled = bool(config_data.get("compatibility_check_enabled", True))
+    final_expected_plugin_version_tag = str(config_data.get("expected_plugin_version_tag", "")).strip()
+    final_crash_capture_enabled = bool(config_data.get("crash_capture_enabled", True))
+    final_runtime_index_enabled = bool(config_data.get("runtime_index_enabled", True))
+    final_param_validation_mode = str(config_data.get("param_validation_mode", "warn")).strip().lower()
+    if final_param_validation_mode not in {"off", "warn", "strict"}:
+        raise ConfigError("param_validation_mode 必须是 off/warn/strict")
     _validate_cleanup_values(
         cleanup_tmp_max=final_cleanup_tmp_max,
         cleanup_tmp_keep=final_cleanup_tmp_keep,
@@ -161,6 +175,12 @@ def load_app_config(
         cleanup_tmp_keep=final_cleanup_tmp_keep,
         cleanup_reports_max=final_cleanup_reports_max,
         cleanup_reports_keep=final_cleanup_reports_keep,
+        command_manifest_enabled=final_command_manifest_enabled,
+        compatibility_check_enabled=final_compatibility_check_enabled,
+        expected_plugin_version_tag=final_expected_plugin_version_tag,
+        crash_capture_enabled=final_crash_capture_enabled,
+        runtime_index_enabled=final_runtime_index_enabled,
+        param_validation_mode=final_param_validation_mode,
         app_root=app_root,
         reports_dir=reports_dir,
         logs_dir=logs_dir,

@@ -1,0 +1,12 @@
+{
+  "stop_on_error": true,
+  "commands": [
+    {
+      "command": "navigation_get_info",
+      "params": {
+        "include_nav_data": true,
+        "include_bounds": true
+      }
+    }
+  ]
+}
