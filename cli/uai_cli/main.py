@@ -34,6 +34,12 @@ from .http_client import UaiHttpClient
 from .logging_setup import setup_logging
 from .naming import build_short_asset_name
 from .release_verify import verify_pak_layout, write_coverage_matrix
+from .release_pipeline import (
+    build_release_sync_check,
+    mirror_development_to_pak,
+    verify_release_pipeline,
+    write_release_manifest,
+)
 from .reporting import build_report_file_path, save_report
 from .runner import dry_run_output, execute_batch, execute_plan, load_and_resolve_plan
 from .quality_gate import run_quality_gate
@@ -150,10 +156,29 @@ def _add_subcommands(parser: argparse.ArgumentParser) -> None:
 
     release = subparsers.add_parser("release", help="生成覆盖矩阵或验证 Pak 分发布局")
     _add_common_overrides_to_subparser(release)
-    release.add_argument("action", choices=["coverage", "pak-verify", "examples", "gate", "all"], help="release 检查动作")
+    release.add_argument(
+        "action",
+        choices=[
+            "coverage",
+            "pak-verify",
+            "examples",
+            "gate",
+            "all",
+            "sync-check",
+            "dev-mirror",
+            "verify",
+            "manifest",
+        ],
+        help="release 检查动作",
+    )
     release.add_argument("--output-json", help="coverage 输出 JSON；默认写到 docs/generated")
     release.add_argument("--output-md", help="coverage 输出 Markdown；默认写到 docs/generated")
     release.add_argument("--run-tests", action="store_true", help="gate 时运行 CLI 单测")
+    release.add_argument("--dry-run", action="store_true", help="dev-mirror 时只计算文件差异，不写入")
+    release.add_argument("--delete-extra", action="store_true", help="dev-mirror 时删除 Pak 副本中的额外文件")
+    release.add_argument("--allow-dirty", action="store_true", help="verify 时允许 dirty worktree，只用于诊断")
+    release.add_argument("--release-id", help="manifest 的 release id")
+    release.add_argument("--manifest-output", help="manifest 输出 JSON 路径")
     release.set_defaults(handler=handle_release)
 
     e2e = subparsers.add_parser("e2e", help="运行 golden E2E 检查")
@@ -930,6 +955,35 @@ def handle_index(args: argparse.Namespace, config: AppConfig) -> int:
 
 def handle_release(args: argparse.Namespace, config: AppConfig) -> int:
     payload: dict[str, Any] = {"success": True, "action": args.action}
+    if args.action == "sync-check":
+        sync_check = build_release_sync_check()
+        payload["sync_check"] = sync_check
+        if not sync_check.get("success", False):
+            payload["success"] = False
+    if args.action == "dev-mirror":
+        mirror = mirror_development_to_pak(dry_run=bool(args.dry_run), delete_extra=bool(args.delete_extra))
+        payload["dev_mirror"] = mirror
+        if not mirror.get("success", False):
+            payload["success"] = False
+    if args.action == "verify":
+        verify = verify_release_pipeline(
+            config.app_root,
+            run_tests=bool(args.run_tests),
+            allow_dirty=bool(args.allow_dirty),
+        )
+        payload["release_verify"] = verify
+        if not verify.get("success", False):
+            payload["success"] = False
+    if args.action == "manifest":
+        manifest_output = Path(args.manifest_output) if getattr(args, "manifest_output", None) else None
+        manifest = write_release_manifest(
+            config.app_root,
+            release_id=getattr(args, "release_id", None),
+            output_path=manifest_output,
+        )
+        payload["manifest"] = manifest
+        if not manifest.get("success", False):
+            payload["success"] = False
     if args.action in {"coverage", "all", "gate"}:
         generated_dir = config.app_root / "docs" / "generated"
         output_json = Path(args.output_json) if getattr(args, "output_json", None) else generated_dir / "command_coverage_matrix.json"

@@ -17,6 +17,8 @@ IMPLEMENTED_COMMAND_PATTERNS = [
 ]
 SMOKE_COMMAND_RE = re.compile(r'TEXT\("([a-z][a-z0-9_]+)"\)')
 PARAM_TOKEN_RE = re.compile(r"`([^`]+)`")
+SMOKE_SINGLE_WORD_COMMANDS = {"redo", "undo"}
+DOC_SINGLE_WORD_COMMANDS = {"redo", "undo"}
 
 
 @dataclass(slots=True)
@@ -89,7 +91,7 @@ def _parse_doc_file(path: Path, plugin_root: Path) -> dict[str, CommandDoc]:
             continue
         if not in_command_table:
             continue
-        commands = [name for name in COMMAND_TOKEN_RE.findall(cells[0]) if "_" in name]
+        commands = [name for name in COMMAND_TOKEN_RE.findall(cells[0]) if "_" in name or name in DOC_SINGLE_WORD_COMMANDS]
         if not commands:
             continue
         description = cells[1]
@@ -137,7 +139,7 @@ def _scan_smoke_commands(plugin_root: Path) -> dict[str, list[str]]:
         text = path.read_text(encoding="utf-8-sig", errors="ignore")
         relative = path.relative_to(plugin_root).as_posix()
         for command in SMOKE_COMMAND_RE.findall(text):
-            if "_" not in command:
+            if "_" not in command and command not in SMOKE_SINGLE_WORD_COMMANDS:
                 continue
             results.setdefault(command, [])
             if relative not in results[command]:

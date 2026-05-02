@@ -47,6 +47,31 @@ class MainParserTests(unittest.TestCase):
         self.assertEqual(args.action, "gate")
         self.assertTrue(args.run_tests)
 
+    def test_release_pipeline_actions_parse(self):
+        args = self._parse(
+            [
+                "release",
+                "dev-mirror",
+                "--dry-run",
+                "--delete-extra",
+                "--release-id",
+                "2026.05.02",
+                "--manifest-output",
+                "manifest.json",
+            ]
+        )
+        self.assertEqual(args.action, "dev-mirror")
+        self.assertTrue(args.dry_run)
+        self.assertTrue(args.delete_extra)
+        self.assertEqual(args.release_id, "2026.05.02")
+        self.assertEqual(args.manifest_output, "manifest.json")
+
+    def test_release_verify_parse(self):
+        args = self._parse(["release", "verify", "--run-tests", "--allow-dirty"])
+        self.assertEqual(args.action, "verify")
+        self.assertTrue(args.run_tests)
+        self.assertTrue(args.allow_dirty)
+
     def test_crash_parse(self):
         args = self._parse(["crash", "replay", "--execute"])
         self.assertEqual(args.action, "replay")

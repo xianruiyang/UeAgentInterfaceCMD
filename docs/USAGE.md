@@ -163,10 +163,23 @@ manifest 内同时包含从文档关键参数推导出的 `param_schema`。默�
 .\dist\uai-cli.exe release examples --json-output
 .\dist\uai-cli.exe release gate --json-output
 .\dist\uai-cli.exe release all --json-output
+.\dist\uai-cli.exe release sync-check --json-output
+.\dist\uai-cli.exe release dev-mirror --dry-run --json-output
+.\dist\uai-cli.exe release verify --run-tests --json-output
+.\dist\uai-cli.exe release manifest --release-id 2026.05.02 --json-output
 ```
 
-`release coverage` 生成 `docs/generated/command_coverage_matrix.json|md`，汇总 `命令 -> 文档 -> 实现 -> smoke` 覆盖关系。`release pak-verify` 检查 Pak 目录关键文件、skill、CLI 与基础 hash 差异。
-`release examples` 生成 `examples/generated/` 里的只读 golden E2E 示例。`release gate` 汇总 manifest、coverage、Pak verify，可加 `--run-tests` 同时运行 CLI 单测。
+`release coverage` 生成 `docs/generated/command_coverage_matrix.json|md`，汇总 `命令 -> 文档 -> 实现 -> smoke` 覆盖关系。所有已实现命令都必须出现在 automation smoke 源码或显式 smoke coverage ledger 中，否则 `missing_smoke` 会进入债务报告。
+`release pak-verify` 检查 Pak 目录关键文件、skill、CLI 与基础 hash 差异。`release examples` 生成 `examples/generated/` 里的只读 golden E2E 示例。`release gate` 汇总 manifest、coverage、Pak verify，可加 `--run-tests` 同时运行 CLI 单测；`missing_smoke` 不再只是提示，会让 gate 失败。
+
+发布拓扑相关命令：
+
+- `release sync-check`：只读检查开发插件/CLI、Pak 插件/CLI 的 commit、当前文件树 hash 和 dirty 状态。
+- `release dev-mirror`：把开发副本镜像到 Pak 副本，只用于本地临时验证；返回 `formal_release_allowed=false`，不能作为正式发布。
+- `release verify`：正式发布硬校验，默认禁止任一相关仓库 dirty，并要求 sync-check、coverage 和 quality gate 全部通过。
+- `release manifest`：生成 `UeAgentInterfacePak/releases/<release_id>/manifest.json`，记录 commit、tree hash、sync 状态和 coverage 摘要。
+
+正式发布不复制源码。插件和 CLI 应先分别提交/tag，再让 Pak 内 submodule checkout 到对应 commit；Pak 仓库只记录 gitlink、README、skills、release notes 和 manifest 等发布材料。
 
 ### 4.12 Golden E2E：`e2e`
 

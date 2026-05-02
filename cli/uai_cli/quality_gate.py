@@ -25,14 +25,21 @@ def run_quality_gate(app_root: Path, *, run_tests: bool = False) -> dict[str, An
     )
 
     coverage = build_coverage_matrix()
+    missing_smoke = coverage.get("missing_smoke", [])
+    generated_doc_catalog_count = int(coverage.get("raw_generated_doc_count", 0) or 0)
     checks.append(
         {
             "name": "coverage_matrix",
-            "success": len(coverage.get("missing_implementation", [])) == 0,
+            "success": (
+                len(coverage.get("missing_implementation", [])) == 0
+                and len(missing_smoke) == 0
+                and generated_doc_catalog_count == 0
+            ),
             "command_count": coverage.get("command_count", 0),
             "missing_doc_count": len(coverage.get("missing_doc", [])),
             "missing_implementation_count": len(coverage.get("missing_implementation", [])),
-            "missing_smoke_count": len(coverage.get("missing_smoke", [])),
+            "missing_smoke_count": len(missing_smoke),
+            "generated_doc_catalog_count": generated_doc_catalog_count,
             "smoke_actionable_missing_count": coverage.get("smoke_coverage", {}).get("actionable_missing_count", 0),
             "smoke_p0_count": coverage.get("smoke_coverage", {}).get("p0_count", 0),
             "smoke_p1_count": coverage.get("smoke_coverage", {}).get("p1_count", 0),
