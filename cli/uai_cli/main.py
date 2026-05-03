@@ -37,6 +37,7 @@ from .release_verify import verify_pak_layout, write_coverage_matrix
 from .release_pipeline import (
     build_release_sync_check,
     mirror_development_to_pak,
+    run_formal_release_gate,
     verify_release_pipeline,
     write_release_manifest,
 )
@@ -168,6 +169,7 @@ def _add_subcommands(parser: argparse.ArgumentParser) -> None:
             "dev-mirror",
             "verify",
             "manifest",
+            "ci",
         ],
         help="release 检查动作",
     )
@@ -177,6 +179,9 @@ def _add_subcommands(parser: argparse.ArgumentParser) -> None:
     release.add_argument("--dry-run", action="store_true", help="dev-mirror 时只计算文件差异，不写入")
     release.add_argument("--delete-extra", action="store_true", help="dev-mirror 时删除 Pak 副本中的额外文件")
     release.add_argument("--allow-dirty", action="store_true", help="verify 时允许 dirty worktree，只用于诊断")
+    release.add_argument("--skip-tests", action="store_true", help="ci 时跳过 CLI 单元测试")
+    release.add_argument("--write-coverage", action="store_true", help="ci 时同步写出 coverage generated docs")
+    release.add_argument("--ci-output", help="ci 门禁报告 JSON 输出路径")
     release.add_argument("--release-id", help="manifest 的 release id")
     release.add_argument("--manifest-output", help="manifest 输出 JSON 路径")
     release.set_defaults(handler=handle_release)
@@ -456,6 +461,22 @@ def _build_replay_commands(args: argparse.Namespace, app_root: Path) -> list[lis
             command.extend(["--output-md", str(args.output_md)])
         if bool(getattr(args, "run_tests", False)):
             command.append("--run-tests")
+        if bool(getattr(args, "allow_dirty", False)):
+            command.append("--allow-dirty")
+        if bool(getattr(args, "skip_tests", False)):
+            command.append("--skip-tests")
+        if bool(getattr(args, "write_coverage", False)):
+            command.append("--write-coverage")
+        if getattr(args, "ci_output", None):
+            command.extend(["--ci-output", str(args.ci_output)])
+        if bool(getattr(args, "dry_run", False)):
+            command.append("--dry-run")
+        if bool(getattr(args, "delete_extra", False)):
+            command.append("--delete-extra")
+        if getattr(args, "release_id", None):
+            command.extend(["--release-id", str(args.release_id)])
+        if getattr(args, "manifest_output", None):
+            command.extend(["--manifest-output", str(args.manifest_output)])
     else:
         return []
     return [command]
@@ -983,6 +1004,18 @@ def handle_release(args: argparse.Namespace, config: AppConfig) -> int:
         )
         payload["manifest"] = manifest
         if not manifest.get("success", False):
+            payload["success"] = False
+    if args.action == "ci":
+        ci_output = Path(args.ci_output) if getattr(args, "ci_output", None) else None
+        ci_gate = run_formal_release_gate(
+            config.app_root,
+            run_tests=not bool(getattr(args, "skip_tests", False)),
+            allow_dirty=bool(args.allow_dirty),
+            write_coverage=bool(getattr(args, "write_coverage", False)),
+            ci_output=ci_output,
+        )
+        payload["ci_gate"] = ci_gate
+        if not ci_gate.get("success", False):
             payload["success"] = False
     if args.action in {"coverage", "all", "gate"}:
         generated_dir = config.app_root / "docs" / "generated"

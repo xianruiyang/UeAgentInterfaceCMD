@@ -72,6 +72,24 @@ class MainParserTests(unittest.TestCase):
         self.assertTrue(args.run_tests)
         self.assertTrue(args.allow_dirty)
 
+    def test_release_ci_parse(self):
+        args = self._parse(
+            [
+                "release",
+                "ci",
+                "--allow-dirty",
+                "--skip-tests",
+                "--write-coverage",
+                "--ci-output",
+                "reports/ci.json",
+            ]
+        )
+        self.assertEqual(args.action, "ci")
+        self.assertTrue(args.allow_dirty)
+        self.assertTrue(args.skip_tests)
+        self.assertTrue(args.write_coverage)
+        self.assertEqual(args.ci_output, "reports/ci.json")
+
     def test_crash_parse(self):
         args = self._parse(["crash", "replay", "--execute"])
         self.assertEqual(args.action, "replay")

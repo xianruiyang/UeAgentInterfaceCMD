@@ -171,6 +171,29 @@ class ReleaseVerifyTests(unittest.TestCase):
             self.assertFalse(coverage_check["success"])
             self.assertEqual(1, coverage_check["generated_doc_catalog_count"])
 
+    def test_quality_gate_disables_python_bytecode_for_unit_tests(self):
+        with patch("uai_cli.quality_gate.build_command_manifest", return_value={"command_count": 1, "warnings": []}), patch(
+            "uai_cli.quality_gate.build_coverage_matrix",
+            return_value={
+                "command_count": 1,
+                "missing_doc": [],
+                "missing_implementation": [],
+                "missing_smoke": [],
+                "raw_generated_doc_count": 0,
+                "smoke_coverage": {"actionable_missing_count": 0, "p0_count": 0, "p1_count": 0},
+            },
+        ), patch("uai_cli.quality_gate.verify_pak_layout", return_value={"success": True, "issues": [], "warnings": []}), patch(
+            "uai_cli.quality_gate.subprocess.run"
+        ) as run_mock:
+            run_mock.return_value.returncode = 0
+            run_mock.return_value.stdout = ""
+            run_mock.return_value.stderr = ""
+
+            result = run_quality_gate(CURRENT.parents[1], run_tests=True)
+
+        self.assertTrue(result["success"])
+        self.assertEqual("1", run_mock.call_args.kwargs["env"]["PYTHONDONTWRITEBYTECODE"])
+
 
 if __name__ == "__main__":
     unittest.main()

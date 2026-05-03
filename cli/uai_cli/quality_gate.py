@@ -3,6 +3,7 @@ from __future__ import annotations
 import subprocess
 import sys
 from pathlib import Path
+import os
 from typing import Any
 
 from .command_manifest import build_command_manifest
@@ -57,12 +58,15 @@ def run_quality_gate(app_root: Path, *, run_tests: bool = False) -> dict[str, An
     )
 
     if run_tests:
+        env = dict(os.environ)
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
         proc = subprocess.run(
             [sys.executable, "-m", "unittest", "discover", "-s", "tests"],
             cwd=app_root,
             text=True,
             capture_output=True,
             timeout=120,
+            env=env,
         )
         checks.append(
             {

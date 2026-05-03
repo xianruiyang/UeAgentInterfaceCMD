@@ -1,18 +1,18 @@
 {
   "schema": "ue_agent_interface.coverage_matrix.v2",
-  "generated_at": "20260502_153515_745444",
+  "generated_at": "20260503_102249_734337",
   "project_root": "D:\\program\\UE\\GptProjectTest",
-  "command_count": 746,
+  "command_count": 827,
   "missing_doc": [],
   "missing_implementation": [],
   "missing_smoke": [],
   "smoke_debt": [],
   "smoke_coverage": {
     "status_counts": {
-      "direct": 746
+      "direct": 827
     },
     "priority_counts": {
-      "covered": 746
+      "covered": 827
     },
     "actionable_missing": [],
     "p0_commands": [],
@@ -2409,6 +2409,7 @@
         "Source/UeAgentInterface/Private/Commands/Blueprint/UeAgentHttpServer_Blueprint_AssetAndViewport.inl"
       ],
       "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp",
         "Source/UeAgentInterfaceTests/Private/Smoke/UeAgentInterfaceSmoke_BlueprintUmg.cpp"
       ],
       "smoke_coverage_status": "direct",
@@ -2500,6 +2501,7 @@
         "Source/UeAgentInterface/Private/Commands/Blueprint/UeAgentHttpServer_Blueprint_AssetAndViewport.inl"
       ],
       "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp",
         "Source/UeAgentInterfaceTests/Private/Smoke/UeAgentInterfaceSmoke_BlueprintUmg.cpp"
       ],
       "smoke_coverage_status": "direct",
@@ -2572,6 +2574,7 @@
         "Source/UeAgentInterface/Private/Commands/Blueprint/UeAgentHttpServer_Blueprint_AssetAndViewport.inl"
       ],
       "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp",
         "Source/UeAgentInterfaceTests/Private/Smoke/UeAgentInterfaceSmoke_BlueprintUmg.cpp"
       ],
       "smoke_coverage_status": "direct",
@@ -3329,6 +3332,348 @@
       ],
       "smoke_files": [
         "Source/UeAgentInterfaceTests/Private/Smoke/UeAgentInterfaceSmoke_Coverage.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_asset_apply_json",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_asset_create",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_asset_diff_json",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_asset_export_json",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_asset_validate_json",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_layer_apply_asset_json",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_layer_create_asset",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_layer_create_instance",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_layer_delete_instance",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_layer_query",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_layer_set_actor_membership",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_layer_set_state",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_layer_validate",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_table_apply_json",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_table_diff_json",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_table_export_json",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_table_query_rows",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_table_sample_rows",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "data_table_validate_json",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
       ],
       "smoke_coverage_status": "direct",
       "smoke_coverage_priority": "covered",
@@ -4114,6 +4459,150 @@
       "smoke_coverage_actionable": false
     },
     {
+      "command": "hlod_assign_actors",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "hlod_build",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "hlod_layer_apply_json",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "hlod_layer_create_json",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "hlod_layer_export_json",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "hlod_layer_validate_json",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "hlod_query_actors",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "hlod_validate_build",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
       "command": "ik_retargeter_apply_folder",
       "doc_file": "docs/commands/14_IKRig_IKRetargeter.md",
       "doc_status": "explicit",
@@ -4582,6 +5071,96 @@
       "smoke_coverage_actionable": false
     },
     {
+      "command": "level_actor_apply_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_actor_diff_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_actor_export_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_actor_snapshot_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_actor_validate_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
       "command": "level_add_actor_tag",
       "doc_file": "docs/commands/01_Core_Level_Assets_Landscape.md",
       "doc_status": "explicit",
@@ -4700,6 +5279,170 @@
       ],
       "smoke_files": [
         "Source/UeAgentInterfaceTests/Private/Smoke/UeAgentInterfaceSmoke_Coverage.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_content_apply_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp",
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp",
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_content_delete_scope",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_content_diff_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_content_merge_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_content_plan_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_content_query_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_content_repair_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_content_snapshot_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_content_validate_json",
+      "doc_file": "docs/commands/23_LevelContent_JSON.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp"
       ],
       "smoke_coverage_status": "direct",
       "smoke_coverage_priority": "covered",
@@ -5104,6 +5847,150 @@
       "smoke_coverage_actionable": false
     },
     {
+      "command": "level_streaming_add_existing",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_streaming_create_level",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_streaming_move_actors",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_streaming_query",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_streaming_remove",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_streaming_save",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_streaming_set_state",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_streaming_validate",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
       "command": "level_sweep_capsule",
       "doc_file": "docs/commands/01_Core_Level_Assets_Landscape.md",
       "doc_status": "explicit",
@@ -5140,6 +6027,96 @@
       "smoke_coverage_actionable": false
     },
     {
+      "command": "level_topology_apply_json",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_topology_diff_json",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_topology_export_json",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_topology_set_actor_assignments",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "level_topology_validate_json",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
       "command": "level_trace_world_ray",
       "doc_file": "docs/commands/01_Core_Level_Assets_Landscape.md",
       "doc_status": "explicit",
@@ -5149,6 +6126,7 @@
         "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
       ],
       "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelContentJson/UeAgentInterfaceLevelContentJsonSmokeTests.cpp",
         "Source/UeAgentInterfaceTests/Private/Smoke/UeAgentInterfaceSmoke_LevelViewportModeling.cpp"
       ],
       "smoke_coverage_status": "direct",
@@ -9029,6 +10007,294 @@
       "smoke_coverage_actionable": false
     },
     {
+      "command": "physical_material_apply_json",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physical_material_export_json",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physical_material_validate_json",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physics_asset_apply_folder",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physics_asset_export_folder",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physics_asset_validate_folder",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physics_capabilities_query",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physics_component_plan_patch",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physics_component_query",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physics_component_validate",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physics_constraint_apply_json",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physics_constraint_export_json",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physics_constraint_validate_json",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "physics_runtime_probe",
+      "doc_file": "docs/commands/26_Physics_Baseline.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/Physics/UeAgentHttpServer_Physics.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/Physics/UeAgentInterfacePhysicsSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "primary_asset_scan_assets",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "primary_asset_validate_asset",
+      "doc_file": "docs/commands/24_DataDriven_DataAsset_DataTable.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/DataDriven/UeAgentHttpServer_DataDriven.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/DataDriven/UeAgentInterfaceDataDrivenSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
       "command": "project_settings_apply_page",
       "doc_file": "docs/commands/22_ProjectSettings_Config.md",
       "doc_status": "explicit",
@@ -11892,7 +13158,7 @@
         "Source/UeAgentInterface/Private/Commands/StaticMesh/UeAgentHttpServer_StaticMesh.cpp"
       ],
       "smoke_files": [
-        "Source/UeAgentInterfaceTests/Private/Smoke/UeAgentInterfaceSmoke_Coverage.cpp"
+        "Source/UeAgentInterfaceTests/Private/Smoke/UeAgentInterfaceSmoke_MaterialStaticDeformerInput.cpp"
       ],
       "smoke_coverage_status": "direct",
       "smoke_coverage_priority": "covered",
@@ -13272,6 +14538,24 @@
       "smoke_coverage_actionable": false
     },
     {
+      "command": "viewport_get_warnings",
+      "doc_file": "docs/commands/01_Core_Level_Assets_Landscape.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Server/UeAgentHttpServer.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/UeAgentInterfaceSmoke_LevelViewportModeling.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
       "command": "viewport_pick_actor_at_screen",
       "doc_file": "docs/commands/01_Core_Level_Assets_Landscape.md",
       "doc_status": "explicit",
@@ -13462,6 +14746,186 @@
       ],
       "smoke_files": [
         "Source/UeAgentInterfaceTests/Private/Smoke/UeAgentInterfaceTextureRenderTargetSmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "world_partition_check_errors",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "world_partition_generate_streaming",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "world_partition_list_loaded_regions",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "world_partition_load_actors",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "world_partition_load_region",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "world_partition_query",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "world_partition_resave_actors",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "world_partition_set_streaming_enabled",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "world_partition_unload_actors",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
+      ],
+      "smoke_coverage_status": "direct",
+      "smoke_coverage_priority": "covered",
+      "smoke_coverage_reason": "command is directly referenced by an automation smoke test",
+      "smoke_coverage_recommended_action": "keep existing smoke coverage",
+      "smoke_coverage_actionable": false
+    },
+    {
+      "command": "world_partition_unload_region",
+      "doc_file": "docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md",
+      "doc_status": "explicit",
+      "implemented": true,
+      "smoke_tested": true,
+      "implementation_files": [
+        "Source/UeAgentInterface/Private/Commands/LevelTopology/UeAgentHttpServer_LevelTopology.cpp"
+      ],
+      "smoke_files": [
+        "Source/UeAgentInterfaceTests/Private/Smoke/LevelTopology/UeAgentInterfaceLevelTopologySmokeTests.cpp"
       ],
       "smoke_coverage_status": "direct",
       "smoke_coverage_priority": "covered",

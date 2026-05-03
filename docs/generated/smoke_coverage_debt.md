@@ -4,8 +4,8 @@
 
 ## Summary
 
-- generated_at: `20260502_153515_745444`
-- command_count: `746`
+- generated_at: `20260503_102249_734337`
+- command_count: `827`
 - direct_smoke_missing: `0`
 - actionable_missing: `0`
 - p0_count: `0`
@@ -15,13 +15,13 @@
 
 | Status | Count |
 | --- | --- |
-| `direct` | 746 |
+| `direct` | 827 |
 
 ## Priority Counts
 
 | Priority | Count |
 | --- | --- |
-| `covered` | 746 |
+| `covered` | 827 |
 
 ## Debt Items
 

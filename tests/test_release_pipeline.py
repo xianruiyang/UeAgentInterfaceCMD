@@ -11,8 +11,10 @@ CLI_DIR = CURRENT.parents[1] / "cli"
 sys.path.insert(0, str(CLI_DIR))
 
 from uai_cli.release_pipeline import (  # noqa: E402
+    build_release_hygiene_check,
     build_release_sync_check,
     mirror_development_to_pak,
+    run_formal_release_gate,
     verify_release_pipeline,
     write_release_manifest,
 )
@@ -126,6 +128,127 @@ class ReleasePipelineTests(unittest.TestCase):
         self.assertEqual("test", result["release_id"])
         self.assertIn("dev_plugin", result["repos"])
         self.assertIn("coverage", result)
+
+    def test_release_hygiene_detects_forbidden_runtime_logs_in_pak(self):
+        root = self._make_project()
+        log_file = root / "UeAgentInterfacePak" / "runtimeLogs" / "old.log"
+        log_file.parent.mkdir(parents=True)
+        log_file.write_text("old\n", encoding="utf-8")
+
+        result = build_release_hygiene_check(root)
+        self.assertFalse(result["success"])
+        self.assertGreaterEqual(result["issue_count"], 1)
+        self.assertTrue(any("runtimeLogs" in issue for issue in result["issues"]))
+
+    def test_release_hygiene_allows_reports_gitkeep(self):
+        root = self._make_project()
+        gitkeep = root / "UeAgentInterfacePak" / "UeAgentInterfaceCMD" / "reports" / ".gitkeep"
+        gitkeep.parent.mkdir(parents=True)
+        gitkeep.write_text("", encoding="utf-8")
+
+        result = build_release_hygiene_check(root)
+        self.assertTrue(result["success"], result["issues"])
+
+    def test_formal_release_gate_fails_on_hygiene_issue(self):
+        root = self._make_project()
+        (root / "UeAgentInterfacePak" / "runtimeLogs").mkdir()
+        (root / "UeAgentInterfacePak" / "runtimeLogs" / "old.log").write_text("old\n", encoding="utf-8")
+        coverage = {
+            "command_count": 1,
+            "missing_doc": [],
+            "missing_implementation": [],
+            "missing_smoke": [],
+            "raw_generated_doc_count": 0,
+            "smoke_coverage": {"actionable_missing_count": 0, "p0_count": 0, "p1_count": 0},
+        }
+        gate = {"success": True, "checks": []}
+        pak = {"success": True, "issues": [], "warnings": []}
+        with patch("uai_cli.release_pipeline.build_coverage_matrix", return_value=coverage), patch(
+            "uai_cli.release_pipeline.run_quality_gate", return_value=gate
+        ), patch("uai_cli.release_pipeline.verify_pak_layout", return_value=pak):
+            result = run_formal_release_gate(root / "UeAgentInterfaceCMD", root, run_tests=False, allow_dirty=True)
+
+        self.assertFalse(result["success"])
+        self.assertIn("release_hygiene_failed", result["issues"])
+
+    def test_formal_release_gate_writes_ci_report(self):
+        root = self._make_project()
+        coverage = {
+            "command_count": 1,
+            "missing_doc": [],
+            "missing_implementation": [],
+            "missing_smoke": [],
+            "raw_generated_doc_count": 0,
+            "smoke_coverage": {"actionable_missing_count": 0, "p0_count": 0, "p1_count": 0},
+        }
+        gate = {"success": True, "checks": []}
+        pak = {"success": True, "issues": [], "warnings": []}
+        output = root / "reports" / "ci.json"
+        with patch("uai_cli.release_pipeline.build_coverage_matrix", return_value=coverage), patch(
+            "uai_cli.release_pipeline.run_quality_gate", return_value=gate
+        ), patch("uai_cli.release_pipeline.verify_pak_layout", return_value=pak):
+            result = run_formal_release_gate(
+                root / "UeAgentInterfaceCMD",
+                root,
+                run_tests=False,
+                allow_dirty=True,
+                ci_output=output,
+            )
+
+        self.assertTrue(result["success"], result["issues"])
+        self.assertTrue(output.exists())
+        self.assertEqual(str(output), result["ci_output"])
+
+    def test_formal_release_gate_runs_pak_cli_quality_gate(self):
+        root = self._make_project()
+        coverage = {
+            "command_count": 1,
+            "missing_doc": [],
+            "missing_implementation": [],
+            "missing_smoke": [],
+            "raw_generated_doc_count": 0,
+            "smoke_coverage": {"actionable_missing_count": 0, "p0_count": 0, "p1_count": 0},
+        }
+        dev_gate = {"success": True, "checks": [{"name": "dev", "success": True}]}
+        pak_gate = {"success": False, "checks": [{"name": "pak_tests", "success": False}]}
+        pak = {"success": True, "issues": [], "warnings": []}
+        with patch("uai_cli.release_pipeline.build_coverage_matrix", return_value=coverage), patch(
+            "uai_cli.release_pipeline.run_quality_gate", side_effect=[dev_gate, pak_gate]
+        ), patch("uai_cli.release_pipeline.verify_pak_layout", return_value=pak):
+            result = run_formal_release_gate(root / "UeAgentInterfaceCMD", root, run_tests=True, allow_dirty=True)
+
+        self.assertFalse(result["success"])
+        self.assertIn("pak_quality_gate_failed", result["issues"])
+        self.assertEqual(pak_gate, result["pak_quality_gate"])
+
+    def test_formal_release_gate_cleans_test_artifacts_before_final_hygiene(self):
+        root = self._make_project()
+        coverage = {
+            "command_count": 1,
+            "missing_doc": [],
+            "missing_implementation": [],
+            "missing_smoke": [],
+            "raw_generated_doc_count": 0,
+            "smoke_coverage": {"actionable_missing_count": 0, "p0_count": 0, "p1_count": 0},
+        }
+        pak = {"success": True, "issues": [], "warnings": []}
+        pak_log = root / "UeAgentInterfacePak" / "UeAgentInterfaceCMD" / "logs" / "uai_cli_test.log"
+
+        def fake_quality_gate(app_root: Path, *, run_tests: bool = False):
+            if "UeAgentInterfacePak" in app_root.as_posix():
+                pak_log.parent.mkdir(parents=True, exist_ok=True)
+                pak_log.write_text("generated by tests\n", encoding="utf-8")
+            return {"success": True, "checks": []}
+
+        with patch("uai_cli.release_pipeline.build_coverage_matrix", return_value=coverage), patch(
+            "uai_cli.release_pipeline.run_quality_gate", side_effect=fake_quality_gate
+        ), patch("uai_cli.release_pipeline.verify_pak_layout", return_value=pak):
+            result = run_formal_release_gate(root / "UeAgentInterfaceCMD", root, run_tests=True, allow_dirty=True)
+
+        self.assertTrue(result["success"], result["issues"])
+        self.assertFalse(pak_log.exists())
+        self.assertTrue(result["release_hygiene_after_tests"]["success"])
+        self.assertTrue(any(item["removed_count"] > 0 for item in result["test_artifact_cleanup"]))
 
 
 if __name__ == "__main__":

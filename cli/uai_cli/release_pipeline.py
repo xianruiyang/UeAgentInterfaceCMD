@@ -8,7 +8,7 @@ from typing import Any
 
 from .project_paths import find_development_project_root, find_pak_root
 from .quality_gate import run_quality_gate
-from .release_verify import build_coverage_matrix
+from .release_verify import build_coverage_matrix, verify_pak_layout, write_coverage_matrix
 from .utils import now_compact, save_json_file
 
 
@@ -28,6 +28,26 @@ TREE_EXCLUDED_DIRS = {
     "tmp",
 }
 TREE_EXCLUDED_SUFFIXES = {".pyc", ".pyo", ".log", ".tmp"}
+
+RELEASE_FORBIDDEN_DIRS = {
+    ".pytest_cache",
+    "__pycache__",
+    "Binaries",
+    "DerivedDataCache",
+    "Intermediate",
+    "Saved",
+    "build_tmp",
+    "logs",
+    "reports",
+    "runtimeLogs",
+    "tmp",
+}
+
+RELEASE_FORBIDDEN_SUFFIXES = {".log", ".tmp", ".pyc", ".pyo"}
+
+RELEASE_ALLOWED_FORBIDDEN_FILES = {
+    "UeAgentInterfaceCMD/reports/.gitkeep",
+}
 
 
 def _run_git(path: Path, args: list[str], *, timeout: int = 30) -> dict[str, Any]:
@@ -184,6 +204,130 @@ def _tree_hash(root: Path) -> dict[str, Any]:
     fallback = _working_tree_hash(root)
     fallback["mode"] = "working_tree"
     return fallback
+
+
+def _is_release_forbidden_path(path: Path, release_root: Path) -> str:
+    relative = path.relative_to(release_root).as_posix()
+    if relative in RELEASE_ALLOWED_FORBIDDEN_FILES:
+        return ""
+    parts = set(path.relative_to(release_root).parts)
+    forbidden_dirs = sorted(parts.intersection(RELEASE_FORBIDDEN_DIRS))
+    if forbidden_dirs:
+        return f"forbidden_dir:{forbidden_dirs[0]}:{relative}"
+    if path.suffix in RELEASE_FORBIDDEN_SUFFIXES:
+        return f"forbidden_suffix:{path.suffix}:{relative}"
+    return ""
+
+
+def build_release_hygiene_check(project_root: Path | None = None) -> dict[str, Any]:
+    root = project_root or find_development_project_root(Path.cwd())
+    if root is None:
+        return {
+            "schema": "ue_agent_interface.release_hygiene.v1",
+            "generated_at": now_compact(),
+            "success": False,
+            "issues": ["project_root_not_found"],
+            "scanned_file_count": 0,
+        }
+
+    pak_root = find_pak_root(root) or (root / "UeAgentInterfacePak")
+    if not pak_root.exists():
+        return {
+            "schema": "ue_agent_interface.release_hygiene.v1",
+            "generated_at": now_compact(),
+            "success": False,
+            "project_root": str(root),
+            "pak_root": str(pak_root),
+            "issues": ["pak_root_not_found"],
+            "scanned_file_count": 0,
+        }
+
+    issues: list[str] = []
+    scanned_file_count = 0
+    for path in sorted(pak_root.rglob("*"), key=lambda item: item.as_posix()):
+        if ".git" in path.relative_to(pak_root).parts:
+            continue
+        if path.is_dir():
+            continue
+        scanned_file_count += 1
+        issue = _is_release_forbidden_path(path, pak_root)
+        if issue:
+            issues.append(issue)
+
+    return {
+        "schema": "ue_agent_interface.release_hygiene.v1",
+        "generated_at": now_compact(),
+        "success": not issues,
+        "project_root": str(root),
+        "pak_root": str(pak_root),
+        "issues": issues[:500],
+        "issue_count": len(issues),
+        "scanned_file_count": scanned_file_count,
+        "forbidden_dirs": sorted(RELEASE_FORBIDDEN_DIRS),
+        "forbidden_suffixes": sorted(RELEASE_FORBIDDEN_SUFFIXES),
+        "allowed_exceptions": sorted(RELEASE_ALLOWED_FORBIDDEN_FILES),
+    }
+
+
+def _cleanup_cli_gate_artifacts(cli_root: Path, *, keep_logs: bool = False) -> list[str]:
+    removed: list[str] = []
+    if not cli_root.exists():
+        return removed
+
+    names = ["tmp", "build_tmp", ".pytest_cache"]
+    if not keep_logs:
+        names.insert(0, "logs")
+    for name in names:
+        target = cli_root / name
+        if target.exists():
+            if target.is_dir():
+                try:
+                    shutil.rmtree(target)
+                except OSError as error:
+                    removed.append(f"skipped:{target}:{error}")
+                    continue
+            else:
+                try:
+                    target.unlink()
+                except OSError as error:
+                    removed.append(f"skipped:{target}:{error}")
+                    continue
+            removed.append(str(target))
+
+    reports_dir = cli_root / "reports"
+    if reports_dir.exists():
+        for path in sorted(reports_dir.rglob("*"), key=lambda item: len(item.parts), reverse=True):
+            if path == reports_dir:
+                continue
+            if path.name == ".gitkeep" and path.parent == reports_dir:
+                continue
+            if path.is_dir():
+                try:
+                    path.rmdir()
+                except OSError:
+                    continue
+            else:
+                path.unlink()
+                removed.append(str(path))
+        try:
+            reports_dir.rmdir()
+            removed.append(str(reports_dir))
+        except OSError:
+            pass
+
+    for cache_dir in sorted(cli_root.rglob("__pycache__"), key=lambda item: len(item.parts), reverse=True):
+        if ".git" in cache_dir.parts:
+            continue
+        shutil.rmtree(cache_dir)
+        removed.append(str(cache_dir))
+
+    for cache_file in sorted(cli_root.rglob("*.py[co]"), key=lambda item: item.as_posix()):
+        if ".git" in cache_file.parts:
+            continue
+        cache_file.unlink()
+        removed.append(str(cache_file))
+
+    return removed
 
 
 def _release_paths(project_root: Path) -> dict[str, Path]:
@@ -408,6 +552,147 @@ def verify_release_pipeline(
         },
         "quality_gate": gate,
     }
+
+
+def _coverage_summary(coverage: dict[str, Any]) -> dict[str, Any]:
+    smoke_coverage = coverage.get("smoke_coverage", {})
+    return {
+        "command_count": coverage.get("command_count", 0),
+        "missing_doc_count": len(coverage.get("missing_doc", [])),
+        "missing_implementation_count": len(coverage.get("missing_implementation", [])),
+        "missing_smoke_count": len(coverage.get("missing_smoke", [])),
+        "generated_doc_catalog_count": coverage.get("raw_generated_doc_count", 0),
+        "smoke_actionable_missing_count": smoke_coverage.get("actionable_missing_count", 0)
+        if isinstance(smoke_coverage, dict)
+        else 0,
+        "smoke_p0_count": smoke_coverage.get("p0_count", 0) if isinstance(smoke_coverage, dict) else 0,
+        "smoke_p1_count": smoke_coverage.get("p1_count", 0) if isinstance(smoke_coverage, dict) else 0,
+    }
+
+
+def run_formal_release_gate(
+    app_root: Path,
+    project_root: Path | None = None,
+    *,
+    run_tests: bool = True,
+    allow_dirty: bool = False,
+    write_coverage: bool = False,
+    ci_output: Path | None = None,
+) -> dict[str, Any]:
+    root = project_root or find_development_project_root(app_root)
+    if root is None:
+        return {
+            "schema": "ue_agent_interface.release_ci_gate.v1",
+            "generated_at": now_compact(),
+            "success": False,
+            "issues": ["project_root_not_found"],
+        }
+
+    coverage_output: dict[str, Any] = {"written": False}
+    if write_coverage:
+        generated_dir = app_root / "docs" / "generated"
+        coverage = write_coverage_matrix(
+            generated_dir / "command_coverage_matrix.json",
+            generated_dir / "command_coverage_matrix.md",
+            root,
+        )
+        coverage_output = {
+            "written": True,
+            "json_file": str(generated_dir / "command_coverage_matrix.json"),
+            "markdown_file": str(generated_dir / "command_coverage_matrix.md"),
+            "generated_catalog_file": coverage.get("generated_catalog_file", ""),
+            "smoke_debt_file": coverage.get("smoke_debt_file", ""),
+        }
+    else:
+        coverage = build_coverage_matrix(root)
+
+    sync_check = build_release_sync_check(root)
+    pak_verify = verify_pak_layout(root)
+    hygiene = build_release_hygiene_check(root)
+    pak_cli_root = root / "UeAgentInterfacePak" / "UeAgentInterfaceCMD"
+    quality_gate = run_quality_gate(app_root, run_tests=run_tests)
+    if pak_cli_root.exists():
+        pak_quality_gate = run_quality_gate(pak_cli_root, run_tests=run_tests)
+    else:
+        pak_quality_gate = {
+            "success": False,
+            "checks": [
+                {
+                    "name": "pak_cli_root",
+                    "success": False,
+                    "details": {"path": str(pak_cli_root), "error": "missing"},
+                }
+            ],
+        }
+
+    test_artifact_cleanup: list[dict[str, Any]] = []
+    if run_tests:
+        dev_removed = _cleanup_cli_gate_artifacts(app_root, keep_logs=True)
+        test_artifact_cleanup.append(
+            {"path": str(app_root), "removed": dev_removed, "removed_count": len(dev_removed), "kept_logs": True}
+        )
+        pak_removed = _cleanup_cli_gate_artifacts(pak_cli_root)
+        test_artifact_cleanup.append(
+            {"path": str(pak_cli_root), "removed": pak_removed, "removed_count": len(pak_removed), "kept_logs": False}
+        )
+    hygiene_after_tests = build_release_hygiene_check(root)
+
+    issues: list[str] = []
+    for issue in sync_check.get("issues", []):
+        issues.append(f"sync:{issue}")
+    if not allow_dirty:
+        for name, state in sync_check.get("repos", {}).items():
+            if isinstance(state, dict) and state.get("dirty"):
+                issues.append(f"dirty_worktree:{name}")
+
+    if coverage.get("missing_doc"):
+        issues.append("coverage:missing_doc")
+    if coverage.get("missing_implementation"):
+        issues.append("coverage:missing_implementation")
+    if coverage.get("missing_smoke"):
+        issues.append("coverage:missing_smoke")
+    if int(coverage.get("raw_generated_doc_count", 0) or 0) > 0:
+        issues.append("coverage:generated_doc_catalog")
+
+    if not pak_verify.get("success", False):
+        issues.append("pak_verify_failed")
+    for warning in pak_verify.get("warnings", []):
+        issues.append(f"pak_warning:{warning}")
+
+    if not hygiene.get("success", False):
+        issues.append("release_hygiene_failed")
+    if not hygiene_after_tests.get("success", False):
+        issues.append("release_hygiene_after_tests_failed")
+
+    if not quality_gate.get("success", False):
+        issues.append("quality_gate_failed")
+    if not pak_quality_gate.get("success", False):
+        issues.append("pak_quality_gate_failed")
+
+    result = {
+        "schema": "ue_agent_interface.release_ci_gate.v1",
+        "generated_at": now_compact(),
+        "success": not issues,
+        "project_root": str(root),
+        "app_root": str(app_root),
+        "run_tests": run_tests,
+        "allow_dirty": allow_dirty,
+        "write_coverage": write_coverage,
+        "issues": sorted(set(issues)),
+        "coverage_output": coverage_output,
+        "coverage_summary": _coverage_summary(coverage),
+        "sync_check": sync_check,
+        "pak_verify": pak_verify,
+        "release_hygiene": hygiene,
+        "release_hygiene_after_tests": hygiene_after_tests,
+        "test_artifact_cleanup": test_artifact_cleanup,
+        "quality_gate": quality_gate,
+        "pak_quality_gate": pak_quality_gate,
+    }
+    if ci_output is not None:
+        save_json_file(ci_output, result)
+        result["ci_output"] = str(ci_output)
+    return result
 
 
 def write_release_manifest(

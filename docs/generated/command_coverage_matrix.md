@@ -1,7 +1,7 @@
 # UAI Command Coverage Matrix
 
-- generated_at: `20260502_153515_745444`
-- command_count: `746`
+- generated_at: `20260503_102249_734337`
+- command_count: `827`
 - missing_doc: `0`
 - missing_implementation: `0`
 - missing_smoke: `0`
@@ -16,7 +16,7 @@
 
 | Status | Count |
 | --- | --- |
-| `direct` | 746 |
+| `direct` | 827 |
 
 ## Commands
 
@@ -206,6 +206,25 @@
 | `control_rig_viewport_set_camera` | `docs/commands/17_ControlRig_FolderFormat.md` | True | True | `direct` | `covered` |
 | `curve_apply_json` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `curve_export_json` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
+| `data_asset_apply_json` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
+| `data_asset_create` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
+| `data_asset_diff_json` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
+| `data_asset_export_json` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
+| `data_asset_validate_json` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
+| `data_layer_apply_asset_json` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `data_layer_create_asset` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `data_layer_create_instance` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `data_layer_delete_instance` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `data_layer_query` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `data_layer_set_actor_membership` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `data_layer_set_state` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `data_layer_validate` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `data_table_apply_json` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
+| `data_table_diff_json` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
+| `data_table_export_json` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
+| `data_table_query_rows` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
+| `data_table_sample_rows` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
+| `data_table_validate_json` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
 | `deformer_graph_apply_folder` | `docs/commands/18_Deformer_MLDeformer_GeometryCache.md` | True | True | `direct` | `covered` |
 | `deformer_graph_compile` | `docs/commands/18_Deformer_MLDeformer_GeometryCache.md` | True | True | `direct` | `covered` |
 | `deformer_graph_create` | `docs/commands/18_Deformer_MLDeformer_GeometryCache.md` | True | True | `direct` | `covered` |
@@ -249,6 +268,14 @@
 | `geometry_cache_screenshot_frame` | `docs/commands/18_Deformer_MLDeformer_GeometryCache.md` | True | True | `direct` | `covered` |
 | `geometry_cache_validate_against_skeletal_mesh` | `docs/commands/18_Deformer_MLDeformer_GeometryCache.md` | True | True | `direct` | `covered` |
 | `get_world_state` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
+| `hlod_assign_actors` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `hlod_build` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `hlod_layer_apply_json` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `hlod_layer_create_json` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `hlod_layer_export_json` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `hlod_layer_validate_json` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `hlod_query_actors` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `hlod_validate_build` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
 | `ik_retargeter_apply_folder` | `docs/commands/14_IKRig_IKRetargeter.md` | True | True | `direct` | `covered` |
 | `ik_retargeter_auto_align_pose` | `docs/commands/14_IKRig_IKRetargeter.md` | True | True | `direct` | `covered` |
 | `ik_retargeter_auto_map_chains` | `docs/commands/14_IKRig_IKRetargeter.md` | True | True | `direct` | `covered` |
@@ -275,6 +302,11 @@
 | `ik_rig_validate_folder` | `docs/commands/14_IKRig_IKRetargeter.md` | True | True | `direct` | `covered` |
 | `landscape_create` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `landscape_raise_circle` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
+| `level_actor_apply_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
+| `level_actor_diff_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
+| `level_actor_export_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
+| `level_actor_snapshot_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
+| `level_actor_validate_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
 | `level_add_actor_tag` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `level_align_actor_by_bounds` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `level_align_actor_vertex_to_vertex` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
@@ -282,6 +314,15 @@
 | `level_attach_actor` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `level_check_overlaps` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `level_cleanup_empty_folders` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
+| `level_content_apply_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
+| `level_content_delete_scope` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
+| `level_content_diff_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
+| `level_content_merge_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
+| `level_content_plan_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
+| `level_content_query_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
+| `level_content_repair_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
+| `level_content_snapshot_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
+| `level_content_validate_json` | `docs/commands/23_LevelContent_JSON.md` | True | True | `direct` | `covered` |
 | `level_destroy_folder_actors` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `level_detach_actor` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `level_duplicate_actor` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
@@ -304,8 +345,21 @@
 | `level_set_skeletal_mesh_morph_target` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `level_snap_to_surface` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `level_spawn_wall_with_opening` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
+| `level_streaming_add_existing` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `level_streaming_create_level` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `level_streaming_move_actors` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `level_streaming_query` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `level_streaming_remove` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `level_streaming_save` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `level_streaming_set_state` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `level_streaming_validate` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
 | `level_sweep_capsule` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `level_sweep_capsule_path` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
+| `level_topology_apply_json` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `level_topology_diff_json` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `level_topology_export_json` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `level_topology_set_actor_assignments` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `level_topology_validate_json` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
 | `level_trace_world_ray` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `level_validate_connectivity` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `light_profile_texture_get_info` | `docs/commands/21_Texture_RenderTarget_Media.md` | True | True | `direct` | `covered` |
@@ -522,6 +576,22 @@
 | `paper_tilemap_export_folder` | `docs/commands/21_Texture_RenderTarget_Media.md` | True | True | `direct` | `covered` |
 | `paper_tileset_apply_folder` | `docs/commands/21_Texture_RenderTarget_Media.md` | True | True | `direct` | `covered` |
 | `paper_tileset_export_folder` | `docs/commands/21_Texture_RenderTarget_Media.md` | True | True | `direct` | `covered` |
+| `physical_material_apply_json` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physical_material_export_json` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physical_material_validate_json` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physics_asset_apply_folder` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physics_asset_export_folder` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physics_asset_validate_folder` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physics_capabilities_query` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physics_component_plan_patch` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physics_component_query` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physics_component_validate` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physics_constraint_apply_json` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physics_constraint_export_json` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physics_constraint_validate_json` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `physics_runtime_probe` | `docs/commands/26_Physics_Baseline.md` | True | True | `direct` | `covered` |
+| `primary_asset_scan_assets` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
+| `primary_asset_validate_asset` | `docs/commands/24_DataDriven_DataAsset_DataTable.md` | True | True | `direct` | `covered` |
 | `project_settings_apply_page` | `docs/commands/22_ProjectSettings_Config.md` | True | True | `direct` | `covered` |
 | `project_settings_diff_page` | `docs/commands/22_ProjectSettings_Config.md` | True | True | `direct` | `covered` |
 | `project_settings_export_index` | `docs/commands/22_ProjectSettings_Config.md` | True | True | `direct` | `covered` |
@@ -757,6 +827,7 @@
 | `viewport_frame_folder` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `viewport_frame_selection` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `viewport_get_camera` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
+| `viewport_get_warnings` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `viewport_pick_actor_at_screen` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `viewport_select_actor_at_screen` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
 | `viewport_set_camera` | `docs/commands/01_Core_Level_Assets_Landscape.md` | True | True | `direct` | `covered` |
@@ -768,3 +839,13 @@
 | `volume_texture_apply_folder` | `docs/commands/21_Texture_RenderTarget_Media.md` | True | True | `direct` | `covered` |
 | `volume_texture_create` | `docs/commands/21_Texture_RenderTarget_Media.md` | True | True | `direct` | `covered` |
 | `volume_texture_export_folder` | `docs/commands/21_Texture_RenderTarget_Media.md` | True | True | `direct` | `covered` |
+| `world_partition_check_errors` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `world_partition_generate_streaming` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `world_partition_list_loaded_regions` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `world_partition_load_actors` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `world_partition_load_region` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `world_partition_query` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `world_partition_resave_actors` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `world_partition_set_streaming_enabled` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `world_partition_unload_actors` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |
+| `world_partition_unload_region` | `docs/commands/25_LevelTopology_Streaming_WorldPartition_DataLayer_HLOD.md` | True | True | `direct` | `covered` |

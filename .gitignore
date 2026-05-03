@@ -9,11 +9,20 @@ build_tmp/
 logs/
 runtimeLogs/
 reports/*.json
+reports/**/*.json
 !reports/.gitkeep
 reports/_tmp/
 dist/reports/*.json
+dist/reports/**/*.json
 dist/logs/*.log
+dist/tmp/
 
 # Python 缓存
 __pycache__/
 *.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/

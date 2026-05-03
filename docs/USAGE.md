@@ -166,8 +166,15 @@ manifest 内同时包含从文档关键参数推导出的 `param_schema`。默�
 .\dist\uai-cli.exe release sync-check --json-output
 .\dist\uai-cli.exe release dev-mirror --dry-run --json-output
 .\dist\uai-cli.exe release verify --run-tests --json-output
+.\dist\uai-cli.exe release ci --json-output --ci-output .\reports\release_ci.json
 .\dist\uai-cli.exe release manifest --release-id 2026.05.02 --json-output
 ```
+
+`release ci` is the formal CI gate entrypoint. It runs coverage checks, sync-check, Pak verify, release-package hygiene checks, Dev CLI unit tests and Pak CLI unit tests by default, then returns one machine-readable gate result. It rejects dirty related worktrees unless `--allow-dirty` is explicitly used for local diagnostics. It also rejects release-package artifacts such as `runtimeLogs/`, `logs/`, report payloads, `tmp/`, `.pytest_cache/`, `__pycache__/`, `Binaries/`, `Intermediate/`, `Saved/` and `DerivedDataCache/` inside `UeAgentInterfacePak`. Test-generated CLI logs/cache are cleaned before the final hygiene pass so CI does not leave a polluted Pak tree behind.
+
+- Use `--skip-tests` only for fast local diagnosis.
+- Use `--write-coverage` when intentionally regenerating `docs/generated/*` before committing release docs.
+- Use `--ci-output <path>` to write the full formal gate JSON report as a CI artifact.
 
 `release coverage` 生成 `docs/generated/command_coverage_matrix.json|md`，汇总 `命令 -> 文档 -> 实现 -> smoke` 覆盖关系。所有已实现命令都必须出现在 automation smoke 源码或显式 smoke coverage ledger 中，否则 `missing_smoke` 会进入债务报告。
 `release pak-verify` 检查 Pak 目录关键文件、skill、CLI 与基础 hash 差异。`release examples` 生成 `examples/generated/` 里的只读 golden E2E 示例。`release gate` 汇总 manifest、coverage、Pak verify，可加 `--run-tests` 同时运行 CLI 单测；`missing_smoke` 不再只是提示，会让 gate 失败。
@@ -176,10 +183,13 @@ manifest 内同时包含从文档关键参数推导出的 `param_schema`。默�
 
 - `release sync-check`：只读检查开发插件/CLI、Pak 插件/CLI 的 commit、当前文件树 hash 和 dirty 状态。
 - `release dev-mirror`：把开发副本镜像到 Pak 副本，只用于本地临时验证；返回 `formal_release_allowed=false`，不能作为正式发布。
-- `release verify`：正式发布硬校验，默认禁止任一相关仓库 dirty，并要求 sync-check、coverage 和 quality gate 全部通过。
+- `release verify`：兼容的底层发布校验，默认禁止任一相关仓库 dirty，并要求 sync-check、coverage 和 quality gate 全部通过。
+- `release ci`：正式 CI / 发布门禁单入口，覆盖 `release verify` 的核心校验，并额外检查 Pak layout、发布包 hygiene、Dev CLI 测试和 Pak CLI 测试。
 - `release manifest`：生成 `UeAgentInterfacePak/releases/<release_id>/manifest.json`，记录 commit、tree hash、sync 状态和 coverage 摘要。
 
 正式发布不复制源码。插件和 CLI 应先分别提交/tag，再让 Pak 内 submodule checkout 到对应 commit；Pak 仓库只记录 gitlink、README、skills、release notes 和 manifest 等发布材料。
+
+GitHub 远端发布是明确的人工边界：CLI 和 Agent 可以准备本地提交、manifest、release notes、待执行命令清单和 gate report，但不执行 `git push`、创建 GitHub Release 或写入远端 tag。最后远端动作由项目维护者手动完成。
 
 ### 4.12 Golden E2E：`e2e`
 
