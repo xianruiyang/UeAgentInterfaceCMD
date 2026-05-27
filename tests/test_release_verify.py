@@ -72,6 +72,45 @@ class ReleaseVerifyTests(unittest.TestCase):
             self.assertEqual(rows["undo"]["doc_status"], "explicit")
             self.assertIn("foo_apply_folder", matrix["smoke_coverage"]["p0_commands"])
 
+    def test_deprecated_commands_are_documented_only_in_deprecated_docs(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "Test.uproject").write_text("{}", encoding="utf-8")
+            plugin = root / "Plugins" / "UeAgentInterface"
+            docs = plugin / "docs" / "commands"
+            deprecated_docs = docs / "deprecatedCommand"
+            source = plugin / "Source" / "UeAgentInterface" / "Private" / "Commands" / "Test"
+            deprecated_docs.mkdir(parents=True)
+            source.mkdir(parents=True)
+            (docs / "01_Test.md").write_text(
+                "# Test\n\n"
+                "| 指令 | 用途 | 关键参数 | 关键返回 |\n"
+                "| --- | --- | --- | --- |\n"
+                "| `foo_apply_folder` | workflow | `folder_path` | `ok` |\n",
+                encoding="utf-8",
+            )
+            (deprecated_docs / "01_Test.md").write_text(
+                "# Deprecated Test\n\n"
+                "| 指令 | 废弃说明 | 新流程 |\n"
+                "| --- | --- | --- |\n"
+                "| `foo_old_write` | **Deprecated for authoring** | `foo_apply_folder` |\n",
+                encoding="utf-8",
+            )
+            (source / "UeAgentHttpServer_Test.cpp").write_text(
+                'if (CommandLower == TEXT("foo_apply_folder")) return Cmd(Ctx, OutData, OutError);\n'
+                'if (CommandLower == TEXT("foo_old_write")) return Cmd(Ctx, OutData, OutError);\n',
+                encoding="utf-8",
+            )
+
+            matrix = build_coverage_matrix(root)
+            rows = {row["command"]: row for row in matrix["rows"]}
+            self.assertEqual("explicit", rows["foo_apply_folder"]["doc_status"])
+            self.assertEqual("deprecated", rows["foo_old_write"]["doc_status"])
+            self.assertTrue(rows["foo_old_write"]["deprecated"])
+            self.assertEqual("docs/commands/deprecatedCommand/01_Test.md", rows["foo_old_write"]["doc_file"])
+            self.assertNotIn("foo_old_write", matrix["missing_doc"])
+            self.assertEqual(1, matrix["deprecated_doc_count"])
+
     def test_write_coverage_matrix_writes_smoke_debt_report(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
@@ -115,8 +154,41 @@ class ReleaseVerifyTests(unittest.TestCase):
             skill_ref.mkdir(parents=True)
             (skill_ref.parent / "SKILL.md").write_text("# skill\n", encoding="utf-8")
             (skill_ref / "command-map.md").write_text("# commands\n", encoding="utf-8")
+            ue_kb = pak / "skills" / "ue-kb"
+            (ue_kb / "references").mkdir(parents=True)
+            (ue_kb / "indexes").mkdir()
+            (ue_kb / "SKILL.md").write_text("# ue kb\n", encoding="utf-8")
+            (ue_kb / "kb-manifest.json").write_text("{}\n", encoding="utf-8")
+            (ue_kb / "references" / "index.md").write_text("# index\n", encoding="utf-8")
+            (ue_kb / "indexes" / "fts.sqlite").write_bytes(b"sqlite")
             result = verify_pak_layout(root)
             self.assertTrue(result["success"])
+
+    def test_verify_pak_layout_rejects_obsolete_skills(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "Test.uproject").write_text("{}", encoding="utf-8")
+            pak = root / "UeAgentInterfacePak"
+            (pak / "UeAgentInterface").mkdir(parents=True)
+            (pak / "UeAgentInterfaceCMD").mkdir()
+            (pak / "README.md").write_text("# pak\n", encoding="utf-8")
+            skill_ref = pak / "skills" / "ue-agent-interface" / "references"
+            skill_ref.mkdir(parents=True)
+            (skill_ref.parent / "SKILL.md").write_text("# skill\n", encoding="utf-8")
+            (skill_ref / "command-map.md").write_text("# commands\n", encoding="utf-8")
+            ue_kb = pak / "skills" / "ue-kb"
+            (ue_kb / "references").mkdir(parents=True)
+            (ue_kb / "indexes").mkdir()
+            (ue_kb / "SKILL.md").write_text("# ue kb\n", encoding="utf-8")
+            (ue_kb / "kb-manifest.json").write_text("{}\n", encoding="utf-8")
+            (ue_kb / "references" / "index.md").write_text("# index\n", encoding="utf-8")
+            (ue_kb / "indexes" / "fts.sqlite").write_bytes(b"sqlite")
+            (pak / "skills" / "leveldesign").mkdir()
+
+            result = verify_pak_layout(root)
+
+            self.assertFalse(result["success"])
+            self.assertIn("obsolete_skill_present:skills/leveldesign", result["issues"])
 
     def test_current_project_has_no_smoke_debt(self):
         project_root = self.current_project_root()

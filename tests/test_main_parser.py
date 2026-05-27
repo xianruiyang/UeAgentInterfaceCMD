@@ -54,6 +54,7 @@ class MainParserTests(unittest.TestCase):
                 "dev-mirror",
                 "--dry-run",
                 "--delete-extra",
+                "--allow-submodule-content-write",
                 "--release-id",
                 "2026.05.02",
                 "--manifest-output",
@@ -63,6 +64,7 @@ class MainParserTests(unittest.TestCase):
         self.assertEqual(args.action, "dev-mirror")
         self.assertTrue(args.dry_run)
         self.assertTrue(args.delete_extra)
+        self.assertTrue(args.allow_submodule_content_write)
         self.assertEqual(args.release_id, "2026.05.02")
         self.assertEqual(args.manifest_output, "manifest.json")
 

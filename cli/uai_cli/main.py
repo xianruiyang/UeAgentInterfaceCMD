@@ -178,6 +178,11 @@ def _add_subcommands(parser: argparse.ArgumentParser) -> None:
     release.add_argument("--run-tests", action="store_true", help="gate 时运行 CLI 单测")
     release.add_argument("--dry-run", action="store_true", help="dev-mirror 时只计算文件差异，不写入")
     release.add_argument("--delete-extra", action="store_true", help="dev-mirror 时删除 Pak 副本中的额外文件")
+    release.add_argument(
+        "--allow-submodule-content-write",
+        action="store_true",
+        help="Allow dev-mirror to write files inside Pak git submodule worktrees.",
+    )
     release.add_argument("--allow-dirty", action="store_true", help="verify 时允许 dirty worktree，只用于诊断")
     release.add_argument("--skip-tests", action="store_true", help="ci 时跳过 CLI 单元测试")
     release.add_argument("--write-coverage", action="store_true", help="ci 时同步写出 coverage generated docs")
@@ -473,6 +478,8 @@ def _build_replay_commands(args: argparse.Namespace, app_root: Path) -> list[lis
             command.append("--dry-run")
         if bool(getattr(args, "delete_extra", False)):
             command.append("--delete-extra")
+        if bool(getattr(args, "allow_submodule_content_write", False)):
+            command.append("--allow-submodule-content-write")
         if getattr(args, "release_id", None):
             command.extend(["--release-id", str(args.release_id)])
         if getattr(args, "manifest_output", None):
@@ -982,7 +989,11 @@ def handle_release(args: argparse.Namespace, config: AppConfig) -> int:
         if not sync_check.get("success", False):
             payload["success"] = False
     if args.action == "dev-mirror":
-        mirror = mirror_development_to_pak(dry_run=bool(args.dry_run), delete_extra=bool(args.delete_extra))
+        mirror = mirror_development_to_pak(
+            dry_run=bool(args.dry_run),
+            delete_extra=bool(args.delete_extra),
+            allow_submodule_content_write=bool(args.allow_submodule_content_write),
+        )
         payload["dev_mirror"] = mirror
         if not mirror.get("success", False):
             payload["success"] = False

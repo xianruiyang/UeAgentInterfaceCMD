@@ -447,11 +447,16 @@ def _copy_tree(src: Path, dst: Path, *, dry_run: bool, delete_extra: bool) -> di
     }
 
 
+def _is_git_worktree_root(path: Path) -> bool:
+    return (path / ".git").exists()
+
+
 def mirror_development_to_pak(
     project_root: Path | None = None,
     *,
     dry_run: bool = False,
     delete_extra: bool = False,
+    allow_submodule_content_write: bool = False,
 ) -> dict[str, Any]:
     root = project_root or find_development_project_root(Path.cwd())
     if root is None:
@@ -476,6 +481,24 @@ def mirror_development_to_pak(
         if not dst.exists():
             issues.append(f"{dst_name}:path_missing")
             continue
+        if not dry_run and not allow_submodule_content_write and _is_git_worktree_root(dst):
+            issues.append(f"{dst_name}:submodule_content_write_blocked")
+            mirrors.append(
+                {
+                    "source": str(src),
+                    "target": str(dst),
+                    "dry_run": dry_run,
+                    "delete_extra": delete_extra,
+                    "copied_count": 0,
+                    "deleted_count": 0,
+                    "blocked": True,
+                    "blocked_reason": (
+                        "target is a git worktree root; pass "
+                        "allow_submodule_content_write=True only for an explicit local dev mirror"
+                    ),
+                }
+            )
+            continue
         mirrors.append(_copy_tree(src, dst, dry_run=dry_run, delete_extra=delete_extra))
 
     after = build_release_sync_check(root) if not dry_run else None
@@ -489,6 +512,7 @@ def mirror_development_to_pak(
         "mirror_dirty_worktree": bool(before.get("mirror_dirty_worktree", False)),
         "dry_run": dry_run,
         "delete_extra": delete_extra,
+        "allow_submodule_content_write": allow_submodule_content_write,
         "issues": issues,
         "before": before,
         "after": after,

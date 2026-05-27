@@ -176,6 +176,10 @@ manifest 内同时包含从文档关键参数推导出的 `param_schema`。默�
 - Use `--write-coverage` when intentionally regenerating `docs/generated/*` before committing release docs.
 - Use `--ci-output <path>` to write the full formal gate JSON report as a CI artifact.
 
+`release dev-mirror` 默认保护 Pak 内 git submodule 工作区：非 `--dry-run` 写入会拒绝直接复制到
+`UeAgentInterfacePak/UeAgentInterface` 和 `UeAgentInterfacePak/UeAgentInterfaceCMD`。只有明确需要本地临时镜像时，
+才传 `--allow-submodule-content-write`；该结果仍然返回 `formal_release_allowed=false`，不能作为正式发布。
+
 `release coverage` 生成 `docs/generated/command_coverage_matrix.json|md`，汇总 `命令 -> 文档 -> 实现 -> smoke` 覆盖关系。所有已实现命令都必须出现在 automation smoke 源码或显式 smoke coverage ledger 中，否则 `missing_smoke` 会进入债务报告。
 `release pak-verify` 检查 Pak 目录关键文件、skill、CLI 与基础 hash 差异。`release examples` 生成 `examples/generated/` 里的只读 golden E2E 示例。`release gate` 汇总 manifest、coverage、Pak verify，可加 `--run-tests` 同时运行 CLI 单测；`missing_smoke` 不再只是提示，会让 gate 失败。
 

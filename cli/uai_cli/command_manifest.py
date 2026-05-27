@@ -29,6 +29,7 @@ class CommandDoc:
     description: str = ""
     params: list[str] = field(default_factory=list)
     returns: list[str] = field(default_factory=list)
+    deprecated: bool = False
     implemented: bool = False
     implementation_files: list[str] = field(default_factory=list)
     smoke_tested: bool = False
@@ -43,6 +44,7 @@ class CommandDoc:
             "params": self.params,
             "param_schema": build_param_schema(self.params),
             "returns": self.returns,
+            "deprecated": self.deprecated,
             "implemented": self.implemented,
             "implementation_files": self.implementation_files,
             "smoke_tested": self.smoke_tested,
@@ -69,18 +71,38 @@ def _extract_tokens(text: str) -> list[str]:
     return values
 
 
-def _parse_doc_file(path: Path, plugin_root: Path) -> dict[str, CommandDoc]:
+def _parse_doc_file(path: Path, plugin_root: Path, *, deprecated: bool = False) -> dict[str, CommandDoc]:
     docs: dict[str, CommandDoc] = {}
     section = ""
     in_command_table = False
     relative_doc = path.relative_to(plugin_root).as_posix()
     for line in path.read_text(encoding="utf-8-sig").splitlines():
+        if line.startswith("### "):
+            section = line.lstrip("#").strip()
+            in_command_table = False
+            commands = [name for name in COMMAND_TOKEN_RE.findall(line) if "_" in name or name in DOC_SINGLE_WORD_COMMANDS]
+            for name in commands:
+                current = docs.get(name) or CommandDoc(name=name)
+                current.doc_file = relative_doc
+                current.section = section
+                current.deprecated = deprecated
+                docs[name] = current
+            continue
         if line.startswith("## "):
             section = line.lstrip("#").strip()
             in_command_table = False
             continue
         cells = _split_markdown_row(line)
         if len(cells) < 2:
+            if deprecated and "Deprecated" in line:
+                commands = [name for name in COMMAND_TOKEN_RE.findall(line) if "_" in name or name in DOC_SINGLE_WORD_COMMANDS]
+                for name in commands:
+                    current = docs.get(name) or CommandDoc(name=name)
+                    current.doc_file = relative_doc
+                    current.section = section
+                    current.description = line.strip()
+                    current.deprecated = True
+                    docs[name] = current
             in_command_table = False
             continue
         first_cell = cells[0].strip()
@@ -104,6 +126,7 @@ def _parse_doc_file(path: Path, plugin_root: Path) -> dict[str, CommandDoc]:
             current.description = description
             current.params = sorted(set(current.params + params))
             current.returns = sorted(set(current.returns + returns))
+            current.deprecated = deprecated
             docs[name] = current
     return docs
 
@@ -180,6 +203,13 @@ def build_command_manifest(project_root: Path | None = None) -> dict[str, Any]:
                 continue
             for name, doc in _parse_doc_file(path, plugin_root).items():
                 command_docs[name] = doc
+        deprecated_dir = docs_dir / "deprecatedCommand"
+        if deprecated_dir.exists():
+            for path in sorted(deprecated_dir.glob("*.md")):
+                if path.name == "README.md":
+                    continue
+                for name, doc in _parse_doc_file(path, plugin_root, deprecated=True).items():
+                    command_docs.setdefault(name, doc)
 
     implemented = _scan_implemented_commands(plugin_root)
     smoked = _scan_smoke_commands(plugin_root)
@@ -208,6 +238,7 @@ def build_command_manifest(project_root: Path | None = None) -> dict[str, Any]:
         "plugin_root": str(plugin_root),
         "command_count": len(commands),
         "documented_count": sum(1 for item in commands.values() if item["doc_file"]),
+        "deprecated_doc_count": sum(1 for item in commands.values() if item.get("deprecated")),
         "implemented_count": sum(1 for item in commands.values() if item["implemented"]),
         "smoke_tested_count": sum(1 for item in commands.values() if item["smoke_tested"]),
         "commands": commands,

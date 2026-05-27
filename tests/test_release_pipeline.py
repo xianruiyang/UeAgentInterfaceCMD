@@ -84,7 +84,7 @@ class ReleasePipelineTests(unittest.TestCase):
         self.assertIn("plugin:tree_hash_mismatch", result["issues"])
         self.assertIn("dev_plugin:dirty_worktree", result["warnings"])
 
-    def test_dev_mirror_copies_dirty_development_changes_to_pak(self):
+    def test_dev_mirror_blocks_submodule_content_write_by_default(self):
         root = self._make_project()
         source_file = root / "Plugins" / "UeAgentInterface" / "Source" / "Test.cpp"
         pak_file = root / "UeAgentInterfacePak" / "UeAgentInterface" / "Source" / "Test.cpp"
@@ -95,6 +95,12 @@ class ReleasePipelineTests(unittest.TestCase):
         self.assertEqual("plugin\n", pak_file.read_text(encoding="utf-8"))
 
         result = mirror_development_to_pak(root, dry_run=False)
+        self.assertFalse(result["success"])
+        self.assertIn("pak_plugin:submodule_content_write_blocked", result["issues"])
+        self.assertIn("pak_cli:submodule_content_write_blocked", result["issues"])
+        self.assertEqual("plugin\n", pak_file.read_text(encoding="utf-8"))
+
+        result = mirror_development_to_pak(root, dry_run=False, allow_submodule_content_write=True)
         self.assertTrue(result["success"])
         self.assertFalse(result["formal_release_allowed"])
         self.assertEqual("plugin changed\n", pak_file.read_text(encoding="utf-8"))

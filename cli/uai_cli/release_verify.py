@@ -10,6 +10,25 @@ from .project_paths import find_development_project_root, find_pak_root, find_pl
 from .utils import now_compact, save_json_file
 
 
+PAK_REQUIRED_RELATIVE_PATHS = [
+    "README.md",
+    "UeAgentInterface",
+    "UeAgentInterfaceCMD",
+    "skills/ue-agent-interface/SKILL.md",
+    "skills/ue-agent-interface/references/command-map.md",
+    "skills/ue-kb/SKILL.md",
+    "skills/ue-kb/kb-manifest.json",
+    "skills/ue-kb/references/index.md",
+    "skills/ue-kb/indexes/fts.sqlite",
+]
+OBSOLETE_PAK_SKILLS = ["leveldesign", "ue-engine-knowledge"]
+INSTALLED_SKILL_HASH_RELATIVE_PATHS = [
+    "ue-agent-interface/SKILL.md",
+    "ue-kb/SKILL.md",
+    "ue-kb/kb-manifest.json",
+]
+
+
 def _sha256(path: Path) -> str:
     data = path.read_bytes()
     if b"\0" not in data:
@@ -30,13 +49,14 @@ def build_coverage_matrix(project_root: Path | None = None) -> dict[str, Any]:
             if not isinstance(item, dict):
                 continue
             doc_file = str(item.get("doc_file", ""))
-            doc_status = "explicit" if doc_file else ("generated_catalog" if item.get("implemented") else "missing")
+            doc_status = "deprecated" if item.get("deprecated") and doc_file else ("explicit" if doc_file else ("generated_catalog" if item.get("implemented") else "missing"))
             if not doc_file and item.get("implemented"):
                 doc_file = "docs/generated/implemented_command_catalog.md"
             row = {
                 "command": name,
                 "doc_file": doc_file,
                 "doc_status": doc_status,
+                "deprecated": bool(item.get("deprecated", False)),
                 "implemented": bool(item.get("implemented", False)),
                 "smoke_tested": bool(item.get("smoke_tested", False)),
                 "implementation_files": item.get("implementation_files", []),
@@ -80,6 +100,7 @@ def build_coverage_matrix(project_root: Path | None = None) -> dict[str, Any]:
         "smoke_debt": smoke_debt,
         "smoke_coverage": smoke_summary,
         "raw_generated_doc_count": sum(1 for row in rows if row["doc_status"] == "generated_catalog"),
+        "deprecated_doc_count": sum(1 for row in rows if row.get("doc_status") == "deprecated"),
         "rows": rows,
     }
 
@@ -190,6 +211,7 @@ def write_coverage_matrix(output_json: Path, output_md: Path | None = None, proj
             f"- smoke_p0_count: `{smoke_coverage.get('p0_count', 0) if isinstance(smoke_coverage, dict) else 0}`",
             f"- smoke_p1_count: `{smoke_coverage.get('p1_count', 0) if isinstance(smoke_coverage, dict) else 0}`",
             f"- generated_doc_catalog_count: `{matrix['raw_generated_doc_count']}`",
+            f"- deprecated_doc_count: `{matrix.get('deprecated_doc_count', 0)}`",
             f"- generated_catalog_file: `{catalog_file}`",
             f"- smoke_debt_file: `{smoke_debt_file}`",
             "",
@@ -228,15 +250,14 @@ def verify_pak_layout(project_root: Path | None = None) -> dict[str, Any]:
     if pak_root is None:
         return {"success": False, "issues": ["pak_root_not_found"], "warnings": []}
 
-    required_paths = [
-        pak_root / "README.md",
-        pak_root / "UeAgentInterface",
-        pak_root / "UeAgentInterfaceCMD",
-        pak_root / "skills" / "ue-agent-interface" / "SKILL.md",
-        pak_root / "skills" / "ue-agent-interface" / "references" / "command-map.md",
-    ]
+    required_paths = [pak_root / relative for relative in PAK_REQUIRED_RELATIVE_PATHS]
     issues = [f"missing:{path.relative_to(pak_root).as_posix()}" for path in required_paths if not path.exists()]
     warnings: list[str] = []
+
+    for skill_name in OBSOLETE_PAK_SKILLS:
+        obsolete_path = pak_root / "skills" / skill_name
+        if obsolete_path.exists():
+            issues.append(f"obsolete_skill_present:{obsolete_path.relative_to(pak_root).as_posix()}")
 
     dev_plugin = find_plugin_root(root)
     pak_plugin = pak_root / "UeAgentInterface"
@@ -257,10 +278,12 @@ def verify_pak_layout(project_root: Path | None = None) -> dict[str, Any]:
         elif dev_file.exists() or pak_file.exists():
             issues.append(f"cli_file_presence_mismatch:{relative}")
 
-    installed_skill = Path.home() / ".codex" / "skills" / "ue-agent-interface" / "SKILL.md"
-    pak_skill = pak_root / "skills" / "ue-agent-interface" / "SKILL.md"
-    if installed_skill.exists() and pak_skill.exists() and _sha256(installed_skill) != _sha256(pak_skill):
-        warnings.append("installed_skill_hash_diff")
+    installed_skills_root = Path.home() / ".codex" / "skills"
+    for relative in INSTALLED_SKILL_HASH_RELATIVE_PATHS:
+        installed_skill = installed_skills_root / relative
+        pak_skill = pak_root / "skills" / relative
+        if installed_skill.exists() and pak_skill.exists() and _sha256(installed_skill) != _sha256(pak_skill):
+            warnings.append(f"installed_skill_hash_diff:{relative}")
 
     manifest_files: list[dict[str, Any]] = []
     for path in required_paths:
