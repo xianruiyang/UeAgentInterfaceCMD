@@ -17,6 +17,15 @@ PATH_LIKE_PARAMS = {
     "destination_name",
 }
 
+STRING_LIKE_PARAMS = {
+    "buffer",
+    "capture_mode",
+    "depth_mode",
+    "format",
+    "method",
+    "target",
+}
+
 BOOL_LIKE_PARAMS = {
     "save_after_create",
     "save_after_apply",
@@ -27,6 +36,7 @@ BOOL_LIKE_PARAMS = {
     "clean_output_dir",
     "include_validation",
     "include_raw_properties",
+    "invert",
     "open_editor_if_needed",
     "bring_to_front",
     "require_non_black",
@@ -42,6 +52,13 @@ NUMBER_LIKE_PARAMS = {
     "view_x",
     "view_y",
     "zoom",
+    "quality",
+    "warmup_frames",
+    "render_warmup_frames",
+    "depth_near_cm",
+    "depth_far_cm",
+    "depth_auto_pct_low",
+    "depth_auto_pct_high",
 }
 
 
@@ -67,6 +84,8 @@ def infer_param_type(param_name: str) -> str:
         return "bool"
     if name in NUMBER_LIKE_PARAMS or name.endswith("_count") or name.endswith("_index"):
         return "number"
+    if name in STRING_LIKE_PARAMS:
+        return "string"
     if name.endswith("[]") or name.endswith("s[]"):
         return "array"
     if name.endswith("_path") or name.endswith("_file") or name in PATH_LIKE_PARAMS:

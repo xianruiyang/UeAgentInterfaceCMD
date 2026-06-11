@@ -11,11 +11,14 @@ from uai_cli.command_schema import build_param_schema, validate_command_payloads
 
 class CommandSchemaTests(unittest.TestCase):
     def test_build_param_schema_infers_basic_types(self):
-        schema = build_param_schema(["asset_path", "save_after_apply", "max_results", "targets[]"])
+        schema = build_param_schema(["asset_path", "save_after_apply", "max_results", "targets[]", "format", "warmup_frames", "invert"])
         self.assertEqual(schema["properties"]["asset_path"]["type"], "string")
         self.assertEqual(schema["properties"]["save_after_apply"]["type"], "bool")
         self.assertEqual(schema["properties"]["max_results"]["type"], "number")
         self.assertEqual(schema["properties"]["targets"]["type"], "array")
+        self.assertEqual(schema["properties"]["format"]["type"], "string")
+        self.assertEqual(schema["properties"]["warmup_frames"]["type"], "number")
+        self.assertEqual(schema["properties"]["invert"]["type"], "bool")
 
     def test_validate_payload_warns_on_type_mismatch(self):
         manifest = {
