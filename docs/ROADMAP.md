@@ -18,8 +18,8 @@
 - 命令覆盖矩阵：`release coverage`
 - Pak 分发布局验证：`release pak-verify`
 - 发布门禁：`release gate` 与 `tools/ci_gate.py`
-- 覆盖矩阵输出 `docs/generated/command_coverage_matrix.json|md`
-- 已实现但缺显式命令表的命令会进入 `docs/generated/implemented_command_catalog.md`
+- 覆盖矩阵默认输出 `Plugins/UeAgentInterface/docs/generated/command_coverage_matrix.json|md`
+- 已实现但缺显式命令表的命令会进入 `Plugins/UeAgentInterface/docs/generated/implemented_command_catalog.md`
 - Pak 验证检查 README、插件目录、CLI 目录、skill、command-map 和基础 hash 差异
 
 ## P2（已实现）

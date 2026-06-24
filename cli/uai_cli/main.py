@@ -8,17 +8,19 @@ import time
 from pathlib import Path
 from typing import Any
 
-from .cleanup import cleanup_runtime_json
-from .command_schema import validate_command_payloads
-from .command_manifest import (
+from uai_core.cleanup import cleanup_runtime_json
+from uai_core.command_schema import validate_command_payloads
+from uai_core.command_manifest import (
     build_command_manifest,
     command_names_from_batch,
+    format_command_lifecycle_error,
     save_command_manifest,
+    validate_command_lifecycle,
     validate_command_names,
 )
-from .config import AppConfig, load_app_config
-from .compatibility import build_compatibility_report
-from .crash_capture import (
+from uai_core.config import AppConfig, load_app_config
+from uai_core.compatibility import build_compatibility_report
+from uai_core.crash_capture import (
     build_crash_signature,
     collect_failure_artifacts,
     find_latest_crash,
@@ -27,26 +29,27 @@ from .crash_capture import (
     pack_crash_dir,
     replay_crash_dir,
 )
-from .e2e import run_local_e2e, run_ue_readonly_e2e
-from .errors import ConfigError, HttpError, PlanError, UaiCliError
-from .example_library import write_example_library
-from .http_client import UaiHttpClient
-from .logging_setup import setup_logging
-from .naming import build_short_asset_name
-from .release_verify import verify_pak_layout, write_coverage_matrix
-from .release_pipeline import (
+from uai_core.e2e import run_local_e2e, run_ue_readonly_e2e
+from uai_core.errors import ConfigError, HttpError, PlanError, UaiCliError
+from uai_core.example_library import write_example_library
+from uai_core.http_client import UaiHttpClient
+from uai_core.logging_setup import setup_logging
+from uai_core.naming import build_short_asset_name
+from uai_core.project_paths import find_development_project_root
+from uai_core.release_verify import default_coverage_output_dir, verify_pak_layout, write_coverage_matrix
+from uai_core.release_pipeline import (
     build_release_sync_check,
     mirror_development_to_pak,
     run_formal_release_gate,
     verify_release_pipeline,
     write_release_manifest,
 )
-from .reporting import build_report_file_path, save_report
-from .runner import dry_run_output, execute_batch, execute_plan, load_and_resolve_plan
-from .quality_gate import run_quality_gate
-from .runtime_index import read_index, record_report
-from .utils import load_json_file, mask_token, now_compact, parse_json_text
-from .version import __version__
+from uai_core.reporting import build_report_file_path, save_report
+from uai_core.runner import dry_run_output, execute_batch, execute_plan, load_and_resolve_plan
+from uai_core.quality_gate import run_quality_gate
+from uai_core.runtime_index import read_index, record_report
+from uai_core.utils import load_json_file, mask_token, now_compact, parse_json_text
+from uai_core.version import __version__
 
 
 def _build_common_parser() -> argparse.ArgumentParser:
@@ -61,6 +64,8 @@ def _build_common_parser() -> argparse.ArgumentParser:
     parser.add_argument("--no-niagara-guard", action="store_true", help="关闭 Niagara 安全护栏（默认开启）")
     parser.add_argument("--allow-unsafe-niagara-mix", action="store_true", help="允许同批次 remove/add emitter（默认禁止）")
     parser.add_argument("--skip-compat-check", action="store_true", help="跳过 CLI/插件版本兼容检查")
+    parser.add_argument("--allow-deprecated-command", action="store_true", help="允许兼容、迁移、诊断或修复场景使用废弃指令")
+    parser.add_argument("--deprecated-use-case", default="authoring", help="废弃指令用途，如 migration/diagnostic/repair")
     parser.add_argument("--no-crash-capture", action="store_true", help="本次执行失败时不生成 crash capture")
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     return parser
@@ -77,6 +82,8 @@ def _add_common_overrides_to_subparser(sub_parser: argparse.ArgumentParser) -> N
     sub_parser.add_argument("--no-niagara-guard", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     sub_parser.add_argument("--allow-unsafe-niagara-mix", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     sub_parser.add_argument("--skip-compat-check", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
+    sub_parser.add_argument("--allow-deprecated-command", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
+    sub_parser.add_argument("--deprecated-use-case", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     sub_parser.add_argument("--no-crash-capture", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
 
 
@@ -173,8 +180,8 @@ def _add_subcommands(parser: argparse.ArgumentParser) -> None:
         ],
         help="release 检查动作",
     )
-    release.add_argument("--output-json", help="coverage 输出 JSON；默认写到 docs/generated")
-    release.add_argument("--output-md", help="coverage 输出 Markdown；默认写到 docs/generated")
+    release.add_argument("--output-json", help="coverage 输出 JSON；默认写到插件 docs/generated")
+    release.add_argument("--output-md", help="coverage 输出 Markdown；默认写到插件 docs/generated")
     release.add_argument("--run-tests", action="store_true", help="gate 时运行 CLI 单测")
     release.add_argument("--dry-run", action="store_true", help="dev-mirror 时只计算文件差异，不写入")
     release.add_argument("--delete-extra", action="store_true", help="dev-mirror 时删除 Pak 副本中的额外文件")
@@ -321,13 +328,30 @@ def _load_manifest_if_enabled(config: AppConfig) -> dict[str, Any] | None:
     return build_command_manifest()
 
 
-def _validate_commands_with_manifest(config: AppConfig, command_names: list[str]) -> dict[str, Any] | None:
-    manifest = _load_manifest_if_enabled(config)
+def _validate_commands_with_manifest(
+    config: AppConfig,
+    command_names: list[str],
+    *,
+    manifest: dict[str, Any] | None = None,
+    args: argparse.Namespace | None = None,
+) -> dict[str, Any] | None:
+    manifest = manifest if manifest is not None else _load_manifest_if_enabled(config)
     if manifest is None:
         return None
     unknown, warnings = validate_command_names(command_names, manifest)
     if unknown:
         raise PlanError(f"命令清单校验失败，未知命令: {', '.join(unknown)}")
+    lifecycle_validation = validate_command_lifecycle(
+        command_names,
+        manifest,
+        allow_deprecated=bool(getattr(args, "allow_deprecated_command", False)),
+        deprecated_use_case=str(getattr(args, "deprecated_use_case", "authoring") or "authoring"),
+    )
+    if not lifecycle_validation.get("success", True):
+        raise PlanError(format_command_lifecycle_error(lifecycle_validation))
+    lifecycle_warnings = lifecycle_validation.get("warnings", [])
+    if isinstance(lifecycle_warnings, list):
+        warnings.extend(str(warning) for warning in lifecycle_warnings)
     if warnings:
         logging.warning("命令清单警告: %s", "; ".join(warnings))
     return {
@@ -335,6 +359,7 @@ def _validate_commands_with_manifest(config: AppConfig, command_names: list[str]
         "command_count": manifest.get("command_count", 0),
         "validated_command_count": len(command_names),
         "warnings": warnings,
+        "command_lifecycle_validation": lifecycle_validation,
     }
 
 
@@ -423,9 +448,13 @@ def _build_replay_commands(args: argparse.Namespace, app_root: Path) -> list[lis
         ("no_niagara_guard", "--no-niagara-guard"),
         ("allow_unsafe_niagara_mix", "--allow-unsafe-niagara-mix"),
         ("skip_compat_check", "--skip-compat-check"),
+        ("allow_deprecated_command", "--allow-deprecated-command"),
     ]:
         if bool(getattr(args, attr, False)):
             command.append(flag)
+    deprecated_use_case = str(getattr(args, "deprecated_use_case", "") or "").strip()
+    if deprecated_use_case and deprecated_use_case != "authoring":
+        command.extend(["--deprecated-use-case", deprecated_use_case])
     command.append("--no-crash-capture")
 
     if subcommand == "exec":
@@ -551,17 +580,7 @@ def handle_doctor(args: argparse.Namespace, config: AppConfig) -> int:
 def handle_exec(args: argparse.Namespace, config: AppConfig) -> int:
     client = _client_from_config(config)
     manifest = _load_manifest_if_enabled(config)
-    manifest_validation = None
-    if manifest is not None:
-        unknown, warnings = validate_command_names([args.cmd], manifest)
-        if unknown:
-            raise PlanError(f"命令清单校验失败，未知命令: {', '.join(unknown)}")
-        manifest_validation = {
-            "schema": manifest.get("schema", ""),
-            "command_count": manifest.get("command_count", 0),
-            "validated_command_count": 1,
-            "warnings": warnings,
-        }
+    manifest_validation = _validate_commands_with_manifest(config, [args.cmd], manifest=manifest, args=args)
     compatibility = _compatibility_preflight(config, args, client, manifest)
     params = _load_params(args)
     param_validation = _validate_payloads_with_manifest(
@@ -614,18 +633,12 @@ def handle_batch(args: argparse.Namespace, config: AppConfig) -> int:
     client = _client_from_config(config)
     commands, stop_on_error = _parse_batch_file(Path(args.file))
     manifest = _load_manifest_if_enabled(config)
-    manifest_validation = None
-    if manifest is not None:
-        command_names = command_names_from_batch(commands)
-        unknown, warnings = validate_command_names(command_names, manifest)
-        if unknown:
-            raise PlanError(f"命令清单校验失败，未知命令: {', '.join(unknown)}")
-        manifest_validation = {
-            "schema": manifest.get("schema", ""),
-            "command_count": manifest.get("command_count", 0),
-            "validated_command_count": len(command_names),
-            "warnings": warnings,
-        }
+    manifest_validation = _validate_commands_with_manifest(
+        config,
+        command_names_from_batch(commands),
+        manifest=manifest,
+        args=args,
+    )
     param_validation = _validate_payloads_with_manifest(config, commands, manifest)
     compatibility = _compatibility_preflight(config, args, client, manifest)
     started = time.perf_counter()
@@ -675,18 +688,12 @@ def handle_run(args: argparse.Namespace, config: AppConfig) -> int:
     resolved_plan = load_and_resolve_plan(plan_path, vars_path)
     t_prepare_ms = (time.perf_counter() - prepare_started) * 1000
     manifest = _load_manifest_if_enabled(config)
-    manifest_validation = None
-    if manifest is not None:
-        command_names = _command_names_from_plan(resolved_plan)
-        unknown, warnings = validate_command_names(command_names, manifest)
-        if unknown:
-            raise PlanError(f"命令清单校验失败，未知命令: {', '.join(unknown)}")
-        manifest_validation = {
-            "schema": manifest.get("schema", ""),
-            "command_count": manifest.get("command_count", 0),
-            "validated_command_count": len(command_names),
-            "warnings": warnings,
-        }
+    manifest_validation = _validate_commands_with_manifest(
+        config,
+        _command_names_from_plan(resolved_plan),
+        manifest=manifest,
+        args=args,
+    )
     plan_commands: list[dict[str, Any]] = []
     for phase in resolved_plan.get("phases", []):
         if isinstance(phase, dict) and isinstance(phase.get("commands"), list):
@@ -792,18 +799,12 @@ def handle_resume(args: argparse.Namespace, config: AppConfig) -> int:
 
     start_phase_index = failed_phase_index if args.retry_failed_phase else failed_phase_index + 1
     manifest = _load_manifest_if_enabled(config)
-    manifest_validation = None
-    if manifest is not None:
-        command_names = _command_names_from_plan(resolved_plan)
-        unknown, warnings = validate_command_names(command_names, manifest)
-        if unknown:
-            raise PlanError(f"命令清单校验失败，未知命令: {', '.join(unknown)}")
-        manifest_validation = {
-            "schema": manifest.get("schema", ""),
-            "command_count": manifest.get("command_count", 0),
-            "validated_command_count": len(command_names),
-            "warnings": warnings,
-        }
+    manifest_validation = _validate_commands_with_manifest(
+        config,
+        _command_names_from_plan(resolved_plan),
+        manifest=manifest,
+        args=args,
+    )
     resume_commands: list[dict[str, Any]] = []
     for phase in resolved_plan.get("phases", []):
         if isinstance(phase, dict) and isinstance(phase.get("commands"), list):
@@ -1029,10 +1030,11 @@ def handle_release(args: argparse.Namespace, config: AppConfig) -> int:
         if not ci_gate.get("success", False):
             payload["success"] = False
     if args.action in {"coverage", "all", "gate"}:
-        generated_dir = config.app_root / "docs" / "generated"
+        project_root = find_development_project_root(config.app_root)
+        generated_dir = default_coverage_output_dir(config.app_root, project_root)
         output_json = Path(args.output_json) if getattr(args, "output_json", None) else generated_dir / "command_coverage_matrix.json"
         output_md = Path(args.output_md) if getattr(args, "output_md", None) else generated_dir / "command_coverage_matrix.md"
-        coverage = write_coverage_matrix(output_json, output_md)
+        coverage = write_coverage_matrix(output_json, output_md, project_root)
         payload["coverage"] = {
             "success": True,
             "json_file": str(output_json),

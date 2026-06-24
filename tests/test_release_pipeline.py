@@ -170,8 +170,10 @@ class ReleasePipelineTests(unittest.TestCase):
         gate = {"success": True, "checks": []}
         pak = {"success": True, "issues": [], "warnings": []}
         with patch("uai_cli.release_pipeline.build_coverage_matrix", return_value=coverage), patch(
-            "uai_cli.release_pipeline.run_quality_gate", return_value=gate
-        ), patch("uai_cli.release_pipeline.verify_pak_layout", return_value=pak):
+            "uai_cli.release_pipeline.verify_written_coverage_matrix", return_value={"success": True, "reason": "current"}
+        ), patch("uai_cli.release_pipeline.run_quality_gate", return_value=gate), patch(
+            "uai_cli.release_pipeline.verify_pak_layout", return_value=pak
+        ):
             result = run_formal_release_gate(root / "UeAgentInterfaceCMD", root, run_tests=False, allow_dirty=True)
 
         self.assertFalse(result["success"])
@@ -191,8 +193,10 @@ class ReleasePipelineTests(unittest.TestCase):
         pak = {"success": True, "issues": [], "warnings": []}
         output = root / "reports" / "ci.json"
         with patch("uai_cli.release_pipeline.build_coverage_matrix", return_value=coverage), patch(
-            "uai_cli.release_pipeline.run_quality_gate", return_value=gate
-        ), patch("uai_cli.release_pipeline.verify_pak_layout", return_value=pak):
+            "uai_cli.release_pipeline.verify_written_coverage_matrix", return_value={"success": True, "reason": "current"}
+        ), patch("uai_cli.release_pipeline.run_quality_gate", return_value=gate), patch(
+            "uai_cli.release_pipeline.verify_pak_layout", return_value=pak
+        ):
             result = run_formal_release_gate(
                 root / "UeAgentInterfaceCMD",
                 root,
@@ -219,8 +223,10 @@ class ReleasePipelineTests(unittest.TestCase):
         pak_gate = {"success": False, "checks": [{"name": "pak_tests", "success": False}]}
         pak = {"success": True, "issues": [], "warnings": []}
         with patch("uai_cli.release_pipeline.build_coverage_matrix", return_value=coverage), patch(
-            "uai_cli.release_pipeline.run_quality_gate", side_effect=[dev_gate, pak_gate]
-        ), patch("uai_cli.release_pipeline.verify_pak_layout", return_value=pak):
+            "uai_cli.release_pipeline.verify_written_coverage_matrix", return_value={"success": True, "reason": "current"}
+        ), patch("uai_cli.release_pipeline.run_quality_gate", side_effect=[dev_gate, pak_gate]), patch(
+            "uai_cli.release_pipeline.verify_pak_layout", return_value=pak
+        ):
             result = run_formal_release_gate(root / "UeAgentInterfaceCMD", root, run_tests=True, allow_dirty=True)
 
         self.assertFalse(result["success"])
@@ -247,8 +253,10 @@ class ReleasePipelineTests(unittest.TestCase):
             return {"success": True, "checks": []}
 
         with patch("uai_cli.release_pipeline.build_coverage_matrix", return_value=coverage), patch(
-            "uai_cli.release_pipeline.run_quality_gate", side_effect=fake_quality_gate
-        ), patch("uai_cli.release_pipeline.verify_pak_layout", return_value=pak):
+            "uai_cli.release_pipeline.verify_written_coverage_matrix", return_value={"success": True, "reason": "current"}
+        ), patch("uai_cli.release_pipeline.run_quality_gate", side_effect=fake_quality_gate), patch(
+            "uai_cli.release_pipeline.verify_pak_layout", return_value=pak
+        ):
             result = run_formal_release_gate(root / "UeAgentInterfaceCMD", root, run_tests=True, allow_dirty=True)
 
         self.assertTrue(result["success"], result["issues"])

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ueagentinterfacecmd"
 version = "0.2.0"
-description = "Packaged CLI for driving UeAgentInterface HTTP server"
+description = "Python core and packaged CLI for driving UeAgentInterface HTTP server"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "UeAgentInterfaceCMD" }]

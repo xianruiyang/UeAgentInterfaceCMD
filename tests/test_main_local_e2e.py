@@ -45,6 +45,63 @@ class MainLocalE2ETests(unittest.TestCase):
             )
             self.assertEqual(exit_code, 2)
 
+    def test_dry_run_rejects_deprecated_command_by_default(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config = Path(temp_dir) / "config.json"
+            config.write_text('{"runtime_index_enabled": false}', encoding="utf-8")
+            plan = Path(temp_dir) / "deprecated.plan.json"
+            plan.write_text(
+                json.dumps(
+                    {
+                        "task_id": "deprecated_command",
+                        "phases": [{"name": "bad", "commands": [{"command": "spawn_actor"}]}],
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+            exit_code = cli_main.main(
+                ["--config", str(config), "run", "--plan", str(plan), "--dry-run", "--no-crash-capture"]
+            )
+            self.assertEqual(exit_code, 2)
+
+    def test_dry_run_allows_deprecated_command_when_explicit(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config = Path(temp_dir) / "config.json"
+            config.write_text('{"runtime_index_enabled": false}', encoding="utf-8")
+            report = Path(temp_dir) / "deprecated_report.json"
+            plan = Path(temp_dir) / "deprecated.plan.json"
+            plan.write_text(
+                json.dumps(
+                    {
+                        "task_id": "deprecated_command",
+                        "phases": [{"name": "allowed", "commands": [{"command": "spawn_actor"}]}],
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+            exit_code = cli_main.main(
+                [
+                    "--config",
+                    str(config),
+                    "run",
+                    "--plan",
+                    str(plan),
+                    "--dry-run",
+                    "--allow-deprecated-command",
+                    "--deprecated-use-case",
+                    "migration",
+                    "--report-file",
+                    str(report),
+                    "--no-crash-capture",
+                ]
+            )
+            self.assertEqual(exit_code, 0)
+            payload = json.loads(report.read_text(encoding="utf-8"))
+            lifecycle = payload["command_manifest_validation"]["command_lifecycle_validation"]
+            self.assertTrue(lifecycle["success"])
+
 
 if __name__ == "__main__":
     unittest.main()

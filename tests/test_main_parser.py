@@ -38,6 +38,20 @@ class MainParserTests(unittest.TestCase):
         self.assertEqual(args.subcommand, "manifest")
         self.assertTrue(args.summary)
 
+    def test_deprecated_command_override_parse(self):
+        args = self._parse(
+            [
+                "exec",
+                "--cmd",
+                "old_command",
+                "--allow-deprecated-command",
+                "--deprecated-use-case",
+                "migration",
+            ]
+        )
+        self.assertTrue(args.allow_deprecated_command)
+        self.assertEqual(args.deprecated_use_case, "migration")
+
     def test_release_parse(self):
         args = self._parse(["release", "all"])
         self.assertEqual(args.action, "all")

@@ -1,4 +1,9 @@
-from datetime import datetime
+﻿"""Compatibility alias for :mod:`uai_core.version`."""
 
-__version__ = "0.2.0"
-BUILD_TAG = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+from __future__ import annotations
+
+import sys
+
+from uai_core import version as _core_module
+
+sys.modules[__name__] = _core_module

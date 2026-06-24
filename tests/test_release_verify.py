@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,7 +11,13 @@ sys.path.insert(0, str(CLI_DIR))
 
 from uai_cli.quality_gate import run_quality_gate
 from uai_cli.project_paths import find_development_project_root
-from uai_cli.release_verify import build_coverage_matrix, verify_pak_layout, write_coverage_matrix
+from uai_cli.release_verify import (
+    build_coverage_matrix,
+    default_coverage_output_dir,
+    verify_pak_layout,
+    verify_written_coverage_matrix,
+    write_coverage_matrix,
+)
 
 
 class ReleaseVerifyTests(unittest.TestCase):
@@ -142,6 +149,74 @@ class ReleaseVerifyTests(unittest.TestCase):
             debt_text = debt_file.read_text(encoding="utf-8")
             self.assertIn("foo_apply_folder", debt_text)
 
+    def test_written_coverage_matrix_detects_stale_generated_file(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "Test.uproject").write_text("{}", encoding="utf-8")
+            plugin = root / "Plugins" / "UeAgentInterface"
+            docs = plugin / "docs" / "commands"
+            source = plugin / "Source" / "UeAgentInterface" / "Private" / "Commands" / "Test"
+            smoke_source = plugin / "Source" / "UeAgentInterfaceTests" / "Private" / "Smoke"
+            docs.mkdir(parents=True)
+            source.mkdir(parents=True)
+            smoke_source.mkdir(parents=True)
+            (docs / "01_Test.md").write_text(
+                "# Test\n\n"
+                "| 指令 | 用途 | 关键参数 | 关键返回 |\n"
+                "| --- | --- | --- | --- |\n"
+                "| `foo_existing` | existing | `asset_path` | `ok` |\n"
+                "| `foo_new_event_query` | event query | `asset_path` | `events` |\n",
+                encoding="utf-8",
+            )
+            (source / "UeAgentHttpServer_Test.cpp").write_text(
+                'if (CommandLower == TEXT("foo_existing")) return Cmd(Ctx, OutData, OutError);\n'
+                'if (CommandLower == TEXT("foo_new_event_query")) return Cmd(Ctx, OutData, OutError);\n',
+                encoding="utf-8",
+            )
+            (smoke_source / "UeAgentInterfaceSmoke_Test.cpp").write_text(
+                'TestTrue(TEXT("existing"), ExecSmokeCommand(this, ServerScope, TEXT("existing"), TEXT("foo_existing"), TEXT("{}"), Data));\n'
+                'TestTrue(TEXT("event"), ExecSmokeCommand(this, ServerScope, TEXT("event"), TEXT("foo_new_event_query"), TEXT("{}"), Data));\n',
+                encoding="utf-8",
+            )
+            generated_dir = default_coverage_output_dir(root, root)
+            generated_dir.mkdir(parents=True)
+            stale = {
+                "schema": "ue_agent_interface.coverage_matrix.v2",
+                "command_count": 1,
+                "missing_doc": [],
+                "missing_implementation": [],
+                "missing_smoke": [],
+                "raw_generated_doc_count": 0,
+                "deprecated_doc_count": 0,
+                "rows": [
+                    {
+                        "command": "foo_existing",
+                        "doc_file": "docs/commands/01_Test.md",
+                        "doc_status": "explicit",
+                        "deprecated": False,
+                        "implemented": True,
+                        "smoke_tested": True,
+                        "implementation_files": ["Source/UeAgentInterface/Private/Commands/Test/UeAgentHttpServer_Test.cpp"],
+                        "smoke_files": ["Source/UeAgentInterfaceTests/Private/Smoke/UeAgentInterfaceSmoke_Test.cpp"],
+                        "smoke_coverage_status": "direct",
+                        "smoke_coverage_priority": "covered",
+                    }
+                ],
+            }
+            (generated_dir / "command_coverage_matrix.json").write_text(json.dumps(stale), encoding="utf-8")
+
+            stale_result = verify_written_coverage_matrix(root)
+            self.assertFalse(stale_result["success"])
+            self.assertIn("foo_new_event_query", stale_result["missing_in_file"])
+
+            write_coverage_matrix(
+                generated_dir / "command_coverage_matrix.json",
+                generated_dir / "command_coverage_matrix.md",
+                root,
+            )
+            current_result = verify_written_coverage_matrix(root)
+            self.assertTrue(current_result["success"], current_result)
+
     def test_verify_pak_layout_minimal(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
@@ -204,7 +279,9 @@ class ReleaseVerifyTests(unittest.TestCase):
     def test_quality_gate_fails_on_smoke_debt(self):
         with patch("uai_cli.quality_gate.build_command_manifest") as manifest_mock, patch(
             "uai_cli.quality_gate.build_coverage_matrix"
-        ) as coverage_mock, patch("uai_cli.quality_gate.verify_pak_layout") as pak_mock:
+        ) as coverage_mock, patch("uai_cli.quality_gate.verify_written_coverage_matrix") as written_coverage_mock, patch(
+            "uai_cli.quality_gate.verify_pak_layout"
+        ) as pak_mock:
             manifest_mock.return_value = {"command_count": 1, "warnings": []}
             coverage_mock.return_value = {
                 "command_count": 1,
@@ -214,6 +291,7 @@ class ReleaseVerifyTests(unittest.TestCase):
                 "raw_generated_doc_count": 0,
                 "smoke_coverage": {"actionable_missing_count": 1, "p0_count": 1, "p1_count": 0},
             }
+            written_coverage_mock.return_value = {"success": True, "reason": "current"}
             pak_mock.return_value = {"success": True, "issues": [], "warnings": []}
 
             result = run_quality_gate(CURRENT.parents[1], run_tests=False)
@@ -225,7 +303,9 @@ class ReleaseVerifyTests(unittest.TestCase):
     def test_quality_gate_fails_on_generated_catalog_docs(self):
         with patch("uai_cli.quality_gate.build_command_manifest") as manifest_mock, patch(
             "uai_cli.quality_gate.build_coverage_matrix"
-        ) as coverage_mock, patch("uai_cli.quality_gate.verify_pak_layout") as pak_mock:
+        ) as coverage_mock, patch("uai_cli.quality_gate.verify_written_coverage_matrix") as written_coverage_mock, patch(
+            "uai_cli.quality_gate.verify_pak_layout"
+        ) as pak_mock:
             manifest_mock.return_value = {"command_count": 1, "warnings": []}
             coverage_mock.return_value = {
                 "command_count": 1,
@@ -235,6 +315,7 @@ class ReleaseVerifyTests(unittest.TestCase):
                 "raw_generated_doc_count": 1,
                 "smoke_coverage": {"actionable_missing_count": 0, "p0_count": 0, "p1_count": 0},
             }
+            written_coverage_mock.return_value = {"success": True, "reason": "current"}
             pak_mock.return_value = {"success": True, "issues": [], "warnings": []}
 
             result = run_quality_gate(CURRENT.parents[1], run_tests=False)
@@ -242,6 +323,36 @@ class ReleaseVerifyTests(unittest.TestCase):
             self.assertFalse(result["success"])
             self.assertFalse(coverage_check["success"])
             self.assertEqual(1, coverage_check["generated_doc_catalog_count"])
+
+    def test_quality_gate_fails_on_stale_generated_coverage(self):
+        with patch("uai_cli.quality_gate.build_command_manifest") as manifest_mock, patch(
+            "uai_cli.quality_gate.build_coverage_matrix"
+        ) as coverage_mock, patch("uai_cli.quality_gate.verify_written_coverage_matrix") as written_coverage_mock, patch(
+            "uai_cli.quality_gate.verify_pak_layout"
+        ) as pak_mock:
+            manifest_mock.return_value = {"command_count": 1, "warnings": []}
+            coverage_mock.return_value = {
+                "command_count": 1,
+                "missing_doc": [],
+                "missing_implementation": [],
+                "missing_smoke": [],
+                "raw_generated_doc_count": 0,
+                "smoke_coverage": {"actionable_missing_count": 0, "p0_count": 0, "p1_count": 0},
+            }
+            written_coverage_mock.return_value = {
+                "success": False,
+                "reason": "generated_coverage_stale",
+                "missing_in_file": ["foo_new_event_query"],
+                "extra_in_file": [],
+                "changed_command_count": 0,
+            }
+            pak_mock.return_value = {"success": True, "issues": [], "warnings": []}
+
+            result = run_quality_gate(CURRENT.parents[1], run_tests=False)
+            generated_check = next(check for check in result["checks"] if check["name"] == "generated_coverage_current")
+            self.assertFalse(result["success"])
+            self.assertFalse(generated_check["success"])
+            self.assertEqual(1, generated_check["missing_in_file_count"])
 
     def test_quality_gate_disables_python_bytecode_for_unit_tests(self):
         with patch("uai_cli.quality_gate.build_command_manifest", return_value={"command_count": 1, "warnings": []}), patch(
@@ -254,7 +365,9 @@ class ReleaseVerifyTests(unittest.TestCase):
                 "raw_generated_doc_count": 0,
                 "smoke_coverage": {"actionable_missing_count": 0, "p0_count": 0, "p1_count": 0},
             },
-        ), patch("uai_cli.quality_gate.verify_pak_layout", return_value={"success": True, "issues": [], "warnings": []}), patch(
+        ), patch("uai_cli.quality_gate.verify_written_coverage_matrix", return_value={"success": True, "reason": "current"}), patch(
+            "uai_cli.quality_gate.verify_pak_layout", return_value={"success": True, "issues": [], "warnings": []}
+        ), patch(
             "uai_cli.quality_gate.subprocess.run"
         ) as run_mock:
             run_mock.return_value.returncode = 0

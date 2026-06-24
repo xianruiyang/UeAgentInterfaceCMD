@@ -121,9 +121,19 @@
 .\dist\uai-cli.exe manifest --output ".\docs\generated\command_manifest.json" --json-output
 ```
 
-`manifest` 会从插件命令文档、C++ dispatch 和 smoke test 中生成机器可读清单。`exec / batch / run / resume` 默认会先用该清单检查命令名，避免把明显不存在的指令发给 UE。
+`manifest` 会从插件命令文档、C++ dispatch 和 smoke test 中生成机器可读清单。`exec / batch / run / resume` 默认会先用该清单检查命令名和废弃生命周期，避免把明显不存在或已废弃的 authoring 指令发给 UE。
 
 manifest 内同时包含从文档关键参数推导出的 `param_schema`。默认 `param_validation_mode=warn`，类型不匹配或未知参数会进入 report warning；设置为 `strict` 时 warning 会升级为执行失败。
+
+对高频且高置信的指令，UAICore 还会在 preflight 阶段执行必填参数和常见别名校验。此类错误即使在 `warn` 模式也会阻断 HTTP 请求，例如 `asset_duplicate` 使用 `asset_path` 代替 `source_asset_path`，或 `control_rig_apply_folder` 只传 `asset_path` 而没有 `folder_path`。返回的 issue 会给出 `param_alias:<wrong>-><expected>` 或 `missing_required_param:*`，用于在调用 UE 前修正脚本。
+
+`docs/commands/deprecatedCommand/` 中的命令会保留兼容实现和 manifest 记录，但默认被阻断。只有兼容、迁移、诊断或修复场景可以显式放行：
+
+```powershell
+.\dist\uai-cli.exe run --plan ".\plans\legacy_migration.json" --allow-deprecated-command --deprecated-use-case migration --json-output
+```
+
+允许的用途包括 `bootstrap / compatibility / diagnostic / migration / repair / schema_boundary / smoke`。普通资产制作不要使用该开关。
 
 ### 4.8 兼容检查：`compat`
 
@@ -173,14 +183,14 @@ manifest 内同时包含从文档关键参数推导出的 `param_schema`。默�
 `release ci` is the formal CI gate entrypoint. It runs coverage checks, sync-check, Pak verify, release-package hygiene checks, Dev CLI unit tests and Pak CLI unit tests by default, then returns one machine-readable gate result. It rejects dirty related worktrees unless `--allow-dirty` is explicitly used for local diagnostics. It also rejects release-package artifacts such as `runtimeLogs/`, `logs/`, report payloads, `tmp/`, `.pytest_cache/`, `__pycache__/`, `Binaries/`, `Intermediate/`, `Saved/` and `DerivedDataCache/` inside `UeAgentInterfacePak`. Test-generated CLI logs/cache are cleaned before the final hygiene pass so CI does not leave a polluted Pak tree behind.
 
 - Use `--skip-tests` only for fast local diagnosis.
-- Use `--write-coverage` when intentionally regenerating `docs/generated/*` before committing release docs.
+- Use `--write-coverage` when intentionally regenerating `Plugins/UeAgentInterface/docs/generated/*` before committing release docs.
 - Use `--ci-output <path>` to write the full formal gate JSON report as a CI artifact.
 
 `release dev-mirror` 默认保护 Pak 内 git submodule 工作区：非 `--dry-run` 写入会拒绝直接复制到
 `UeAgentInterfacePak/UeAgentInterface` 和 `UeAgentInterfacePak/UeAgentInterfaceCMD`。只有明确需要本地临时镜像时，
 才传 `--allow-submodule-content-write`；该结果仍然返回 `formal_release_allowed=false`，不能作为正式发布。
 
-`release coverage` 生成 `docs/generated/command_coverage_matrix.json|md`，汇总 `命令 -> 文档 -> 实现 -> smoke` 覆盖关系。所有已实现命令都必须出现在 automation smoke 源码或显式 smoke coverage ledger 中，否则 `missing_smoke` 会进入债务报告。
+`release coverage` 默认生成 `Plugins/UeAgentInterface/docs/generated/command_coverage_matrix.json|md`，汇总 `命令 -> 文档 -> 实现 -> smoke` 覆盖关系；可用 `--output-json/--output-md` 显式覆盖输出路径。所有已实现命令都必须出现在 automation smoke 源码或显式 smoke coverage ledger 中，否则 `missing_smoke` 会进入债务报告。
 `release pak-verify` 检查 Pak 目录关键文件、skill、CLI 与基础 hash 差异。`release examples` 生成 `examples/generated/` 里的只读 golden E2E 示例。`release gate` 汇总 manifest、coverage、Pak verify，可加 `--run-tests` 同时运行 CLI 单测；`missing_smoke` 不再只是提示，会让 gate 失败。
 
 发布拓扑相关命令：
@@ -235,7 +245,7 @@ GitHub 远端发布是明确的人工边界：CLI 和 Agent 可以准备本地�
 - `runtimeLogs/crashes/<run_id>/crash-summary.md`
 - `runtimeLogs/uai_cli_index.json`
 - `examples/generated/`
-- `docs/generated/implemented_command_catalog.md`
+- `Plugins/UeAgentInterface/docs/generated/implemented_command_catalog.md`
 
 ## 7. 常见问题
 

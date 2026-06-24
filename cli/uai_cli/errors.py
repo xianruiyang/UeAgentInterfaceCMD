@@ -1,18 +1,9 @@
-class UaiCliError(Exception):
-    pass
+﻿"""Compatibility alias for :mod:`uai_core.errors`."""
 
+from __future__ import annotations
 
-class ConfigError(UaiCliError):
-    pass
+import sys
 
+from uai_core import errors as _core_module
 
-class HttpError(UaiCliError):
-    def __init__(self, message: str, status_code: int | None = None, payload: dict | None = None):
-        super().__init__(message)
-        self.status_code = status_code
-        self.payload = payload or {}
-
-
-class PlanError(UaiCliError):
-    pass
-
+sys.modules[__name__] = _core_module
