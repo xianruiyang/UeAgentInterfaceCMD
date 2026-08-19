@@ -6,6 +6,8 @@ import hashlib
 import json
 import re
 
+import pytest
+
 from uai.commands import BINDING_CATALOG, bind_generated_commands
 from tools.uai_repository.migration_evidence import (
     historical_obligation_fingerprint,
@@ -213,6 +215,7 @@ def test_t44_old_ids_are_absent_from_current_manifest_and_sdk() -> None:
     )
 
 
+@pytest.mark.historical_evidence
 def test_t44_current_successor_consumes_fingerprint_and_product_receipt() -> None:
     project_root = Path(__file__).resolve().parents[3]
     plan_root = (

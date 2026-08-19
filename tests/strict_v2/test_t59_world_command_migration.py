@@ -4,6 +4,9 @@ from typing import Any
 import hashlib
 import json
 import re
+
+import pytest
+
 from uai.commands import BINDING_CATALOG,bind_generated_commands
 from tools.uai_repository.migration_evidence import (
     historical_obligation_fingerprint,
@@ -60,6 +63,7 @@ def test_t59_legacy_binding_and_tutorial_authority_exit():
   for ns,m in METHODS.values():assert f"client.{ns}.{m}" in text
   assert "command_search" in text and "command_detail" in text and "uai-cli" in text and "semantic_frame_id" in text and "uai.generated_commands" not in text
 
+@pytest.mark.historical_evidence
 def test_t59_current_successor_consumes_all_26_frozen_rows_and_product_receipt():
  project_root=Path(__file__).resolve().parents[3]
  plan_root=project_root/"docs"/"plan"/"20260806_UAI_REQUIREMENT_DESIGN_REALIGNMENT"

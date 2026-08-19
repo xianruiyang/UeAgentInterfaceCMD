@@ -52,6 +52,9 @@ uai-cli --connection connection.toml exec namespace.command --params-json "{}"
   `tools/uai_repository/migration_evidence/` 仍是受保护的 adoption residual。它们的
   权威拆分受 `DCR-UAI-TARGET-TAXONOMY` 与 `DCR-UAI-TARGET-PROVENANCE` 阻断，
   当前既不作为公开用法，也不单独作为完成门禁；
+- `historical_evidence` pytest marker 只标记仍绑定旧根计划任务收据的历史
+  oracle。默认 pytest 选择明确排除这些 case；需要审计历史时可显式使用
+  `python -m pytest -m historical_evidence`，其结果不得作为当前产品完成证据；
 - ignored cache、build、日志和运行输出可以重建，不得反推当前实现或任务状态；
 - 本仓库的开发提交不等于 Pak/installed 发布；发布、同步和 gitlink 更新必须走
   各自正式流程。

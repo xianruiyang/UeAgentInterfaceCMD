@@ -24,3 +24,9 @@ where = ["cli"]
 
 [tool.setuptools.package-data]
 "uai.commands" = ["*.pyi"]
+
+[tool.pytest.ini_options]
+addopts = "-m 'not historical_evidence'"
+markers = [
+    "historical_evidence: preserved oracle that consumes pre-root-plan task receipts and is excluded from the current product suite",
+]

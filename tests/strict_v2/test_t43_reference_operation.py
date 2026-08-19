@@ -6,6 +6,8 @@ import hashlib
 import json
 import re
 
+import pytest
+
 from uai.commands import BINDING_CATALOG, bind_generated_commands
 from tools.uai_repository.migration_evidence import (
     LegacyReferenceSpec,
@@ -97,6 +99,7 @@ def test_t43_has_no_task_specific_binding_or_tutorial_authority() -> None:
         assert "uai.generated_commands" not in text
 
 
+@pytest.mark.historical_evidence
 def test_t43_consumes_current_manifest_receipt_and_legacy_exit_adapter() -> None:
     project_root = Path(__file__).resolve().parents[3]
     active = load_active_command_snapshot(

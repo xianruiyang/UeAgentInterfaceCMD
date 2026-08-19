@@ -77,35 +77,25 @@ class PublicDistributionBoundaryTests(unittest.TestCase):
             "public_sdk_playbook_missing",
         )
 
-    def test_public_catalog_examples_use_server_supported_values(self) -> None:
+    def test_public_discovery_examples_use_current_command_contract(self) -> None:
         for path in (PUBLIC_SDK_DOC, PUBLIC_PLAYBOOK, PAK_README):
             text = path.read_text(encoding="utf-8-sig")
             with self.subTest(path=path):
-                self.assertNotIn(
-                    'match_mode="contains"',
-                    text,
-                    "catalog_example_uses_unsupported_match_mode",
-                )
-                self.assertNotIn(
-                    'materialization_policy="none"',
-                    text,
-                    "catalog_example_uses_unsupported_materialization_policy",
-                )
-                self.assertNotIn(
-                    'catalog_kind="asset"',
-                    text,
-                    "catalog_example_uses_unregistered_catalog_source",
-                )
-                self.assertNotIn(
-                    '"catalog_kind": "asset"',
-                    text,
-                    "dynamic_catalog_example_uses_unregistered_catalog_source",
-                )
-                self.assertIn('catalog_kind="uai_reference"', text)
-                self.assertIn('match_mode="broad"', text)
+                for retired in (
+                    "reference.catalog_search",
+                    "catalog_kind",
+                    "match_mode",
+                    "materialization_policy",
+                ):
+                    self.assertNotIn(
+                        retired,
+                        text,
+                        f"public_discovery_uses_retired_catalog:{retired}",
+                    )
                 self.assertIn(
-                    'materialization_policy="index_only"',
+                    "query.command_search(",
                     text,
+                    "public_discovery_named_method_missing",
                 )
 
     def test_skill_sync_uses_repository_tool_not_removed_runtime(self) -> None:

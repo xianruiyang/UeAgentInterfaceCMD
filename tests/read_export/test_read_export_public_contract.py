@@ -27,13 +27,18 @@ def test_read_export_commands_are_cpp_manifest_owned_and_generated() -> None:
     by_id = {str(command["command_id"]): command for command in commands}
 
     required_ids = {
-        "reference.catalog_search",
+        "query.command.search",
+        "query.command.detail",
         "reference.asset_read",
         "content_graph.export_workspace",
     }
     assert required_ids.issubset(by_id)
+    assert "reference.catalog_search" not in by_id
     assert "/api/uai/export" not in by_id
-    assert manifest["source"]["kind"] == "cpp_command_registry_export"
+    assert (
+        manifest["source"]["kind"]
+        == "cpp_immutable_command_registry_export"
+    )
 
     generated = GENERATED_PATH.read_text(encoding="utf-8")
     for command_id in sorted(required_ids):
@@ -46,9 +51,6 @@ def test_read_export_commands_are_cpp_manifest_owned_and_generated() -> None:
     ] == [
         "target",
         "workspace_path",
-        "input",
-        "context",
-        "projection",
         "profile_id",
     ]
 
@@ -58,7 +60,8 @@ def test_public_read_shape_does_not_expose_internal_dispatch() -> None:
     commands = manifest["commands"]
     by_id = {str(command["command_id"]): command for command in commands}
     for command_id in (
-        "reference.catalog_search",
+        "query.command.search",
+        "query.command.detail",
         "reference.asset_read",
         "content_graph.export_workspace",
     ):

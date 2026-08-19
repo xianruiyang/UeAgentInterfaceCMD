@@ -6,6 +6,8 @@ import hashlib
 import json
 import re
 
+import pytest
+
 from uai.commands import BINDING_CATALOG, bind_generated_commands
 from tools.uai_repository.migration_evidence import (
     historical_obligation_fingerprint,
@@ -155,6 +157,7 @@ def test_t41_has_no_task_specific_binding_or_tutorial_authority() -> None:
         assert "uai.generated_commands" not in text
 
 
+@pytest.mark.historical_evidence
 def test_t41_current_successor_consumes_both_complete_inventory_rows_and_product_receipt() -> None:
     project_root = Path(__file__).resolve().parents[3]
     plan_root = (

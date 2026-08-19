@@ -135,12 +135,12 @@ ue.content_graph.import_workspace(
 )
 ```
 
-当前正式 manifest 包含 340 条命令（均为 active command），覆盖 Query discovery、
-Read/Export、Reference CRUD、
+当前公开命令集合以 C++ 冻结 `FUeAgentImmutableCommandRegistry` 的正式 manifest
+为唯一依据，覆盖 Query discovery、Read/Export、Reference CRUD、
 SimpleAuthoring、Timeline/Spatial、GraphCompound、Destructive/Import 与
-LongRunning/Session 等统一模块。命名方法全部由 C++ 正式 manifest 生成，Python
-不手写或补充第二份命令列表；manifest 数量本身不代表每条 command 都已获得完整
-E3/E4 真实 UE 证据。
+LongRunning/Session 等模块。命名方法全部由该 manifest 生成，Python 不手写或
+补充第二份命令列表；硬编码命令数量既不是同步机制，也不代表每条 command 都已
+获得完整 E3/E4 真实 UE 证据。
 
 `content_graph.compound` 的领域合同要求 `input.sections`。SDK 不在客户端
 补业务默认值；完整 authoring Export 需要的 sections 和 closure 默认由
@@ -231,7 +231,7 @@ uai-cli --connection connection.toml exec query.calibration.read `
 
 参数来源三选一：
 
-- `--params-json '{"catalog_kind":"uai_reference",...}'`
+- `--params-json '{"intent":"inspect the current editor","limit":3}'`
 - `--params-file params.json`
 - `--params-stdin`
 
@@ -250,7 +250,8 @@ uai-cli --connection connection.toml exec query.calibration.read `
 
 ## 静态 binding 生成
 
-静态 binding 的唯一输入是 C++ CommandContractRegistry 导出的正式 manifest：
+静态 binding 的唯一输入是 C++ `FUeAgentImmutableCommandRegistry` 经
+`FUeAgentActiveCommandManifest` 导出的正式 manifest：
 
 ```powershell
 python tools/uai_binding/generate_bindings.py `

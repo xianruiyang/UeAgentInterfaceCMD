@@ -6,6 +6,8 @@ import hashlib
 import json
 import re
 
+import pytest
+
 from uai.commands import BINDING_CATALOG, bind_generated_commands
 from tools.uai_repository.migration_evidence import (
     historical_obligation_fingerprint,
@@ -261,6 +263,7 @@ def test_t40_old_ids_are_absent_and_bake_probe_are_distinct_current_commands() -
     assert "texture_graph.artifact.capture" in active_ids
 
 
+@pytest.mark.historical_evidence
 def test_t40_current_successor_consumes_the_complete_inventory_fingerprint_and_product_receipt() -> None:
     project_root = Path(__file__).resolve().parents[3]
     plan_root = (

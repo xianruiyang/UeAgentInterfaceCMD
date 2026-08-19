@@ -25,7 +25,7 @@ class CppPublicCommandEdgeContractTests(unittest.TestCase):
         self.assertEqual(payload.get("schema"), "uai.command_manifest.v1")
         self.assertEqual(
             (payload.get("source") or {}).get("kind"),
-            "cpp_command_registry_export",
+            "cpp_immutable_command_registry_export",
         )
         commands = payload.get("commands")
         self.assertIsInstance(commands, list)
@@ -56,13 +56,15 @@ class CppPublicCommandEdgeContractTests(unittest.TestCase):
         }
         self.assertTrue(
             {
-                "reference.catalog_search",
+                "query.command.search",
+                "query.command.detail",
                 "reference.asset_read",
                 "reference.asset_apply",
                 "content_graph.export_workspace",
                 "content_graph.import_workspace",
             }.issubset(by_id)
         )
+        self.assertNotIn("reference.catalog_search", by_id)
         self.assertEqual(
             [
                 parameter["name"]
@@ -73,13 +75,9 @@ class CppPublicCommandEdgeContractTests(unittest.TestCase):
             [
                 "target",
                 "source",
-                "intent",
                 "expected_revision",
-                "context",
-                "projection",
-                "profile_id",
-                "dry_run",
-                "destructive_authorization_id",
+                "authorization_id",
+                "limits",
             ],
         )
         self.assertEqual(
@@ -90,7 +88,19 @@ class CppPublicCommandEdgeContractTests(unittest.TestCase):
                     "nullable": False,
                     "required": True,
                     "wire_type": "string",
-                }
+                },
+                {
+                    "name": "context",
+                    "nullable": False,
+                    "required": False,
+                    "wire_type": "object",
+                },
+                {
+                    "name": "projection",
+                    "nullable": False,
+                    "required": False,
+                    "wire_type": "object",
+                },
             ],
         )
 
