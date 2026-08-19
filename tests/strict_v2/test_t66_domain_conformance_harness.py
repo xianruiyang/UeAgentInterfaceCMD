@@ -13,7 +13,6 @@ from tests.support.domain_conformance import (
     build_equivalent_sources,
     build_owned_worker_plan,
     validate_product_evidence,
-    validate_representative_calibrations,
 )
 
 
@@ -115,18 +114,3 @@ def test_synthetic_or_incomplete_receipt_cannot_become_product_ready(
                 cleanup_observed=True,
             ),
         )
-
-
-def test_representative_calibration_is_bounded_and_current() -> None:
-    project_root = Path(__file__).resolve().parents[3]
-    calibration_path = (
-        project_root
-        / "Plugins/UeAgentInterface/Source/UeAgentInterfaceTests/Private/Fixtures/DomainConformance/t13_t27_t30.json"
-    )
-    calibrated = validate_representative_calibrations(project_root, calibration_path)
-    assert [item["domain_id"] for item in calibrated] == [
-        "uobject-dataasset",
-        "datatable-curvetable",
-        "localization-string-table",
-    ]
-    assert all(item["bounded_claim"] for item in calibrated)

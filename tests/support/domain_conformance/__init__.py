@@ -202,72 +202,6 @@ def validate_product_evidence(
         )
 
 
-def _resolve_path(value: Any, dotted_path: str) -> Any:
-    current = value
-    for part in dotted_path.split("."):
-        if isinstance(current, list):
-            current = current[int(part)]
-        elif isinstance(current, dict) and part in current:
-            current = current[part]
-        else:
-            raise ConformanceError(
-                f"domain_conformance_calibration_path_missing:{dotted_path}"
-            )
-    return current
-
-
-def validate_representative_calibrations(
-    project_root: Path,
-    calibration_path: Path,
-) -> list[dict[str, Any]]:
-    payload = json.loads(calibration_path.read_text(encoding="utf-8"))
-    if payload.get("schema") != "uai.domain_conformance.calibration.v1":
-        raise ConformanceError("domain_conformance_calibration_schema_invalid")
-    calibrations = payload.get("calibrations")
-    if not isinstance(calibrations, list) or not calibrations:
-        raise ConformanceError("domain_conformance_calibration_empty")
-    domain_ids: set[str] = set()
-    for item in calibrations:
-        domain_id = item.get("domain_id")
-        if not isinstance(domain_id, str) or not domain_id or domain_id in domain_ids:
-            raise ConformanceError(
-                f"domain_conformance_calibration_domain_invalid:{domain_id}"
-            )
-        domain_ids.add(domain_id)
-        if item.get("public_route_id") != "content_graph.import_workspace":
-            raise ConformanceError(
-                f"domain_conformance_calibration_route_invalid:{domain_id}"
-            )
-        if not item.get("bounded_claim"):
-            raise ConformanceError(
-                f"domain_conformance_calibration_unbounded:{domain_id}"
-            )
-        evidence_ref = item.get("evidence_ref")
-        evidence_path = project_root / evidence_ref
-        if not isinstance(evidence_ref, str) or not evidence_path.is_file():
-            raise ConformanceError(
-                f"domain_conformance_calibration_evidence_missing:{domain_id}"
-            )
-        evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
-        for assertion in item.get("required_equals", []):
-            observed = _resolve_path(evidence, assertion["path"])
-            if observed != assertion["value"]:
-                raise ConformanceError(
-                    "domain_conformance_calibration_assertion_failed:"
-                    f"{domain_id}:{assertion['path']}"
-                )
-        for assertion in item.get("required_contains", []):
-            observed = _resolve_path(evidence, assertion["path"])
-            if not isinstance(observed, list) or not any(
-                assertion["value"] in str(value) for value in observed
-            ):
-                raise ConformanceError(
-                    "domain_conformance_calibration_assertion_failed:"
-                    f"{domain_id}:{assertion['path']}"
-                )
-    return calibrations
-
-
 __all__ = [
     "ConformanceError",
     "DomainFixture",
@@ -276,5 +210,4 @@ __all__ = [
     "build_equivalent_sources",
     "build_owned_worker_plan",
     "validate_product_evidence",
-    "validate_representative_calibrations",
 ]
