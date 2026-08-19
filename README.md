@@ -1,54 +1,54 @@
 # UeAgentInterfaceCMD
 
-`UeAgentInterfaceCMD` 是 `UeAgentInterface` 的 Python SDK、CLI 与配套仓库工具源码。
+`UeAgentInterfaceCMD` 承载 UAI 的公开 Python SDK、薄 CLI，以及只服务本仓库的
+binding 和仓库诊断工具。它是模型连接远端 UAI 服务的客户端边界：Python 每次只
+转发正式 manifest 中的一条真实指令，不实现第二套 UE 业务，也不在 Transport
+Adapter 之外直接操作 HTTP。
 
-## 当前状态
+## 公开入口
 
-Python 客户端已经迁移到新的单一转发边界。本地 CommandSpec 教程、
-ScenarioCoverage selector、组合 quality gate、旧 `uai_core.UaiCore`、
-`run/batch/resume` 和 Python 业务第二实现已经退出 active runtime，不再作为
-SDK 设计、兼容入口或业务正确性的依据。
+Python 调用只导入 `uai`，并从一份完整的 Connection TOML 建立 Client：
 
-目标公开接口为：
+```python
+import uai
 
-- 普通代码只导入 `uai`；
-- `uai.connect(<connection.toml>)` 建立可直接使用的 Client；
-- 每个 `ue.<namespace>.<command>(...)` 只转发一条真实 UAI command；
-- Python 不实现 HJSON、Contract、Planning、Durable、Verification 或领域业务；
-- CLI 复用与 SDK 相同的 Client、Protocol 和 Transport。
+with uai.connect("connection.toml") as client:
+    result = client.execute("namespace.command", {"name": "value"})
+```
 
-当前 `import uai`、Connection TOML、纯客户端 Transport、`uai.command.v1`
-Protocol、单指令 Client、由 C++ 正式 manifest 生成的静态 binding，以及同链路
-`uai-cli exec` 已经建立。当前只实现 HTTP Transport Adapter；HTTP route 只出现
-在 Connection TOML 和 Adapter 内部，不进入 Client、Protocol 或 command method。
+CLI 与 SDK 共用 Client、Protocol 和 Transport，只提供连接检查与单指令转发：
 
-当前生成的首批静态方法为
-`client.reference.catalog_search(...)`、`client.reference.asset_apply(...)` 和
-`client.reference.asset_read(...)`。SDK/CLI 的本地协议、转发与无损结果合同已
-通过定向测试；到真实 C++ 服务的跨进程 E3 也已验证 SDK 命名 Query、CLI 同链路
-调用，以及 effect 后独立 UE 持久状态读回。尚未进入正式 manifest 的旧能力仍按
-未迁移处理，不由 Python 兼容层补回。
+```text
+uai-cli --connection connection.toml connection show
+uai-cli --connection connection.toml connection probe
+uai-cli --connection connection.toml exec namespace.command --params-json "{}"
+```
 
-正式用法见 [`docs/PYTHON_SDK_AND_CLI.md`](docs/PYTHON_SDK_AND_CLI.md)，目标规范见
-项目计划
-`../docs/plan/20260726_UAI_FRAMEWORK_RECOVERY_REPLAN/UAI_PYTHON_CLIENT_AND_CLI_DESIGN.md`。
+参数来源、精确 contract 调用、结果和退出码等正式用法见
+[`docs/PYTHON_SDK_AND_CLI.md`](docs/PYTHON_SDK_AND_CLI.md)。指令身份和 schema
+以 Plugin 的正式 manifest 为权威来源；`tools/uai_binding` 生成的静态 binding
+只是可重建投影，不是第二份指令真源。
 
-## 目录
+## 目录职责
 
-- `cli/uai/`：唯一公开 SDK 包与 client-only 内部分层；
-- `cli/uai_cli/`：只依赖公开 `uai` 的薄 CLI 外壳；
-- `tests/network_transport/`：Transport 边界测试；
-- `tests/uai_protocol/`：公开 command wire、单次转发和无损 response 测试；
-- `tests/uai_client/`：Client 生命周期与单指令调用测试；
-- `tests/command_binding/`：正式 manifest 与静态 binding 生成测试；
-- `tests/uai_cli/`：薄 CLI 与 SDK 同链路测试；
-- `tests/public_api/`：public-edge 静态与 import 边界测试；
-- `tools/uai_binding/`：只消费 C++ 正式 manifest 的确定性 binding generator；
+- `cli/uai/`：唯一公开 Python SDK 包及其 client-only 内部分层；
+- `cli/uai_cli/`：只依赖公开 `uai` 的薄命令行入口；
+- `tools/uai_binding/`：消费正式 manifest 的确定性 binding generator；
 - `tools/uai_repository/`：不进入 SDK import graph 的仓库诊断工具；
-- `tools/tests/`：仓库工具的独立模块测试；
-- `scripts/ue/BuildUeDiscoveryReceiptSet.py`：项目外层 standalone UE 测试证据桥，
-  不属于客户 SDK，也不依赖旧 `uai_core`。
+- `tools/tests/`：仓库工具自身的模块测试；
+- `tests/`：SDK、协议、CLI 和边界行为的验证证据，不单独定义产品完成状态；
+- `docs/`：当前 SDK/CLI 合同和维护说明；
+- `templates/`、`reports/` 与 `build/README.md`：模板或受控输出落点说明，生成结果
+  不作为源码、计划或状态真源。
 
-## 许可证
+## 生命周期与发布边界
 
-本仓库使用 MIT License，见 `LICENSE`。
+- `retired/strict_v2/` 是按需精确读取的历史证据根，不属于普通实现发现面；
+- `examples/`、`plans/`、`vars/`、已经 tracked 的 `*.egg-info`，以及 strict_v2
+  相关 tests/docs 是受保护的 adoption residual；在消费者复核完成前不删除，也
+  不作为当前 public usage 或完成门禁；
+- ignored cache、build、日志和运行输出可以重建，不得反推当前实现或任务状态；
+- 本仓库的开发提交不等于 Pak/installed 发布；发布、同步和 gitlink 更新必须走
+  各自正式流程。
+
+仓库文本由 `.gitattributes` 统一为 LF。许可证见 [`LICENSE`](LICENSE)。

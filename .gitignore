@@ -1,4 +1,6 @@
 # 打包与运行产物
+build/*
+!build/README.md
 dist/
 release/
 temp/
@@ -19,6 +21,7 @@ dist/tmp/
 
 # Python 缓存
 __pycache__/
+*.egg-info/
 *.pyc
 *.pyo
 .pytest_cache/
