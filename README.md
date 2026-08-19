@@ -44,9 +44,14 @@ uai-cli --connection connection.toml exec namespace.command --params-json "{}"
 ## 生命周期与发布边界
 
 - `retired/strict_v2/` 是按需精确读取的历史证据根，不属于普通实现发现面；
-- `examples/`、`plans/`、`vars/`、已经 tracked 的 `*.egg-info`，以及 strict_v2
-  相关 tests/docs 是受保护的 adoption residual；在消费者复核完成前不删除，也
-  不作为当前 public usage 或完成门禁；
+- 旧 `examples/`、`plans/`、`vars/` 与 `tools/dev-run.ps1` 已逐字节迁入
+  `retired/strict_v2/legacy_cli_surface/`，只保留历史证据身份，不得导入或执行；
+- `*.egg-info/` 是被忽略且可由打包工具重建的元数据，不进入版本控制；
+- `docs/active/`、`tests/strict_v2/`、`tests/support/`，以及
+  `tools/uai_repository/command_contract_generation/` 和
+  `tools/uai_repository/migration_evidence/` 仍是受保护的 adoption residual。它们的
+  权威拆分受 `DCR-UAI-TARGET-TAXONOMY` 与 `DCR-UAI-TARGET-PROVENANCE` 阻断，
+  当前既不作为公开用法，也不单独作为完成门禁；
 - ignored cache、build、日志和运行输出可以重建，不得反推当前实现或任务状态；
 - 本仓库的开发提交不等于 Pak/installed 发布；发布、同步和 gitlink 更新必须走
   各自正式流程。
