@@ -1,0 +1,5 @@
+commands: [
+  { command: get_world_state, params: {} }
+  { command: list_actors, params: { limit: 20 } }
+]
+stop_on_error: true

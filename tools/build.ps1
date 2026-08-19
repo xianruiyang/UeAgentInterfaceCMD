@@ -37,7 +37,4 @@ python -m PyInstaller `
 if ($LASTEXITCODE -ne 0) {
     throw "PyInstaller build failed."
 }
-
-Copy-Item "$Root\uai-cli.default.json" "$Root\dist\uai-cli.default.json" -Force
-
 Write-Host "Build done: $Root\dist\uai-cli.exe"

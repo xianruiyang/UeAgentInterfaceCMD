@@ -1,0 +1,49 @@
+{
+  "schema": "uai.command_manifest.v1",
+  "manifest_version": 1,
+  "wire_schema": "uai.command.v1",
+  "wire_version": 1,
+  "source": {
+    "kind": "cpp_immutable_command_registry_export",
+    "plugin_version": "test-only",
+    "build_id": "python-generator-contract-fixture"
+  },
+  "registry_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "commands": [
+    {
+      "command_id": "fixture.echo_exact",
+      "namespace": "fixture",
+      "method": "echo_exact",
+      "parameters": [
+        {
+          "name": "required_text",
+          "wire_type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "optional_note",
+          "wire_type": "string",
+          "required": false,
+          "nullable": false
+        },
+        {
+          "name": "nullable_value",
+          "wire_type": "any",
+          "required": false,
+          "nullable": true
+        },
+        {
+          "name": "large_integer",
+          "wire_type": "integer",
+          "required": true,
+          "nullable": false
+        }
+      ],
+      "min_wire_version": 1,
+      "max_wire_version": 1,
+      "status": "active",
+      "binding_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ]
+}

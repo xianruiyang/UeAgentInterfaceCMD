@@ -1,68 +1,53 @@
 # UeAgentInterfaceCMD
 
-`UeAgentInterfaceCMD` 是 `UeAgentInterface` 的外置命令行工具与 Python core 库目录。
-目标是通过 `uai_core` 复用执行逻辑，并通过 `uai-cli` 提供兼容命令行入口，减少重复输入、提高稳定性和可追踪性。
+`UeAgentInterfaceCMD` 是 `UeAgentInterface` 的 Python SDK、CLI 与配套仓库工具源码。
 
-它与 `UeAgentInterface` 插件仓库配套使用：插件运行在 UE Editor 内，`uai_core` 负责配置、HTTP、manifest 校验、batch/run、report 和失败现场等库逻辑；`uai_cli` 只负责命令行参数解析和子命令分发。
+## 当前状态
 
-## 代码来源说明
+Python 客户端已经迁移到新的单一转发边界。本地 CommandSpec 教程、
+ScenarioCoverage selector、组合 quality gate、旧 `uai_core.UaiCore`、
+`run/batch/resume` 和 Python 业务第二实现已经退出 active runtime，不再作为
+SDK 设计、兼容入口或业务正确性的依据。
 
-本仓库的初步代码是使用 GPT 编写，并在实际 Unreal Engine 自动化工作流中持续调试、测试和修复。后续维护应以 CLI 单测、UAI 报告、UE 编译/运行验证和文档同步为准。
+目标公开接口为：
 
-## 当前重点
+- 普通代码只导入 `uai`；
+- `uai.connect(<connection.toml>)` 建立可直接使用的 Client；
+- 每个 `ue.<namespace>.<command>(...)` 只转发一条真实 UAI command；
+- Python 不实现 HJSON、Contract、Planning、Durable、Verification 或领域业务；
+- CLI 复用与 SDK 相同的 Client、Protocol 和 Transport。
 
-- Python core：`uai_core.UaiCore` 可直接用于脚本调用
-- 统一入口：`dist/uai-cli.exe`
-- 推荐模式：`run`（plan + vars）与 `batch`（JSON 文件）
-- 命名简化：内置 `namegen`，默认生成短资产名
-- Niagara 护栏：自动 preflight + 编译/日志/emitter 校验
-- 自动清理：`tmp/reports` 超阈值自动裁剪
-- 命令清单：`manifest` 生成插件命令 manifest，并在执行前校验命令名和废弃生命周期
-- 参数校验：manifest 中包含轻量 `param_schema`，支持 warn/strict；高频必填参数和常见别名错误会在 preflight 阶段直接阻断
-- 兼容检查：`compat` 检查 CLI 与 UE 插件服务状态
-- 失败现场：执行失败自动写入 `runtimeLogs/crashes/<run_id>/`
-- 失败复现：`crash signature|replay|bisect`
-- Golden E2E：`e2e local|ue-readonly`
-- 发布验证：`release coverage|pak-verify|examples|gate|all`
+当前 `import uai`、Connection TOML、纯客户端 Transport、`uai.command.v1`
+Protocol、单指令 Client、由 C++ 正式 manifest 生成的静态 binding，以及同链路
+`uai-cli exec` 已经建立。当前只实现 HTTP Transport Adapter；HTTP route 只出现
+在 Connection TOML 和 Adapter 内部，不进入 Client、Protocol 或 command method。
 
-## 快速开始
+当前生成的首批静态方法为
+`client.reference.catalog_search(...)`、`client.reference.asset_apply(...)` 和
+`client.reference.asset_read(...)`。SDK/CLI 的本地协议、转发与无损结果合同已
+通过定向测试；到真实 C++ 服务的跨进程 E3 也已验证 SDK 命名 Query、CLI 同链路
+调用，以及 effect 后独立 UE 持久状态读回。尚未进入正式 manifest 的旧能力仍按
+未迁移处理，不由 Python 兼容层补回。
 
-```powershell
-.\dist\uai-cli.exe doctor --json-output
-.\dist\uai-cli.exe run --plan ".\plans\sample_plan_list_actors.json" --vars ".\vars\sample_vars.json" --json-output
-.\dist\uai-cli.exe manifest --summary --json-output
-.\dist\uai-cli.exe release all --json-output
-.\dist\uai-cli.exe release gate --json-output
-```
-
-Python 侧可直接复用 core：
-
-```python
-from uai_core import UaiCore
-
-ue = UaiCore.from_config()
-world = ue.exec("get_world_state")
-world.raise_for_failure()
-```
-
-废弃指令会保留在 manifest 中，但 `exec/batch/run/resume` 默认阻断。兼容、迁移、诊断或修复场景必须显式使用 `--allow-deprecated-command --deprecated-use-case migration`，Python API 侧对应 `allow_deprecated=True, deprecated_use_case="migration"`。
-
-完整文档：`docs/USAGE.md`
+正式用法见 [`docs/PYTHON_SDK_AND_CLI.md`](docs/PYTHON_SDK_AND_CLI.md)，目标规范见
+项目计划
+`../docs/plan/20260726_UAI_FRAMEWORK_RECOVERY_REPLAN/UAI_PYTHON_CLIENT_AND_CLI_DESIGN.md`。
 
 ## 目录
 
-- `REQ_UeAgentInterfaceCMD.md`：需求说明
-- `docs/USAGE.md`：使用说明
-- `docs/ARCHITECTURE.md`：架构说明
-- `docs/ROADMAP.md`：迭代路线
-- `cli/uai_core/`：可复用执行核心与 Python API
-- `cli/uai_cli/`：CLI 入口与旧模块导入兼容层
-- `plans/`：计划模板
-- `vars/`：变量模板
-- `tmp/`：临时 JSON（自动清理）
-- `reports/`：执行报告（自动清理）
-- `logs/`：CLI 日志
-- `tools/build.ps1`：打包脚本
+- `cli/uai/`：唯一公开 SDK 包与 client-only 内部分层；
+- `cli/uai_cli/`：只依赖公开 `uai` 的薄 CLI 外壳；
+- `tests/network_transport/`：Transport 边界测试；
+- `tests/uai_protocol/`：公开 command wire、单次转发和无损 response 测试；
+- `tests/uai_client/`：Client 生命周期与单指令调用测试；
+- `tests/command_binding/`：正式 manifest 与静态 binding 生成测试；
+- `tests/uai_cli/`：薄 CLI 与 SDK 同链路测试；
+- `tests/public_api/`：public-edge 静态与 import 边界测试；
+- `tools/uai_binding/`：只消费 C++ 正式 manifest 的确定性 binding generator；
+- `tools/uai_repository/`：不进入 SDK import graph 的仓库诊断工具；
+- `tools/tests/`：仓库工具的独立模块测试；
+- `scripts/ue/BuildUeDiscoveryReceiptSet.py`：项目外层 standalone UE 测试证据桥，
+  不属于客户 SDK，也不依赖旧 `uai_core`。
 
 ## 许可证
 

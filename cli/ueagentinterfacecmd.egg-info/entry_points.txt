@@ -1,0 +1,2 @@
+[console_scripts]
+uai-cli = uai_cli.main:main

@@ -1,0 +1,4 @@
+commands: [
+  { command: texture_usage_find_references, params: { asset_path: "/Game/Example/T_Texture" } }
+]
+stop_on_error: true

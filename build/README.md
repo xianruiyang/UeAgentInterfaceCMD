@@ -5,4 +5,6 @@
 实际打包产物输出到：
 
 - `dist/uai-cli.exe`
-- `dist/uai-cli.default.json`
+
+连接配置由调用方通过 `--connection <connection.toml>` 显式提供，不随可执行文件
+附带第二套默认配置。

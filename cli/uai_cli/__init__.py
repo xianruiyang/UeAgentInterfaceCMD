@@ -1,9 +1,3 @@
-"""Command-line entry package for UeAgentInterfaceCMD.
+"""Thin command-line shell over the public :mod:`uai` SDK."""
 
-Reusable execution logic lives in :mod:`uai_core`. This package keeps the
-installed ``uai-cli`` console entry point and backward-compatible imports.
-"""
-
-from uai_core.version import __version__
-
-__all__ = ["__version__"]
+__all__: list[str] = []

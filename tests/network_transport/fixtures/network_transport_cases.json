@@ -1,0 +1,73 @@
+{
+  "schema": "uai.network_transport_fixture.v1",
+  "frames": [
+    {
+      "case_id": "portable_binary",
+      "channel": "rpc",
+      "correlation_id": "corr-0001",
+      "peer_id": "peer-loopback",
+      "principal_subject": "agent-local",
+      "authentication_method": "fixture",
+      "payload_hex": "00017f80ff55aa"
+    },
+    {
+      "case_id": "single_delivery",
+      "channel": "effect",
+      "correlation_id": "corr-0002",
+      "peer_id": "peer-loopback",
+      "principal_subject": "agent-local",
+      "authentication_method": "fixture",
+      "payload_hex": "65666665637466756c2d6f70617175652d6672616d65"
+    }
+  ],
+  "capabilities": {
+    "stream": {
+      "ordered": true,
+      "reliable": true,
+      "preserves_message_boundaries": true,
+      "max_frame_bytes": 64,
+      "request_reply": true,
+      "duplicate_suppression": true
+    },
+    "datagram": {
+      "ordered": false,
+      "reliable": false,
+      "preserves_message_boundaries": true,
+      "max_frame_bytes": 64,
+      "request_reply": true,
+      "duplicate_suppression": false
+    }
+  },
+  "requirements": {
+    "portable": {
+      "require_ordered": false,
+      "require_reliable": false,
+      "require_message_boundaries": true,
+      "max_frame_bytes": 64,
+      "require_request_reply": true,
+      "require_duplicate_suppression": false
+    },
+    "strict": {
+      "require_ordered": true,
+      "require_reliable": true,
+      "require_message_boundaries": true,
+      "max_frame_bytes": 64,
+      "require_request_reply": true,
+      "require_duplicate_suppression": true
+    }
+  },
+  "stream_chunk_sizes": [
+    1,
+    2,
+    1,
+    3
+  ],
+  "delivery_states": [
+    "delivered",
+    "backpressured",
+    "timed_out",
+    "disconnected",
+    "failed",
+    "unsupported"
+  ]
+}

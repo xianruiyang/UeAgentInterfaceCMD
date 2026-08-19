@@ -1,0 +1,18 @@
+{
+  "stop_on_error": true,
+  "commands": [
+    {
+      "request_id": "sample_list_actors_001",
+      "command": "list_actors",
+      "params": {
+        "limit": 30
+      }
+    },
+    {
+      "request_id": "sample_get_world_state_002",
+      "command": "get_world_state",
+      "params": {}
+    }
+  ]
+}
+
