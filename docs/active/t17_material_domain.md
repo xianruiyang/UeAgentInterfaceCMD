@@ -33,3 +33,12 @@ The default SDK also preserves the shared `content_graph.export_workspace`
 identity, but the T17 server provider deliberately returns
 `material_domain_export_not_registered`: no Material serializer is registered,
 so the command must not be treated as a successful query or a verified export.
+
+Material Import now consumes the shared domain HJSON authoring kit for resolved-source
+validation, canonical capture, and result construction. Material remains the sole owner of
+candidate validation and native graph mutation. A successful result is emitted only when the
+native mutation returns its exact `reload:` persistence evidence and the independent content
+graph capture reports `compile_status=valid`; the shared result includes
+`mutation_applied`, `compile_settled`, `saved`, `reloaded`,
+`persistence_receipt_id`, and `independent_readback`. Do not infer these lifecycle facts from
+HTTP success or manufacture them in caller code.

@@ -1,33 +1,34 @@
-# T14 Blueprint Surfaces SDK Projection
+# Blueprint Surfaces through the default SDK
 
 Use `client.content_graph.import_workspace(...)` as the only public Blueprint
-HJSON mutation ingress. Supply its `source` as `inline`, `single_file`, or
-`directory`; there is no Blueprint-specific apply method. Use the shared
-content-graph read methods and `client.content_graph.export_workspace(...)` for
-persisted inspection and export. Use `client.command_search(...)` and
-`client.command_detail(...)` when the current method or contract is not already
-known; `uai-cli` exposes the same discovery path.
+HJSON mutation ingress. Supply `source` as `inline`, `single_file`, or
+`directory`; no Blueprint-specific apply method is public. Read or export the
+current asset with the shared `content_graph.*` methods.
 
-The generated SDK forwards exactly one public command with its manifest
-contract hash. It contains no HTTP route, Unreal business rule, retry, HJSON
-parser, recursive initializer, Blueprint mutation, compile, save, unload,
-reload, or readback implementation. The server-side Blueprint Surfaces
-provider remains the only Blueprint-root content-graph read authority and the
-only owner of ordinary Blueprint settings, parent, interfaces, class defaults,
-members, component tree, and managed graphs, nodes, pins, and edges.
+Use `client.command_search(...)` and `client.command_detail(...)` when the
+generated method or current hash is not already known; `uai-cli` exposes the
+same discovery path. T13 remains the sole carrier-loading and common recursive
+initialization authority.
 
-Submit one `uai.blueprint.edit/1` entry document whose root type is
+Submit one `uai.blueprint.edit/1` entry whose root type is
 `/Script/Engine.Blueprint`. Create uses `expected_revision="missing"`; update
-and upsert copy the latest revision from a public content-graph read unchanged.
-Accept success only when `terminal_status` is `succeeded`, then independently
-read back every intended surface. The directory carrier may contain recursive
-workspace documents, but only the manifest-selected entry document owns the
-target Blueprint mutation.
+and upsert copy the latest public content-graph revision unchanged. The
+directory carrier may contain multiple recursive workspace documents, but only
+the manifest-selected entry owns the target Blueprint mutation.
 
-T13 remains the sole carrier-loading and common recursive initialization
-authority. It resolves the public source into a target-bound workspace and T14
-consumes that normalized source; T14 does not reopen files or implement a
-parallel directory walker. Unsupported roots or creation roles, mismatched
-identity, duplicate or missing entries, stale revisions, unresolved type
-identities, compile or persistence failures are explicit terminal failures and
-do not fall back to a retired owner.
+For supported node and Component creation, call
+`client.blueprint.node_candidates(...)` or
+`client.blueprint.component_candidates(...)` and place the returned
+`payload["candidates"][index]` object unchanged in the corresponding HJSON
+entry. Do not derive class aliases, duplicate native mutation fields, or replace
+the HJSON graph map key with `candidate.graph_id`. The server revalidates the
+binding immediately before write and performs the only candidate-to-native
+translation.
+
+Accept success only when `terminal_status` is `succeeded`, then independently
+read back every intended setting, member, Component, graph, node, pin, edge, or
+Widget-owned Blueprint graph. The server owns compile/settle, save,
+unload/reload, persistence receipt, and failure cleanup. Unsupported roots,
+mismatched identity, missing entry documents, stale asset or candidate
+revisions, unresolved types, compile failures, or persistence failures are
+terminal and do not fall back to a retired Blueprint handler.

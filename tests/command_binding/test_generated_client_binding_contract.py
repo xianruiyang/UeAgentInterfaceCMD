@@ -64,6 +64,7 @@ class GeneratedClientBindingContractTests(unittest.TestCase):
         self.assertIn("class QueryCommands", stub)
         self.assertIn("def command_search", stub)
         self.assertIn("def command_detail", stub)
+        self.assertIn("def content_search", stub)
         self.assertIn("class ReferenceCommands", stub)
         self.assertIn("def asset_read", stub)
         self.assertIn("def asset_apply", stub)
@@ -102,6 +103,45 @@ class GeneratedClientBindingContractTests(unittest.TestCase):
             ],
         )
 
+    def test_content_search_forwards_exact_filters_and_cursor_once(self) -> None:
+        namespaces, client = self._namespaces()
+        cursor = {
+            "request_fingerprint": "sha1:fixture",
+            "providers": [
+                {
+                    "provider_id": "editor.asset_registry.content",
+                    "revision": "sha1:revision",
+                    "offset": 20,
+                }
+            ],
+        }
+        namespaces.query.content_search(
+            query="Cube",
+            match_mode="text",
+            content_kinds=["asset"],
+            path_prefix="/Game",
+            required_operations=["query"],
+            limit_per_provider=20,
+            cursor=cursor,
+        )
+        self.assertEqual(
+            client.calls,
+            [
+                (
+                    "query.content.search",
+                    {
+                        "query": "Cube",
+                        "match_mode": "text",
+                        "content_kinds": ["asset"],
+                        "path_prefix": "/Game",
+                        "required_operations": ["query"],
+                        "limit_per_provider": 20,
+                        "cursor": cursor,
+                    },
+                )
+            ],
+        )
+
     def test_asset_apply_forwards_once_without_business_defaults(self) -> None:
         namespaces, client = self._namespaces()
         namespaces.reference.asset_apply(
@@ -137,6 +177,44 @@ class GeneratedClientBindingContractTests(unittest.TestCase):
                         ),
                     },
                 )
+            ],
+        )
+
+    def test_voxel_grid_bindings_forward_only_explicit_session_data(self) -> None:
+        namespaces, client = self._namespaces()
+        namespaces.mesh.voxel_grid_session(
+            "begin",
+            mode="create",
+            grid_id="VG_PY_PUBLIC",
+            cell_size=100.0,
+        )
+        namespaces.mesh.voxel_grid_apply(
+            "VGS_PY_PUBLIC",
+            2,
+            collision={"mode": "exact_box_components"},
+            keep_session=True,
+        )
+        self.assertEqual(
+            client.calls,
+            [
+                (
+                    "mesh.voxel_grid.session",
+                    {
+                        "action": "begin",
+                        "mode": "create",
+                        "grid_id": "VG_PY_PUBLIC",
+                        "cell_size": 100.0,
+                    },
+                ),
+                (
+                    "mesh.voxel_grid.apply",
+                    {
+                        "session_id": "VGS_PY_PUBLIC",
+                        "expected_revision": 2,
+                        "collision": {"mode": "exact_box_components"},
+                        "keep_session": True,
+                    },
+                ),
             ],
         )
 

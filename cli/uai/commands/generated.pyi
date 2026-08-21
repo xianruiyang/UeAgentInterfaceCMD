@@ -475,6 +475,15 @@ class AssetCommands:
         destructive_authorization_id: str = ...,
     ) -> Any: ...
 
+    def factory_candidates(
+        self,
+        create_command: str,
+        *,
+        query: str = ...,
+        limit: int = ...,
+        cursor: int = ...,
+    ) -> Any: ...
+
     def fixup_redirectors(
         self,
         root_ref: str,
@@ -1299,6 +1308,8 @@ class MaterialCommands:
     def asset_create(
         self,
         asset_name: str,
+        *,
+        material_kind: str = ...,
         package_path: str,
     ) -> Any: ...
 
@@ -1690,6 +1701,37 @@ class MeshCommands:
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
+    def voxel_grid_apply(
+        self,
+        session_id: str,
+        expected_revision: int,
+        *,
+        mesh_build: str = ...,
+        collision: dict[str, Any] = ...,
+        material_ref: str = ...,
+        keep_session: bool = ...,
+    ) -> Any: ...
+
+    def voxel_grid_session(
+        self,
+        action: str,
+        *,
+        session_id: str = ...,
+        expected_revision: int = ...,
+        mode: str = ...,
+        grid_id: str = ...,
+        actor_ref: str = ...,
+        label: str = ...,
+        folder_path: str = ...,
+        cell_size: float = ...,
+        origin: dict[str, Any] = ...,
+        rotation: dict[str, Any] = ...,
+        anchor: dict[str, Any] = ...,
+        bounds: dict[str, Any] = ...,
+        max_operation_cells: int = ...,
+        projection: dict[str, Any] = ...,
+    ) -> Any: ...
+
 class MetasoundCommands:
 
     def graph_compile_settle(
@@ -1924,6 +1966,12 @@ class PcgCommands:
         target_ref: str,
     ) -> Any: ...
 
+    def graph_asset_create(
+        self,
+        asset_name: str,
+        package_path: str,
+    ) -> Any: ...
+
     def graph_instance_apply(
         self,
         graph_ref: str,
@@ -2050,6 +2098,20 @@ class QueryCommands:
         *,
         limit: int = ...,
         cursor: int = ...,
+    ) -> Any: ...
+
+    def content_search(
+        self,
+        *,
+        query: str = ...,
+        match_mode: str = ...,
+        content_kinds: list[Any] = ...,
+        class_path: str = ...,
+        path_prefix: str = ...,
+        owner_identity: str = ...,
+        required_operations: list[Any] = ...,
+        limit_per_provider: int = ...,
+        cursor: dict[str, Any] = ...,
     ) -> Any: ...
 
 class ReferenceCommands:

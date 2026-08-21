@@ -9,7 +9,7 @@ result = client.graph.layout_apply(
     targets=[
         {
             "graph_identity": "/Game/UI/BP_Menu.BP_Menu:EventGraph",
-            "expected_revision": "graph-layout:0123abcd",
+            "expected_revision": "content-graph:0123abcd",
         }
     ],
     strategy="hierarchical_left_to_right",
@@ -18,10 +18,15 @@ result = client.graph.layout_apply(
 )
 ```
 
-`targets` may contain one graph or multiple exact graphs from different
-supported domains. The service routes by real graph type, preflights the whole
-set, saves all affected packages, and returns an `impact_plan` plus
-`independent_readback`. Callers do not select a provider and there are no
-Blueprint, Material, Niagara, PCG, AI, Audio, Animation Blueprint, or Control
-Rig layout aliases. The exact `uai-cli` invocation uses the same ID, hash, and
-JSON parameter object.
+`targets` may contain one graph or multiple exact graphs only from the same
+owning Blueprint asset and package. Read the owner with `content_graph.*` and
+use its public `revision` as every target's `expected_revision`. The service
+routes by the real owner type, measures geometry offscreen, preflights the whole
+set, compiles and saves the package, reloads it, and returns an `impact_plan`, a
+`persistence_receipt`, and persisted positions in `independent_readback`.
+
+Blueprint, Widget Blueprint, and Animation Blueprint are the current verified
+provider families. Cross-package batches and Material, Niagara, PCG, AI, Audio,
+and Control Rig layout are rejected until those verticals contribute real
+mechanics. Callers do not select a provider. The exact `uai-cli` invocation uses
+the same command ID and JSON parameter object.

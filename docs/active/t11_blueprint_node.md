@@ -1,36 +1,50 @@
-# Blueprint node through the default SDK
+# Blueprint node candidate through the default SDK
 
-`blueprint.node.candidates` is an ordinary entry in the default generated
-binding catalog. Do not import a task-specific generated projection. Discover
-the current purpose and exact fields first:
+Discover the current method and hash when they are not already known, then
+query the exact owning Blueprint graph:
 
 ```python
 matches = client.command_search(query="Blueprint node candidate")
 contract = client.command_detail(command_id="blueprint.node.candidates")
-```
-
-Copy the public content/graph query identities without reinterpretation, then
-invoke the named binding. It uses the same current contract hash as exact
-generic execution and sends one request:
-
-```python
 result = client.blueprint.node_candidates(
-    target=target,
-    graph_id=graph_id,
+    target="/Game/Blueprints/BP_Example.BP_Example",
+    graph_id="graph:...",
     query="branch",
 )
+candidate = result.payload["candidates"][0]
 ```
 
-Copy the returned `candidate.name`, `binding_revision`, and `graph_revision`
-unchanged into `client.content_graph.import_workspace(...)`. T13 remains the
-sole initialization and recursive HJSON authority; this query does not select
-a candidate or mutate Unreal state.
+Copy `candidate` unchanged to the node entry in the Blueprint-root
+`uai.blueprint.edit/1` document:
 
-The equivalent CLI call uses the hash returned by `command_detail`:
+```hjson
+"event_graph:EventGraph": {
+  operation: update
+  graph: { graph_kind: event_graph }
+  nodes: {
+    "11111111-1111-1111-1111-111111111111": {
+      operation: create
+      candidate: {
+        name: "/Script/BlueprintGraph.K2Node_IfThenElse"
+        binding_revision: "sha256:..."
+        display_name: Branch
+        graph_id: "graph:..."
+      }
+      pos: { x: 800, y: 600 }
+    }
+  }
+}
+```
+
+Do not turn `candidate.graph_id` into the graph map key and do not synthesize
+`node_type` or `node_class`; the server validates the exact binding and expands
+those native fields. The response-level `graph_revision` is read-only candidate
+evidence. Use the owning asset's latest public content-graph revision as the
+`expected_revision` of `client.content_graph.import_workspace(...)`.
+
+A changed binding fails before write, including the exact stale code
+`blueprint_surface_node_candidate_binding_stale`. The equivalent CLI call is:
 
 ```text
 uai-cli --connection connection.toml exec blueprint.node.candidates --contract-hash <hash> --params-json <json-object>
 ```
-
-Unresolved target, graph, or candidate identity is a terminal read-only
-failure. It does not fall back to a class alias or a task-local binding.

@@ -52,6 +52,14 @@ the final owned artifact; native work still uses operation-owned staging.
 The historical names in the first column are documentation identities only.
 Do not call them and do not construct an alias from them.
 
+Every image policy requires a rendering-capable Editor process. In a process
+where `FApp::CanEverRender()` is false, including `-NullRHI`, the returned
+operation reaches terminal failure with
+`capture_image_rhi_unavailable:<policy_id>` before screenshot mechanics or an
+asset editor is opened, and it publishes no image artifact. The SDK and CLI do
+not provide a fallback; run image capture in a rendering-capable Editor or
+owned RHI worker.
+
 ## Observe, cancel and release
 
 A successful start returns an `operation_ref`, not the final image. Use the
@@ -62,4 +70,3 @@ replay. Timeout, unsupported policy, invalid subject, resource refusal, missing
 artifact, failed independent readback, or incomplete cancellation must not be
 reported as success. The user's main Editor is preserved; tests use an owned
 background Editor process.
-

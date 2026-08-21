@@ -44,12 +44,15 @@ class TransportNeutralCommandServiceContractTest(unittest.TestCase):
     def test_http_adapter_is_composed_outside_command_service(self) -> None:
         source = (
             PLUGIN_PRIVATE
-            / "Composition"
-            / "UeAgentQueryServiceComposition.cpp"
+            / "Module"
+            / "UeAgentInterfaceModule.cpp"
         ).read_text(encoding="utf-8-sig")
+        self.assertIn("TryCreateQueryCommandIngress", source)
+        self.assertIn("FUeAgentCommandService::TryCreate", source)
         self.assertIn("FUeAgentHttpTransportAdapter", source)
         self.assertIn("GetUaiHttpCommandRoutePath", source)
-        self.assertIn("CommandService->GetIngressHandler()", source)
+        self.assertIn("NewCommandService->GetIngressHandler()", source)
+        self.assertNotIn("FUeAgentQueryServiceComposition", source)
 
 
 if __name__ == "__main__":

@@ -33,6 +33,16 @@ evidence, observation time, conversion evidence, and the declared
 write/read/verify frames. Supply current expected revisions for writes and use
 `client.world.object_transform_read(...)` for independent readback.
 
+`world.object_transform.read` accepts exactly an Actor or StaticMesh target. An
+Actor returns its transform in the requested convertible frame. A StaticMesh
+requires an identity `mesh.geometry.local`, three-dimensional, centimeter
+verify frame and returns real mesh-description vertices plus any live component
+placement observations. In both cases its returned revision comes from the same
+WorldSpatial runtime/session as the mutation validator, so pass it unchanged as
+that target's `expected_revision`. Other UObject types or non-local StaticMesh
+frames fail before mutation. Successful durable mesh bake or pivot updates save
+the asset package and remain observable after reload.
+
 For `client.reference.origin_resolve(...)`, pass one `input.target` whose
 required `source` is `catalog_candidate`, `json_reference`, `ue_object`,
 `graph_node`, or `name_reference`. Use the fields named by that source; the

@@ -1,27 +1,42 @@
-# Blueprint Component candidate SDK
+# Blueprint Component candidate through the default SDK
 
-Use the default generated binding
-`client.blueprint.component_candidates(target=..., component_class=...,
-requested_name=...)` for the exact `blueprint.component.candidates` contract.
-The binding preserves all three arguments without translation. Copy the
-returned candidate identity and `scs_revision` unchanged into the T12 HJSON
-document, then call the default
-`client.content_graph.import_workspace(...)` ingress.
+Query the requested Component class and name through the default generated
+binding:
 
-When the method is not already known, use `client.command_search(...)` to find
-the command and `client.command_detail(...)` to read its current contract and
-example. The same discovery path is available from `uai-cli`; tutorials do not
-maintain a second command catalog or a task-specific generated helper.
+```python
+result = client.blueprint.component_candidates(
+    target="/Game/Blueprints/BP_Example.BP_Example",
+    component_class="/Script/Engine.PointLightComponent",
+    requested_name="PointLight",
+)
+candidate = result.payload["candidates"][0]
+```
 
-The default binding contains no transport selection, retry, HJSON generation,
-SCS mechanics, or Unreal Engine business logic. The server owns candidate
-validation, T13 recursive initialization-contract resolution, mutation,
-persistence, reload, and typed failure semantics. T13 remains the sole common
-source-carrier, initialization, and recursive traversal authority; T12 consumes
-the normalized `source.kind=resolved` document set and only contributes the
-Blueprint Component domain contract and SCS mechanics.
+Copy `candidate` unchanged to the Component entry in the Blueprint-root
+`uai.blueprint.edit/1` document:
 
-The retired ids `blueprint_add_component`, `blueprint_remove_component`, and
-`blueprint_set_component_property` have no SDK binding and are not public
-discovery results. `blueprint.component.events.discover` is a separate active
-T47 contract and is not replaced by this T12 candidate surface.
+```hjson
+"component:PointLight": {
+  operation: create
+  candidate: {
+    name: PointLight
+    component_class: "/Script/Engine.PointLightComponent"
+    binding_revision: "sha256:..."
+  }
+  parent: DefaultSceneRoot
+}
+```
+
+Do not synthesize duplicate `name` or `class` fields; the server validates the
+candidate against current SCS state and expands the native mutation fields.
+The response-level `scs_revision` and `existing_components` are read-only
+evidence. Use the owning asset's latest public content-graph revision as the
+`expected_revision` of `client.content_graph.import_workspace(...)`.
+
+A changed class, name availability, SCS state, or binding fails before write,
+including the exact stale code
+`blueprint_surface_component_candidate_binding_stale`. Use
+`client.command_search(...)` and `client.command_detail(...)` for the current
+contract; `uai-cli` exposes the same exact command and JSON parameter object.
+T13 remains the sole source-carrier and common recursive initialization
+authority; the SDK forwards only the selected public command.
