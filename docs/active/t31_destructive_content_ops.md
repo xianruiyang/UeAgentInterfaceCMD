@@ -12,6 +12,13 @@ current contract and hash, then call the default named method. The active set is
 `uai-cli ... exec <command-id>` uses the same exact binding. There is no
 task-specific generated SDK authority.
 
+For `client.world.level_content_delete_scope`, `folder_path` is required and
+`managed_id` is optional. Omitting `managed_id` requests the broad folder and
+descendant scope. Supplying it requests the exact intersection of that folder
+and one canonical UAI-managed actor identity; callers must pass the same values
+for plan and authorized commit. Duplicate, absent, or folder-mismatched managed
+identities are rejected by the plugin before mutation.
+
 Every destructive request performs complete preflight first. Where the
 contract requires two phases, the first call returns the exact authorization
 identity and the second call must echo it unchanged; the SDK never invents or

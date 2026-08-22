@@ -1,13 +1,20 @@
 # Landscape commands through the default SDK
 
-`landscape.create` and `landscape.height_delta` are ordinary entries in the
-default generated binding catalog. Do not import a task-specific generated
-projection module. Discover them before authoring:
+`landscape.create`, `landscape.height_read`, and `landscape.height_delta` are
+ordinary entries in the default generated binding catalog. Do not import a
+task-specific generated projection module. Discover them before authoring:
 
 ```python
-matches = client.command_search(query="landscape terrain height")
-create_contract = client.command_detail(command_id="landscape.create")
-delta_contract = client.command_detail(command_id="landscape.height_delta")
+matches = client.query.command_search("landscape terrain height", limit=8)
+create_contract = client.query.command_detail(
+    "landscape.create", create_hash_from_matches
+)
+read_contract = client.query.command_detail(
+    "landscape.height.read", read_hash_from_matches
+)
+delta_contract = client.query.command_detail(
+    "landscape.height_delta", delta_hash_from_matches
+)
 ```
 
 Copy only fields returned by the current `command_detail`. Named calls use the
@@ -22,6 +29,22 @@ result = client.landscape.create(
     topology=topology,
 )
 
+height_state = client.landscape.height_read(
+    target_ref,
+    input={
+        "region": {
+            "frame_id": "ue.landscape.local_sample_grid",
+            "min_inclusive": [2, 1],
+            "max_inclusive": [4, 2],
+        },
+        "space_contract": {
+            "frame_id": "ue.landscape.local_sample_grid",
+            "unit": "sample",
+            "basis_evidence": "observed exact Landscape and bounded region",
+        },
+    },
+)
+
 delta_result = client.landscape.height_delta(
     delta=delta,
     region=region,
@@ -30,16 +53,25 @@ delta_result = client.landscape.height_delta(
 )
 ```
 
-The spatial objects must state their `semantic_frame_id`, unit, basis evidence,
-and any conversion chain required by the current contract. The SDK does not
-guess sample-grid coordinates, Landscape scale, topology, revisions, or target
-identity.
+Mutation spatial objects must state their `semantic_frame_id`, unit, basis
+evidence, and any conversion chain required by the current contract. The
+read-only height input instead uses the exact `frame_id` fields shown above.
+The SDK does not guess sample-grid coordinates, Landscape scale, topology,
+revisions, or target identity.
 
-`landscape.create.target_ref` is a requested creation identity and supplies
-the actor label; Unreal still owns the resulting UObject name and path. Read
-the persisted Landscape after creation and use the exact returned UObject path
-as `landscape.height_delta.target_ref`. Do not reuse a logical URI or infer a
-path from the label.
+`landscape.create.target_ref` is a stable managed identity. Creation binds it
+to the actor's UAI marker and `UAI/Managed/landscape` folder, and the same exact
+identity can be used for `height_read`, `height_delta`, and exact managed
+cleanup after reload. Unreal still owns the resulting UObject name and path.
+An exact observed UObject path is also accepted; never infer one from the
+label, use a partial path, or rewrite either identity into an alias.
+
+`height_read.input.region` uses inclusive local sample-grid coordinates.
+`height_read.input.space_contract` must declare the same frame, `unit=sample`,
+and non-empty basis evidence. A request is bounded to 16,384 samples. The
+projected state reports extent, region, scale, managed evidence and local
+heights in `row_major_x_fastest` order. The command is strictly read-only and
+does not dirty the Landscape package.
 
 ### Replacing `landscape_raise_circle`
 
@@ -88,21 +120,24 @@ def circle_delta(center_local_xy, extent, scale_xyz,
     }
 ```
 
-Combine that `region` and `delta` with the observed `target_ref` and a complete
-`space_contract`, then call `client.landscape.height_delta(...)` once. The
+Combine that `region` and `delta` with the exact managed ID or observed UObject
+path and a complete `space_contract`, then call
+`client.landscape.height_delta(...)` once. The
 formula uses both XY scales, so a circle remains circular in world space under
 non-uniform Landscape scale; `strength_cm / scale_z` preserves the requested
 world-space height.
 
-The equivalent exact CLI form is shown by discovery:
+The equivalent exact CLI forms are shown by discovery:
 
 ```text
+uai-cli --connection connection.toml exec landscape.height.read --contract-hash <hash-from-command_detail> --params-json <json-object>
 uai-cli --connection connection.toml exec landscape.height_delta --contract-hash <hash-from-command_detail> --params-json <json-object>
 ```
 
 Success is terminal only when the common operation lifecycle reports a
-verified native outcome. Validate persistence with an independent public
-world/Landscape read after reload. Prewrite validation failures leave no
-residue; `operation_state_unknown` requires reconciliation and must not be
-blindly replayed. Remove test fixtures through the public destructive-content
-workflow and verify absence after reload.
+verified native outcome. Validate the exact region with
+`client.landscape.height_read(...)` before and after mutation and after reload
+when persistence is in scope. Prewrite validation failures leave no residue;
+`operation_state_unknown` requires reconciliation and must not be blindly
+replayed. Remove test fixtures through the public destructive-content workflow
+using the same managed ID, then verify `landscape_height_target_not_found`.

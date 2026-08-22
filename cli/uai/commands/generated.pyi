@@ -1295,6 +1295,15 @@ class LandscapeCommands:
         topology: dict[str, Any],
     ) -> Any: ...
 
+    def height_read(
+        self,
+        target: str,
+        *,
+        input: dict[str, Any] = ...,
+        context: dict[str, Any] = ...,
+        projection: dict[str, Any] = ...,
+    ) -> Any: ...
+
     def height_delta(
         self,
         delta: dict[str, Any],
@@ -1356,7 +1365,7 @@ class MeshCommands:
         material_ref: str,
         slot_name: str,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def attribute_material_slot_assign(
@@ -1364,7 +1373,7 @@ class MeshCommands:
         selection: dict[str, Any],
         slot_index: int,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def attribute_normals_recompute(
@@ -1374,7 +1383,7 @@ class MeshCommands:
         mode: str,
         preserve_existing_hard_edges: bool,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def attribute_uv_auto(
@@ -1383,7 +1392,7 @@ class MeshCommands:
         method: str,
         pack: bool,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         texture_resolution: int,
         uv_channel: int,
     ) -> Any: ...
@@ -1395,7 +1404,7 @@ class MeshCommands:
         projection_type: str,
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         uv_channel: int,
     ) -> Any: ...
 
@@ -1406,7 +1415,7 @@ class MeshCommands:
         mode: str,
         replace_existing: bool,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def collision_simple_generate(
@@ -1415,7 +1424,7 @@ class MeshCommands:
         method: str,
         replace_existing: bool,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def element_select_by_ray(
@@ -1517,13 +1526,13 @@ class MeshCommands:
     def topology_boolean(
         self,
         operand_ref: str,
-        operand_revision: str,
+        operand_revision: dict[str, Any],
         operand_to_target: dict[str, Any],
         operation: str,
         simplify_output: bool,
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def topology_edges_bevel(
@@ -1534,15 +1543,14 @@ class MeshCommands:
         selection: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def topology_edges_weld(
         self,
         edge_pairs: list[Any],
-        mesh_revision: str,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         tolerance_cm: float,
     ) -> Any: ...
 
@@ -1551,7 +1559,7 @@ class MeshCommands:
         selection: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         translation_cm: list[Any],
     ) -> Any: ...
 
@@ -1564,7 +1572,7 @@ class MeshCommands:
         selection: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def topology_faces_inset(
@@ -1574,7 +1582,7 @@ class MeshCommands:
         selection: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def topology_faces_offset(
@@ -1584,7 +1592,7 @@ class MeshCommands:
         selection: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def topology_faces_push_pull(
@@ -1596,7 +1604,7 @@ class MeshCommands:
         selection: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def topology_holes_fill(
@@ -1604,7 +1612,7 @@ class MeshCommands:
         fill_mode: str,
         selection: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def topology_mesh_cut(
@@ -1612,11 +1620,11 @@ class MeshCommands:
         fill_cut: bool,
         keep_sides: str,
         operand_ref: str,
-        operand_revision: str,
+        operand_revision: dict[str, Any],
         operand_to_target: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def topology_mirror(
@@ -1625,7 +1633,7 @@ class MeshCommands:
         plane: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         weld_seam: bool,
     ) -> Any: ...
 
@@ -1636,7 +1644,7 @@ class MeshCommands:
         plane: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def topology_remesh(
@@ -1647,7 +1655,7 @@ class MeshCommands:
         space_contract: dict[str, Any],
         target_edge_length_cm: float,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def topology_simplify(
@@ -1655,7 +1663,7 @@ class MeshCommands:
         preserve_boundaries: bool,
         target_mode: str,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         target_value: float,
     ) -> Any: ...
 
@@ -1664,7 +1672,7 @@ class MeshCommands:
         levels: int,
         scheme: str,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def topology_trim(
@@ -1672,23 +1680,23 @@ class MeshCommands:
         fill_hole: bool,
         keep_region: str,
         operand_ref: str,
-        operand_revision: str,
+        operand_revision: dict[str, Any],
         operand_to_target: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ) -> Any: ...
 
     def topology_voxel_boolean(
         self,
         adaptivity: float,
         operand_ref: str,
-        operand_revision: str,
+        operand_revision: dict[str, Any],
         operand_to_target: dict[str, Any],
         operation: str,
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         voxel_size_cm: float,
     ) -> Any: ...
 
@@ -1722,7 +1730,6 @@ class MeshCommands:
         grid_id: str = ...,
         actor_ref: str = ...,
         label: str = ...,
-        folder_path: str = ...,
         cell_size: float = ...,
         origin: dict[str, Any] = ...,
         rotation: dict[str, Any] = ...,
@@ -2484,7 +2491,6 @@ class WorldCommands:
         folder_path: str = ...,
         label: str,
         placement: dict[str, Any],
-        save_level: bool,
         tags: list[Any] = ...,
     ) -> Any: ...
 
@@ -2594,13 +2600,13 @@ class WorldCommands:
         self,
         folder_path: str,
         *,
+        managed_id: str = ...,
         destructive_authorization_id: str = ...,
     ) -> Any: ...
 
     def level_game_mode_update(
         self,
         game_mode_class_ref: str,
-        save_level: bool,
     ) -> Any: ...
 
     def level_streaming_move_actors(

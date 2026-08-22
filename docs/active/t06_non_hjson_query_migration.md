@@ -1,7 +1,8 @@
 # Non-HJSON Query SDK and CLI
 
 Import only `uai` and connect from one complete Connection TOML. The final
-manifest generates the normal domain namespaces for all forty T06 contracts:
+manifest generates the normal domain namespaces for all forty-two current
+Query routes:
 
 ```python
 import uai
@@ -18,6 +19,21 @@ with uai.connect("connection.toml") as client:
     )
     asset = client.reference.asset_read(
         "/Game/UAI/Reference/BP_Reference.BP_Reference",
+    )
+    heights = client.landscape.height_read(
+        "uai://landscape/example",
+        input={
+            "region": {
+                "frame_id": "ue.landscape.local_sample_grid",
+                "min_inclusive": [0, 0],
+                "max_inclusive": [3, 3],
+            },
+            "space_contract": {
+                "frame_id": "ue.landscape.local_sample_grid",
+                "unit": "sample",
+                "basis_evidence": "exact managed target and observed extent",
+            },
+        },
     )
 ```
 

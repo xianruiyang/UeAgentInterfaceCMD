@@ -55,7 +55,7 @@ def test_catalog_schema_identity_and_manifest_partition_are_current() -> None:
     ]
     assert len(assigned) == len(set(assigned))
     assert set(assigned) == set(manifest_ids)
-    assert len(assigned) == 347
+    assert len(assigned) == len(manifest_ids)
 
     delivery_task_ids = {item["id"] for item in catalog["delivery_tasks"]}
     for unit in catalog["units"]:
@@ -148,7 +148,16 @@ def test_high_value_recovery_units_are_explicit_and_non_overclaiming() -> None:
     }
     assert cube_grid["command_contract_state"] == "registered_exact_contract"
     assert cube_grid["implementation_state"] == (
-        "current_shared_modeling_operation_vertical"
+        "ue_owned_authoring_state_c8d_c9_public_vertical_with_legacy_sidecar_import_only"
+    )
+    assert "UE-owned serialized authoring state" in cube_grid["authoring_surfaces"]
+    assert "sidecar" not in cube_grid["authoring_surfaces"]
+    assert cube_grid["evidence"]["highest_verified_layer"] == (
+        "public_sdk_real_ue_c8d_c9_persisted_vertical"
+    )
+    assert any(
+        ref.endswith("/public_sdk/cubegrid-product.json")
+        for ref in cube_grid["evidence"]["evidence_refs"]
     )
     assert set(cube_grid["historical_command_ids"]) == cube_grid_ids
     assert cube_grid["historical_obligation_count"] == 4
@@ -158,12 +167,14 @@ def test_high_value_recovery_units_are_explicit_and_non_overclaiming() -> None:
     } == cube_grid_ids
     assert all(
         item["current_resolution_status"]
-        == "required_capability_contract_recorded"
+        == "required_capability_contract_c8d_c9_verified"
         and item["current_capability_ids"]
         == ["mesh.voxel_grid.apply", "mesh.voxel_grid.session"]
         and item["successor_equivalence"] == "non_exact"
         and item["current_capability_evidence_status"]
-        == "public_sdk_product_verified"
+        == "c8d_c9_public_sdk_product_verified"
+        and item["resolution_evidence_task_id"]
+        == "TROOT-UAI-50-MODELING-WORLD-PHYSICS-EXACT-MATRIX"
         for item in catalog["recovered_historical_identities"]
     )
 

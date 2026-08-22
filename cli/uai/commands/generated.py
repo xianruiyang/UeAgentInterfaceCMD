@@ -12,8 +12,8 @@ from ._runtime import (
     OMITTED,
 )
 
-GENERATED_MANIFEST_HASH = "sha256:12eb39d20d6f93cee47c1f1c7fae84c31c1ab87ccfc3268bdeb117ab25161bdb"
-GENERATED_REGISTRY_HASH = "sha256:64b16c7eaace79ca8b5d5c344fea41a255d0808f9e9d895b57383c178b30986b"
+GENERATED_MANIFEST_HASH = "sha256:2f3e6a752b3a5a1a83725d600a5a9e4c3ab3a30b983ebe043d9f80354319a7fa"
+GENERATED_REGISTRY_HASH = "sha256:2221b35a6d67045add87412a09f56a49b5539714f699996e89a02fa3a7398e04"
 
 class AiCommands:
     __slots__ = ("_client",)
@@ -2906,6 +2906,27 @@ class LandscapeCommands:
             params,
         )
 
+    def height_read(
+        self,
+        target: str,
+        *,
+        input: dict[str, Any] | object = OMITTED,
+        context: dict[str, Any] | object = OMITTED,
+        projection: dict[str, Any] | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        params["target"] = target
+        if input is not OMITTED:
+            params["input"] = input
+        if context is not OMITTED:
+            params["context"] = context
+        if projection is not OMITTED:
+            params["projection"] = projection
+        return self._client.execute(
+            "landscape.height.read",
+            params,
+        )
+
     def height_delta(
         self,
         delta: dict[str, Any],
@@ -3047,7 +3068,7 @@ class MeshCommands:
         material_ref: str,
         slot_name: str,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["material_ref"] = material_ref
@@ -3064,7 +3085,7 @@ class MeshCommands:
         selection: dict[str, Any],
         slot_index: int,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["selection"] = selection
@@ -3083,7 +3104,7 @@ class MeshCommands:
         mode: str,
         preserve_existing_hard_edges: bool,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         if angle_degrees is not OMITTED:
@@ -3103,7 +3124,7 @@ class MeshCommands:
         method: str,
         pack: bool,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         texture_resolution: int,
         uv_channel: int,
     ):
@@ -3127,7 +3148,7 @@ class MeshCommands:
         projection_type: str,
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         uv_channel: int,
     ):
         params: dict[str, Any] = {}
@@ -3150,7 +3171,7 @@ class MeshCommands:
         mode: str,
         replace_existing: bool,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["max_hulls"] = max_hulls
@@ -3170,7 +3191,7 @@ class MeshCommands:
         method: str,
         replace_existing: bool,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["max_shapes"] = max_shapes
@@ -3392,13 +3413,13 @@ class MeshCommands:
     def topology_boolean(
         self,
         operand_ref: str,
-        operand_revision: str,
+        operand_revision: dict[str, Any],
         operand_to_target: dict[str, Any],
         operation: str,
         simplify_output: bool,
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["operand_ref"] = operand_ref
@@ -3422,7 +3443,7 @@ class MeshCommands:
         selection: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["distance_cm"] = distance_cm
@@ -3440,14 +3461,12 @@ class MeshCommands:
     def topology_edges_weld(
         self,
         edge_pairs: list[Any],
-        mesh_revision: str,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         tolerance_cm: float,
     ):
         params: dict[str, Any] = {}
         params["edge_pairs"] = edge_pairs
-        params["mesh_revision"] = mesh_revision
         params["target_ref"] = target_ref
         params["target_revision"] = target_revision
         params["tolerance_cm"] = tolerance_cm
@@ -3461,7 +3480,7 @@ class MeshCommands:
         selection: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         translation_cm: list[Any],
     ):
         params: dict[str, Any] = {}
@@ -3484,7 +3503,7 @@ class MeshCommands:
         selection: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         if direction is not OMITTED:
@@ -3507,7 +3526,7 @@ class MeshCommands:
         selection: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["boundary_mode"] = boundary_mode
@@ -3528,7 +3547,7 @@ class MeshCommands:
         selection: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["distance_cm"] = distance_cm
@@ -3551,7 +3570,7 @@ class MeshCommands:
         selection: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         if direction is not OMITTED:
@@ -3572,7 +3591,7 @@ class MeshCommands:
         fill_mode: str,
         selection: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["fill_mode"] = fill_mode
@@ -3589,11 +3608,11 @@ class MeshCommands:
         fill_cut: bool,
         keep_sides: str,
         operand_ref: str,
-        operand_revision: str,
+        operand_revision: dict[str, Any],
         operand_to_target: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["fill_cut"] = fill_cut
@@ -3615,7 +3634,7 @@ class MeshCommands:
         plane: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         weld_seam: bool,
     ):
         params: dict[str, Any] = {}
@@ -3637,7 +3656,7 @@ class MeshCommands:
         plane: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["fill_hole"] = fill_hole
@@ -3659,7 +3678,7 @@ class MeshCommands:
         space_contract: dict[str, Any],
         target_edge_length_cm: float,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["iterations"] = iterations
@@ -3679,7 +3698,7 @@ class MeshCommands:
         preserve_boundaries: bool,
         target_mode: str,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         target_value: float,
     ):
         params: dict[str, Any] = {}
@@ -3698,7 +3717,7 @@ class MeshCommands:
         levels: int,
         scheme: str,
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["levels"] = levels
@@ -3715,11 +3734,11 @@ class MeshCommands:
         fill_hole: bool,
         keep_region: str,
         operand_ref: str,
-        operand_revision: str,
+        operand_revision: dict[str, Any],
         operand_to_target: dict[str, Any],
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["fill_hole"] = fill_hole
@@ -3739,12 +3758,12 @@ class MeshCommands:
         self,
         adaptivity: float,
         operand_ref: str,
-        operand_revision: str,
+        operand_revision: dict[str, Any],
         operand_to_target: dict[str, Any],
         operation: str,
         space_contract: dict[str, Any],
         target_ref: str,
-        target_revision: str,
+        target_revision: dict[str, Any],
         voxel_size_cm: float,
     ):
         params: dict[str, Any] = {}
@@ -3818,7 +3837,6 @@ class MeshCommands:
         grid_id: str | object = OMITTED,
         actor_ref: str | object = OMITTED,
         label: str | object = OMITTED,
-        folder_path: str | object = OMITTED,
         cell_size: float | object = OMITTED,
         origin: dict[str, Any] | object = OMITTED,
         rotation: dict[str, Any] | object = OMITTED,
@@ -3841,8 +3859,6 @@ class MeshCommands:
             params["actor_ref"] = actor_ref
         if label is not OMITTED:
             params["label"] = label
-        if folder_path is not OMITTED:
-            params["folder_path"] = folder_path
         if cell_size is not OMITTED:
             params["cell_size"] = cell_size
         if origin is not OMITTED:
@@ -5582,7 +5598,6 @@ class WorldCommands:
         folder_path: str | object = OMITTED,
         label: str,
         placement: dict[str, Any],
-        save_level: bool,
         tags: list[Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
@@ -5591,7 +5606,6 @@ class WorldCommands:
             params["folder_path"] = folder_path
         params["label"] = label
         params["placement"] = placement
-        params["save_level"] = save_level
         if tags is not OMITTED:
             params["tags"] = tags
         return self._client.execute(
@@ -5838,10 +5852,13 @@ class WorldCommands:
         self,
         folder_path: str,
         *,
+        managed_id: str | object = OMITTED,
         destructive_authorization_id: str | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["folder_path"] = folder_path
+        if managed_id is not OMITTED:
+            params["managed_id"] = managed_id
         if destructive_authorization_id is not OMITTED:
             params["destructive_authorization_id"] = destructive_authorization_id
         return self._client.execute(
@@ -5852,11 +5869,9 @@ class WorldCommands:
     def level_game_mode_update(
         self,
         game_mode_class_ref: str,
-        save_level: bool,
     ):
         params: dict[str, Any] = {}
         params["game_mode_class_ref"] = game_mode_class_ref
-        params["save_level"] = save_level
         return self._client.execute(
             "world.level_game_mode.update",
             params,
@@ -11234,7 +11249,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="landscape.create",
-            binding_hash="sha256:49804a8757405e80fdd99b966920b19e074f7db18c2a81229d7885ee58ce1fa0",
+            binding_hash="sha256:a003b0a1a590bf2703fb64f130b54b201dc17b53bcb11f6cebd664d2bced4871",
             namespace="landscape",
             method="create",
             parameters=(
@@ -11274,8 +11289,43 @@ BINDING_CATALOG = CommandBindingCatalog(
             status="active",
         ),
         CommandBinding(
+            command_id="landscape.height.read",
+            binding_hash="sha256:b88b72bd3132c728b920a2360ec61f3dcd92ff2f5a9a55d92930ae5fa2cb812e",
+            namespace="landscape",
+            method="height_read",
+            parameters=(
+                CommandParameterBinding(
+                    name="target",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="input",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="context",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="projection",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
             command_id="landscape.height_delta",
-            binding_hash="sha256:a1c48c4f7a41039189aecb6a1e98c86c0c8fdeb34c7cc930e8782adead0540f7",
+            binding_hash="sha256:61d4d61151d2f14e451e752efeb9443f6970c5edcb8adde2036355a6412c9b34",
             namespace="landscape",
             method="height_delta",
             parameters=(
@@ -11472,7 +11522,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.attribute.material_slot.add",
-            binding_hash="sha256:e613c594f0b04e5af165260f69021a8f6f6697206ac92ef1f09d075be5489d78",
+            binding_hash="sha256:7f7cf258fee34cb973dfeec8063c7c061b8f86c7cdbefdd5b298819b975c6d64",
             namespace="mesh",
             method="attribute_material_slot_add",
             parameters=(
@@ -11496,7 +11546,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -11507,7 +11557,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.attribute.material_slot.assign",
-            binding_hash="sha256:9f2ceecaf227b33c4fc28d8e0f56dcc731eb8a6053e72eb49be64a252e002663",
+            binding_hash="sha256:625f66f0fc7c06773dff2ce97def6052547d5c992b4903e9cfc488ca873221d7",
             namespace="mesh",
             method="attribute_material_slot_assign",
             parameters=(
@@ -11531,7 +11581,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -11542,7 +11592,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.attribute.normals.recompute",
-            binding_hash="sha256:abee7950c362f0e553f8f6ad66682977b33fbff569c22127aa0ff72da5f5b3e9",
+            binding_hash="sha256:a0ee563116eb8e728f8e5edc07f0fc77325a44b9598a68004d9ea5594ccf4ee8",
             namespace="mesh",
             method="attribute_normals_recompute",
             parameters=(
@@ -11572,7 +11622,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -11583,7 +11633,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.attribute.uv.auto",
-            binding_hash="sha256:9608347078c3b189a5d70f6ad10e10c70dff3e09571d5fb0630907b1114d7cab",
+            binding_hash="sha256:fc4c8b7c60d608f8d651f9f922c0e6572b530d21092a70d6dbc50e725803ac8c",
             namespace="mesh",
             method="attribute_uv_auto",
             parameters=(
@@ -11613,7 +11663,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -11636,7 +11686,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.attribute.uv.project",
-            binding_hash="sha256:e42682a0677be4461d1ab41a5b5638a72cb62bfe015f02f5309bd08c5d95a12e",
+            binding_hash="sha256:4cca9d65e067cf4fa12d27038500b1e98642120113ad07e1fee86240f443163e",
             namespace="mesh",
             method="attribute_uv_project",
             parameters=(
@@ -11672,7 +11722,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -11689,7 +11739,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.collision.convex.generate",
-            binding_hash="sha256:cd1abe823b99426dd02be3ce94af0121c7b48d856c9edbca219a8ce2a16ae203",
+            binding_hash="sha256:75a1691a758dcebbcfd29441842b2de1ce25d1d4b2d54e7d74a6c09e098b5f93",
             namespace="mesh",
             method="collision_convex_generate",
             parameters=(
@@ -11725,7 +11775,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -11736,7 +11786,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.collision.simple.generate",
-            binding_hash="sha256:a18ce1d5109c2ff38cc5e7f07b198b394eed98686b93f95a984043e50eb60dc7",
+            binding_hash="sha256:ae5c1733601185084283d58d52538db28163cb2d03a4cd531417a5e4db81866e",
             namespace="mesh",
             method="collision_simple_generate",
             parameters=(
@@ -11766,7 +11816,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -11888,7 +11938,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.box.create",
-            binding_hash="sha256:fd1db72df43dec934e882c838591c8e9ecb6b01dd30f53859c968b09fa5ed98c",
+            binding_hash="sha256:a180dcf67845e424898cd9eb0de6de6bea43cdbdc6699216187307e5cdad02c5",
             namespace="mesh",
             method="primitive_box_create",
             parameters=(
@@ -11929,7 +11979,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.cylinder.create",
-            binding_hash="sha256:41f6c57477ffe8a6d81697d1026e739cf9e018ad700e65fc98de8140a0f90b46",
+            binding_hash="sha256:103525d4676cc66ac0888ce3a069f083c43a985e13f7397cca6f1b592ad830b2",
             namespace="mesh",
             method="primitive_cylinder_create",
             parameters=(
@@ -11988,7 +12038,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.plane.create",
-            binding_hash="sha256:0d98605e737fd80450a775f4dcd41291840cba937fcf0e32568fb67c450130d8",
+            binding_hash="sha256:a9c17dabe26125cac9da32510e8379ad68ed27a88198673aae8298fa7d33e78d",
             namespace="mesh",
             method="primitive_plane_create",
             parameters=(
@@ -12029,7 +12079,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.ramp.create",
-            binding_hash="sha256:1d7f7203ae9c428ac61701514711fd42e2e590c077fe8add528ce364bc8e902d",
+            binding_hash="sha256:b37b2513b7d8bb82dfdc567e4d6e9de01972af78d0806bdc4f43677771efd035",
             namespace="mesh",
             method="primitive_ramp_create",
             parameters=(
@@ -12070,7 +12120,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.ramp_corner.create",
-            binding_hash="sha256:94fca35062e84ec6cfef28db13ed218e6b9c57520a0c0e121683ad43bfd69401",
+            binding_hash="sha256:2f9cfe1e140651a97204f08d77aee76fa7a624aab1aba8a4d572b97d987843c3",
             namespace="mesh",
             method="primitive_ramp_corner_create",
             parameters=(
@@ -12105,7 +12155,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.sphere.create",
-            binding_hash="sha256:7c558b2e983da289de9304bced368c4583646e067157f4b9ae03e000a68aa2a4",
+            binding_hash="sha256:73d941434eacd86a2d5c5fd58e67d6510c7e3421623cc0cbf889dfda4db5a761",
             namespace="mesh",
             method="primitive_sphere_create",
             parameters=(
@@ -12146,7 +12196,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.stairs.create",
-            binding_hash="sha256:b190ad087621b7e9730a66a9bb551a3626ca489cf2deeabdb509ab88bd8c3ac4",
+            binding_hash="sha256:04c63aff94768551de8a89d932ac618fd48b3f48d9e5b24ce47d3c319186d219",
             namespace="mesh",
             method="primitive_stairs_create",
             parameters=(
@@ -12205,7 +12255,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.boolean",
-            binding_hash="sha256:5bccb9dc8cebdbac3f825ac3317c6989c23d75eb03975285cd037bded6ee3d80",
+            binding_hash="sha256:e0b3f7c50e7d44ecc206b3596b63b5da74b3f3c89a1e9257dd64b46a6fb3ec95",
             namespace="mesh",
             method="topology_boolean",
             parameters=(
@@ -12217,7 +12267,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="operand_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12253,7 +12303,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12264,7 +12314,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.edges.bevel",
-            binding_hash="sha256:1ea02b90b81f660802630d86d265837ceccb6cbf17a6ee17a245faea494e3b4e",
+            binding_hash="sha256:e57710ee7cc3286c18f1986594e97bc0676765eb55c5293704364ec07ed68874",
             namespace="mesh",
             method="topology_edges_bevel",
             parameters=(
@@ -12306,7 +12356,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12317,19 +12367,13 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.edges.weld",
-            binding_hash="sha256:deb0441525447b4cbcdf45b3a4090b359a41fd4f6ce2851bf95296ded3905301",
+            binding_hash="sha256:624ebce4573bb1b34964f161947e29dd99f397a09b61000b71a1836b6c681ee9",
             namespace="mesh",
             method="topology_edges_weld",
             parameters=(
                 CommandParameterBinding(
                     name="edge_pairs",
                     wire_type="array",
-                    required=True,
-                    nullable=False,
-                ),
-                CommandParameterBinding(
-                    name="mesh_revision",
-                    wire_type="string",
                     required=True,
                     nullable=False,
                 ),
@@ -12341,7 +12385,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12358,7 +12402,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.faces.duplicate",
-            binding_hash="sha256:549978265872a8bbb384ea07b0f3f82d7b062e289678d35473df1f4d6fcb534e",
+            binding_hash="sha256:aeb382bc86a5e1d5c33b8b978459086124a5671e14cfc0c53674f95da8af0c29",
             namespace="mesh",
             method="topology_faces_duplicate",
             parameters=(
@@ -12382,7 +12426,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12399,7 +12443,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.faces.extrude",
-            binding_hash="sha256:c59cb80110de41a8396695bd28490130fecf21e64c30ae7361127fb83904ace3",
+            binding_hash="sha256:eda73907fde60be42cafbab4f63d6510369ee83aa3d6c3aa100de359c15c5b93",
             namespace="mesh",
             method="topology_faces_extrude",
             parameters=(
@@ -12441,7 +12485,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12452,7 +12496,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.faces.inset",
-            binding_hash="sha256:856dec2cbb7464127c28317b9579f8df46527af375412f59c6dfd0f3886b5297",
+            binding_hash="sha256:0013707989daed85280e4a93e5ac9151910449aa6d6d90f5e7dc9f6515ac4e70",
             namespace="mesh",
             method="topology_faces_inset",
             parameters=(
@@ -12488,7 +12532,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12499,7 +12543,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.faces.offset",
-            binding_hash="sha256:d90671ee9b718d25bb1288c73f005508d971f4dbf195181ce35d10c10bc58861",
+            binding_hash="sha256:11c64b4c9593c6ade1e1026fcd0db43eb85d88f135683ab7916fce04084e1206",
             namespace="mesh",
             method="topology_faces_offset",
             parameters=(
@@ -12535,7 +12579,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12546,7 +12590,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.faces.push_pull",
-            binding_hash="sha256:9bea03fba4546ae2eb6072cc53d650904221e304a1c268446000eb3afcc6b101",
+            binding_hash="sha256:0474d98b9dc3d15e48ebd0d76e237a03f99f8f61a565dfe4a0b03959385c4ccd",
             namespace="mesh",
             method="topology_faces_push_pull",
             parameters=(
@@ -12588,7 +12632,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12599,7 +12643,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.holes.fill",
-            binding_hash="sha256:65c3b89290ebea540628d0b83f084c99217c5a9fbfdc71d38660fbb354ac2c1e",
+            binding_hash="sha256:691ce5e7230d0761085dcc76615ab8e3d467a1643d7bd8072c4518653876da16",
             namespace="mesh",
             method="topology_holes_fill",
             parameters=(
@@ -12623,7 +12667,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12634,7 +12678,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.mesh_cut",
-            binding_hash="sha256:180e209dae7aa1d23da59083f33f89690339b70479ae3ed53131bafca5fcd33a",
+            binding_hash="sha256:1aa0e44c972bb7eedac805bab58cb3cec2fa22e7d1c0a2f0147e24eb6923c1e9",
             namespace="mesh",
             method="topology_mesh_cut",
             parameters=(
@@ -12658,7 +12702,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="operand_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12682,7 +12726,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12693,7 +12737,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.mirror",
-            binding_hash="sha256:7b92d68b3aadb27cc7e46d07371202363167a02f52b6ea1078058b8caf59a85f",
+            binding_hash="sha256:e7754354fbf0d832c4b4929b6d2f25cc3f0f0f00d8266403ebc2a3a6947dd396",
             namespace="mesh",
             method="topology_mirror",
             parameters=(
@@ -12723,7 +12767,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12740,7 +12784,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.plane_cut",
-            binding_hash="sha256:bf7ad5edd01d2b4baaaeb941e2a7a9a203f3083bdf53681b42c52dd632061586",
+            binding_hash="sha256:14dd09ff028cbc0f41b6013ce7840b51963db306a18960576e479a955ef7354d",
             namespace="mesh",
             method="topology_plane_cut",
             parameters=(
@@ -12776,7 +12820,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12787,7 +12831,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.remesh",
-            binding_hash="sha256:5730ca25ca820b3f1e6dba76563ae523d129a4e0c6fb68e82bcc1db09a258c14",
+            binding_hash="sha256:09417e8b54e79f1b8de227af8ec546ed7519e7e8df12e6e3c7f481ddb2201f92",
             namespace="mesh",
             method="topology_remesh",
             parameters=(
@@ -12829,7 +12873,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12840,7 +12884,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.simplify",
-            binding_hash="sha256:6fd1ac07bb20c34d5a403341c2bc8c2f2391e8ac68f8d3e996b083ce665956e2",
+            binding_hash="sha256:48cb07140c78f39b98c5729e6753580e81bed6b426fbf587f045dea0cf0379ec",
             namespace="mesh",
             method="topology_simplify",
             parameters=(
@@ -12864,7 +12908,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12881,7 +12925,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.subdivide",
-            binding_hash="sha256:eb485c11ff02b2ceb07edb5a2e1928b24cdb89fc7f359a8aab9c8edf4aa9bf0e",
+            binding_hash="sha256:1640d3e4a61df7a4281af1ae0c8966c25d3a4e2667f6ef53ff1d4dafb46159db",
             namespace="mesh",
             method="topology_subdivide",
             parameters=(
@@ -12905,7 +12949,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12916,7 +12960,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.trim",
-            binding_hash="sha256:8c3760dabb9cc25e535a0dafa381908faddea563f7219e19b388377ef360c9f9",
+            binding_hash="sha256:22ff6acfe9142f130962ab4e807845785f3f0c4f51f56f197955fa069f837312",
             namespace="mesh",
             method="topology_trim",
             parameters=(
@@ -12940,7 +12984,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="operand_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12964,7 +13008,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -12975,7 +13019,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.voxel_boolean",
-            binding_hash="sha256:cafbb6dad6c35c7868ae6cd2476d81b4c6d357297d393fd7b078b52707bdd563",
+            binding_hash="sha256:72c7d20d4362b57e47f51fe84c3e0083c90b2fc985baab425c1acd86045595e7",
             namespace="mesh",
             method="topology_voxel_boolean",
             parameters=(
@@ -12993,7 +13037,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="operand_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -13023,7 +13067,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="target_revision",
-                    wire_type="string",
+                    wire_type="object",
                     required=True,
                     nullable=False,
                 ),
@@ -13075,7 +13119,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.voxel_grid.apply",
-            binding_hash="sha256:1c0c241c3fe606fec16d393692392c4b6922ee6757051d5fd9cc607728d43a7f",
+            binding_hash="sha256:4db44a29632c296ead66d97c7222020da5d110b6c9beb2c4193a3ece57e08564",
             namespace="mesh",
             method="voxel_grid_apply",
             parameters=(
@@ -13122,7 +13166,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.voxel_grid.session",
-            binding_hash="sha256:a9e2fdb57285832a139eb042b3341247feaaa50723e758ba3f82dd86dda00919",
+            binding_hash="sha256:99edcf22eb94d749faef9d7973802d8f3313b8b43eb3e826cd954081d4b5fb89",
             namespace="mesh",
             method="voxel_grid_session",
             parameters=(
@@ -13164,12 +13208,6 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="label",
-                    wire_type="string",
-                    required=False,
-                    nullable=False,
-                ),
-                CommandParameterBinding(
-                    name="folder_path",
                     wire_type="string",
                     required=False,
                     nullable=False,
@@ -14583,7 +14621,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="query.command.detail",
-            binding_hash="sha256:78a228528dc0a42590fa51f3b398246448ca7e74a20f7d44442f703a12870022",
+            binding_hash="sha256:e40bc15770b133639104ab89bb09de77c2a19f3a84985aafd02713c3289f2765",
             namespace="query",
             method="command_detail",
             parameters=(
@@ -16025,7 +16063,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.actor.create",
-            binding_hash="sha256:f9af6f2b2e42cc61652b7da31beda95bbb42144457dff1e450140cb51de79b83",
+            binding_hash="sha256:5b8dd511f014b63793d8b6e41dad99158c2ee7d3f42bb6ff76a900378dc3578a",
             namespace="world",
             method="actor_create",
             parameters=(
@@ -16050,12 +16088,6 @@ BINDING_CATALOG = CommandBindingCatalog(
                 CommandParameterBinding(
                     name="placement",
                     wire_type="object",
-                    required=True,
-                    nullable=False,
-                ),
-                CommandParameterBinding(
-                    name="save_level",
-                    wire_type="boolean",
                     required=True,
                     nullable=False,
                 ),
@@ -16455,7 +16487,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.level_content.delete_scope",
-            binding_hash="sha256:568560b6a9c7227307afc19f8f2b2f99bd7ab1465644a6f835bc4ad26ac200d5",
+            binding_hash="sha256:f99c5914309922974a8b234c0f6dc43d8db79788554c41f0f560060ece282f67",
             namespace="world",
             method="level_content_delete_scope",
             parameters=(
@@ -16463,6 +16495,12 @@ BINDING_CATALOG = CommandBindingCatalog(
                     name="folder_path",
                     wire_type="string",
                     required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="managed_id",
+                    wire_type="string",
+                    required=False,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -16478,19 +16516,13 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.level_game_mode.update",
-            binding_hash="sha256:215b69f6e2ec40557ad5b2f2aea58d2b9709f1f2819130de85ffd492017cf805",
+            binding_hash="sha256:4559c567d0b55bb8e6480823fbcb414f77ce3a51b7388b9f94f782d37d540e89",
             namespace="world",
             method="level_game_mode_update",
             parameters=(
                 CommandParameterBinding(
                     name="game_mode_class_ref",
                     wire_type="string",
-                    required=True,
-                    nullable=False,
-                ),
-                CommandParameterBinding(
-                    name="save_level",
-                    wire_type="boolean",
                     required=True,
                     nullable=False,
                 ),

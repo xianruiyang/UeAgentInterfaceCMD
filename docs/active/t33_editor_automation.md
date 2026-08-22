@@ -2,6 +2,8 @@
 
 `scripts/ue/RunSmokeTests.ps1` accepts only structured plans with `preserve_main_editor=true`. Each batch declares whether it needs RHI, Slate, or foreground interaction.
 
+`scripts/ue/UeAutomationCommand.psm1` is the runner's command-transport owner. It builds module loading, filter selection, and exactly one queued `Automation RunTests` command for a batch; callers use the structured runner instead of composing `-ExecCmds` themselves.
+
 - headless, no rendering: owned `UnrealEditor-Cmd` with `-unattended -NullRHI`;
 - headless rendering: owned `UnrealEditor-Cmd` with `-unattended` and RHI enabled;
 - Slate or foreground interaction: rejected until a dedicated owned interactive runner exists.
