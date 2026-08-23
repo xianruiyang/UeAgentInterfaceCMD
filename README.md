@@ -38,8 +38,11 @@ uai-cli --connection connection.toml exec namespace.command --params-json "{}"
 - `tools/tests/`：仓库工具自身的模块测试；
 - `tests/`：SDK、协议、CLI 和边界行为的验证证据，不单独定义产品完成状态；
 - `docs/`：当前 SDK/CLI 合同和维护说明；
-- `templates/`、`reports/` 与 `build/README.md`：模板或受控输出落点说明，生成结果
-  不作为源码、计划或状态真源。
+- `templates/` 与 `build/README.md`：模板或受控构建输出说明，生成结果不作为
+  源码、计划或状态真源；
+- CLI report 只写入调用方通过 `--report` 明确选择的路径。仓库根不保留
+  `logs/` 或 `reports/` 默认输出入口，项目运行证据按调用方的 scoped
+  `runtimeLogs/<producer>/<task>/<run>/` 合同管理。
 
 ## 生命周期与发布边界
 
