@@ -12,8 +12,8 @@ from ._runtime import (
     OMITTED,
 )
 
-GENERATED_MANIFEST_HASH = "sha256:98fd21e381a215aef2571b14f43fcbacb7e2a174c2f10503fc09de51b94dd278"
-GENERATED_REGISTRY_HASH = "sha256:ad84ad420e34abc3250b71ee8b3b5b5825c32756d04b80a5fe7dc3c6eff50d4a"
+GENERATED_MANIFEST_HASH = "sha256:f7900304394c1c401dceeaad27b7e2546c60671d13e996d8548efd5db3db1f7a"
+GENERATED_REGISTRY_HASH = "sha256:ebfd0e0ba4b8df3402ef22fc7ff299d91e301fe6dcea8b83f21fead78340d280"
 
 class AiCommands:
     __slots__ = ("_client",)
@@ -1933,6 +1933,43 @@ class AssetCommands:
             params,
         )
 
+class AssetDurableCommands:
+    __slots__ = ("_client",)
+
+    def __init__(
+        self,
+        client: CommandExecutor,
+    ) -> None:
+        self._client = client
+
+    def journal_read(
+        self,
+        journal_id: str,
+    ):
+        params: dict[str, Any] = {}
+        params["journal_id"] = journal_id
+        return self._client.execute(
+            "asset_durable.journal.read",
+            params,
+        )
+
+    def journal_reconcile(
+        self,
+        journal_id: str,
+        expected_journal_owner_id: str,
+        expected_fencing_token: int,
+        verification_id: str,
+    ):
+        params: dict[str, Any] = {}
+        params["journal_id"] = journal_id
+        params["expected_journal_owner_id"] = expected_journal_owner_id
+        params["expected_fencing_token"] = expected_fencing_token
+        params["verification_id"] = verification_id
+        return self._client.execute(
+            "asset_durable.journal.reconcile",
+            params,
+        )
+
 class AudioCommands:
     __slots__ = ("_client",)
 
@@ -2181,6 +2218,17 @@ class ContentGraphCommands:
         client: CommandExecutor,
     ) -> None:
         self._client = client
+
+    def authoring_schema(
+        self,
+        target: str,
+    ):
+        params: dict[str, Any] = {}
+        params["target"] = target
+        return self._client.execute(
+            "content_graph.authoring_schema",
+            params,
+        )
 
     def compound(
         self,
@@ -5272,6 +5320,26 @@ class TimelineCommands:
             params,
         )
 
+    def sequence_settings_update(
+        self,
+        target: str,
+        input: dict[str, Any],
+        *,
+        context: dict[str, Any] | object = OMITTED,
+        projection: dict[str, Any] | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        params["target"] = target
+        params["input"] = input
+        if context is not OMITTED:
+            params["context"] = context
+        if projection is not OMITTED:
+            params["projection"] = projection
+        return self._client.execute(
+            "timeline.sequence.settings.update",
+            params,
+        )
+
     def sequence_structure_replace(
         self,
         target: str,
@@ -6086,6 +6154,25 @@ class WorldCommands:
             params,
         )
 
+    def object_transform_update(
+        self,
+        target: str,
+        input: dict[str, Any],
+        context: dict[str, Any],
+        *,
+        projection: dict[str, Any] | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        params["target"] = target
+        params["input"] = input
+        params["context"] = context
+        if projection is not OMITTED:
+            params["projection"] = projection
+        return self._client.execute(
+            "world.object_transform.update",
+            params,
+        )
+
     def overlap(
         self,
         *,
@@ -6326,25 +6413,6 @@ class WorldCommands:
             params["projection"] = projection
         return self._client.execute(
             "world.summary",
-            params,
-        )
-
-    def transform_candidates_evaluate(
-        self,
-        target: str,
-        input: dict[str, Any],
-        context: dict[str, Any],
-        *,
-        projection: dict[str, Any] | object = OMITTED,
-    ):
-        params: dict[str, Any] = {}
-        params["target"] = target
-        params["input"] = input
-        params["context"] = context
-        if projection is not OMITTED:
-            params["projection"] = projection
-        return self._client.execute(
-            "world.transform_candidates.evaluate",
             params,
         )
 
@@ -8519,7 +8587,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.object.clone",
-            binding_hash="sha256:2cb3001dc9adb7a87fc4686a8e06a89485f0b55de4f84c760050dd11b8b576ce",
+            binding_hash="sha256:7fd21f68b58967c33800d783f570d85b6e517293d07cab0416f740df069dd7a2",
             namespace="asset",
             method="object_clone",
             parameters=(
@@ -9755,6 +9823,58 @@ BINDING_CATALOG = CommandBindingCatalog(
             status="active",
         ),
         CommandBinding(
+            command_id="asset_durable.journal.read",
+            binding_hash="sha256:e252bb72ef40d6780901c824fcd37933b7afa07119f84c3e5f4e7234ba005125",
+            namespace="asset_durable",
+            method="journal_read",
+            parameters=(
+                CommandParameterBinding(
+                    name="journal_id",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="asset_durable.journal.reconcile",
+            binding_hash="sha256:3fee929abb997b9b5bf9b39cfbdb2d113e0e8dcc632f8bcbce6a74da47e6fa7a",
+            namespace="asset_durable",
+            method="journal_reconcile",
+            parameters=(
+                CommandParameterBinding(
+                    name="journal_id",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="expected_journal_owner_id",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="expected_fencing_token",
+                    wire_type="integer",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="verification_id",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
             command_id="audio.graph.candidates",
             binding_hash="sha256:63e00dad492a215f4ed9a32f0fcd0692fd0225b57385b251361b224c393e6597",
             namespace="audio",
@@ -9960,7 +10080,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="capture.image.execute",
-            binding_hash="sha256:5f292064dbabfbefd58c91611060e6e21db6def15f9a6ed7d9640b0cd066ecb6",
+            binding_hash="sha256:e8e32230712add95a27c1399c4146b6a13670a8b1b2c0a9487eb58c502fa36b3",
             namespace="capture",
             method="image_execute",
             parameters=(
@@ -10104,8 +10224,25 @@ BINDING_CATALOG = CommandBindingCatalog(
             status="active",
         ),
         CommandBinding(
+            command_id="content_graph.authoring_schema",
+            binding_hash="sha256:a9aa7c017b7edb1f19509019998c01633786168dc2ffc1a737a1e9b0f30bde80",
+            namespace="content_graph",
+            method="authoring_schema",
+            parameters=(
+                CommandParameterBinding(
+                    name="target",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
             command_id="content_graph.compound",
-            binding_hash="sha256:020abd58285d49632aef02ee086d876d4bea9ba2e6f74bb391330d334e78ff1e",
+            binding_hash="sha256:0cf5a46a482db7d71f715002fe26c1c600c5a3bf4291328ea873f611a90b3eb9",
             namespace="content_graph",
             method="compound",
             parameters=(
@@ -10140,7 +10277,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.diagnostics",
-            binding_hash="sha256:0a391ba5e7f60a6fe14f9a8f188ea3eb9a756136212829f714d391ea04c70d64",
+            binding_hash="sha256:8d42bbe76f7ae476328f0c873cd55b98cdbbbd10533ff6d83215f35e32f230ae",
             namespace="content_graph",
             method="diagnostics",
             parameters=(
@@ -10175,7 +10312,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.export_workspace",
-            binding_hash="sha256:16aee82b1daec9d88f2c2ce4804f7f53d0de3b72cc09826cc4f93118d6f7e40a",
+            binding_hash="sha256:4117a13cc08abbc40cfe36c4bb062b604ba598e982a9893fcd092d12206be1b2",
             namespace="content_graph",
             method="export_workspace",
             parameters=(
@@ -10204,7 +10341,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.import_workspace",
-            binding_hash="sha256:e407d58817ba99a7d83e0ad5c16649aabfe89857f0f6be587c0f9804e2b58e4c",
+            binding_hash="sha256:d9f2bb00c671fe54ad15b45f96a29a05e5291808d76f528dda39986282ea9b43",
             namespace="content_graph",
             method="import_workspace",
             parameters=(
@@ -10245,7 +10382,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.items",
-            binding_hash="sha256:aa7fce431dcf60235a96feec3f8896c676238a75726fd02e69793af854475ad6",
+            binding_hash="sha256:46149d5c4770cdc2a9acc23298564fd2ca997d0f3dd93168a4a069997ac7ec16",
             namespace="content_graph",
             method="items",
             parameters=(
@@ -10280,7 +10417,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.properties",
-            binding_hash="sha256:728b6232de933a58ae3ae8dffec2946dfca451cd5fc51169d35fa6444fcdaea5",
+            binding_hash="sha256:4b59f653fd063a5cb70f5892a7bd09f8bae833eb0058de6f013818c3c0d41964",
             namespace="content_graph",
             method="properties",
             parameters=(
@@ -10315,7 +10452,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.relations",
-            binding_hash="sha256:634371246b8afc5e08ec68d21f8c929c4226ae46d8278bc78d4cad4aa71c7e18",
+            binding_hash="sha256:df4087d36a0aeca2d49b66a86b9a1485c7b351a1ea92316a0c8dedea7cd33d94",
             namespace="content_graph",
             method="relations",
             parameters=(
@@ -10350,7 +10487,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.structure",
-            binding_hash="sha256:4785ca19b2b217094731ab78e888e5f4412e71d391d81f96bd7bb8f139cdd993",
+            binding_hash="sha256:c785378a2e94acde49ce8734534e04718b46eaabbda4058fa63c74117dc529e4",
             namespace="content_graph",
             method="structure",
             parameters=(
@@ -10385,7 +10522,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.summary",
-            binding_hash="sha256:68940efb8dfb240d1f00eb93ec1c851c259364fc368131fd4c1f3da44adb6a9c",
+            binding_hash="sha256:33c332bb2baf050083d46c984f7a334679c3c9ed69679cd2d46a4d74df0fda3a",
             namespace="content_graph",
             method="summary",
             parameters=(
@@ -11835,7 +11972,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.element.select_by_ray",
-            binding_hash="sha256:61353d32d57ba99962e589acd18db8272c95bcab5e4a65f81293f837d3a4303e",
+            binding_hash="sha256:b3d0a641bd2cbc5f3b908c88e44c5ea689ee11a84df87dd24705001619e16cbf",
             namespace="mesh",
             method="element_select_by_ray",
             parameters=(
@@ -11911,7 +12048,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.pivot.update",
-            binding_hash="sha256:ed35fd565d6cf6c0068742bf26b3619a889b4966956e5dbb6504c5639ac5595b",
+            binding_hash="sha256:c2720be15240423ab2bda59a15cf5d5dccf1fc7d8a53d8074135e95509a8c248",
             namespace="mesh",
             method="pivot_update",
             parameters=(
@@ -13092,7 +13229,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.transform.bake",
-            binding_hash="sha256:766f6eff3d3f2d787fc82a1555b88220e1883b2d97a56d09fff7dc97d1210beb",
+            binding_hash="sha256:00d848939886752ac0bd6a716f5bfa340e568bd9a0f43b3ef9e12a32a755bb1e",
             namespace="mesh",
             method="transform_bake",
             parameters=(
@@ -15552,6 +15689,41 @@ BINDING_CATALOG = CommandBindingCatalog(
             status="active",
         ),
         CommandBinding(
+            command_id="timeline.sequence.settings.update",
+            binding_hash="sha256:23fb13e38e48d55c84827028ee7c3b27c532c2b5878e8cda6f707a05e6ca9269",
+            namespace="timeline",
+            method="sequence_settings_update",
+            parameters=(
+                CommandParameterBinding(
+                    name="target",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="input",
+                    wire_type="object",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="context",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="projection",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
             command_id="timeline.sequence.structure.replace",
             binding_hash="sha256:9d9ba71e5f2dd710badaef01c599898f179978110e48cd48d3a38e3c938c8e5b",
             namespace="timeline",
@@ -16779,7 +16951,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.object_align",
-            binding_hash="sha256:ad965c033494ec914118772859ba6cb057b512d5ff7b3846c8fd9f2cda3a2f73",
+            binding_hash="sha256:e515c3a07e041cdaf7083b16670bf7bd767b6cd66518f5f05e6f37afc9c66ae9",
             namespace="world",
             method="object_align",
             parameters=(
@@ -16814,7 +16986,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.object_snap_to_surface",
-            binding_hash="sha256:3756db8139cff3fdf840440e748e29532baec9b7b840c52f11d237eb8a28d04b",
+            binding_hash="sha256:0f61d5bc08afa1adf9f195d81242dcac059b7fd56c75de8de377a6ae2c3e4618",
             namespace="world",
             method="object_snap_to_surface",
             parameters=(
@@ -16849,9 +17021,44 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.object_transform.read",
-            binding_hash="sha256:d5bbb2445cf1f884fd0320bf5e20d016b8590aef723f6fb6b030917d4be8285e",
+            binding_hash="sha256:9013657da56b5a062235b5e7d5b51926c61b3773be58d0feabf26379ab9895c0",
             namespace="world",
             method="object_transform_read",
+            parameters=(
+                CommandParameterBinding(
+                    name="target",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="input",
+                    wire_type="object",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="context",
+                    wire_type="object",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="projection",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="world.object_transform.update",
+            binding_hash="sha256:6027d967e1f58049e528fd3cd86fda59fe90c9503087be5fb3e3f0d4ad8f7d54",
+            namespace="world",
+            method="object_transform_update",
             parameters=(
                 CommandParameterBinding(
                     name="target",
@@ -17272,41 +17479,6 @@ BINDING_CATALOG = CommandBindingCatalog(
             status="active",
         ),
         CommandBinding(
-            command_id="world.transform_candidates.evaluate",
-            binding_hash="sha256:092211e796b63bf4302cf88db97fe9b7b1d2ede1ad4bfb4c872e097d31cce596",
-            namespace="world",
-            method="transform_candidates_evaluate",
-            parameters=(
-                CommandParameterBinding(
-                    name="target",
-                    wire_type="string",
-                    required=True,
-                    nullable=False,
-                ),
-                CommandParameterBinding(
-                    name="input",
-                    wire_type="object",
-                    required=True,
-                    nullable=False,
-                ),
-                CommandParameterBinding(
-                    name="context",
-                    wire_type="object",
-                    required=True,
-                    nullable=False,
-                ),
-                CommandParameterBinding(
-                    name="projection",
-                    wire_type="object",
-                    required=False,
-                    nullable=False,
-                ),
-            ),
-            min_wire_version=1,
-            max_wire_version=1,
-            status="active",
-        ),
-        CommandBinding(
             command_id="world.wall.create_with_opening",
             binding_hash="sha256:e5e3f7d9de2cac4e5dd92c3810f6b36a5b93e912222536e0705366d8ecd9af15",
             namespace="world",
@@ -17362,7 +17534,7 @@ BINDING_CATALOG = CommandBindingCatalog(
 )
 
 class GeneratedCommandNamespaces:
-    __slots__ = ("ai", "animation", "animation_rig_graph", "asset", "audio", "audio_media", "blueprint", "capture", "config", "content_graph", "deformer", "editor", "editor_project", "external", "graph", "job", "landscape", "material", "material_instance", "mesh", "metasound", "modeling", "niagara", "operation", "pcg", "physics", "project", "query", "reference", "rig", "skeletal_mesh", "sound_cue", "texture_graph", "timeline", "umg", "viewport", "world")
+    __slots__ = ("ai", "animation", "animation_rig_graph", "asset", "asset_durable", "audio", "audio_media", "blueprint", "capture", "config", "content_graph", "deformer", "editor", "editor_project", "external", "graph", "job", "landscape", "material", "material_instance", "mesh", "metasound", "modeling", "niagara", "operation", "pcg", "physics", "project", "query", "reference", "rig", "skeletal_mesh", "sound_cue", "texture_graph", "timeline", "umg", "viewport", "world")
 
     def __init__(
         self,
@@ -17372,6 +17544,7 @@ class GeneratedCommandNamespaces:
         self.animation = AnimationCommands(client)
         self.animation_rig_graph = AnimationRigGraphCommands(client)
         self.asset = AssetCommands(client)
+        self.asset_durable = AssetDurableCommands(client)
         self.audio = AudioCommands(client)
         self.audio_media = AudioMediaCommands(client)
         self.blueprint = BlueprintCommands(client)
@@ -17425,6 +17598,10 @@ class GeneratedClientBindingsMixin:
     @property
     def asset(self) -> AssetCommands:
         return self._generated_commands.asset
+
+    @property
+    def asset_durable(self) -> AssetDurableCommands:
+        return self._generated_commands.asset_durable
 
     @property
     def audio(self) -> AudioCommands:

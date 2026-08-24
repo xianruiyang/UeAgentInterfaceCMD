@@ -880,6 +880,21 @@ class AssetCommands:
         target_ref: str,
     ) -> Any: ...
 
+class AssetDurableCommands:
+
+    def journal_read(
+        self,
+        journal_id: str,
+    ) -> Any: ...
+
+    def journal_reconcile(
+        self,
+        journal_id: str,
+        expected_journal_owner_id: str,
+        expected_fencing_token: int,
+        verification_id: str,
+    ) -> Any: ...
+
 class AudioCommands:
 
     def graph_candidates(
@@ -978,6 +993,11 @@ class ConfigCommands:
     ) -> Any: ...
 
 class ContentGraphCommands:
+
+    def authoring_schema(
+        self,
+        target: str,
+    ) -> Any: ...
 
     def compound(
         self,
@@ -2344,6 +2364,15 @@ class TimelineCommands:
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
+    def sequence_settings_update(
+        self,
+        target: str,
+        input: dict[str, Any],
+        *,
+        context: dict[str, Any] = ...,
+        projection: dict[str, Any] = ...,
+    ) -> Any: ...
+
     def sequence_structure_replace(
         self,
         target: str,
@@ -2702,6 +2731,15 @@ class WorldCommands:
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
+    def object_transform_update(
+        self,
+        target: str,
+        input: dict[str, Any],
+        context: dict[str, Any],
+        *,
+        projection: dict[str, Any] = ...,
+    ) -> Any: ...
+
     def overlap(
         self,
         *,
@@ -2807,15 +2845,6 @@ class WorldCommands:
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
-    def transform_candidates_evaluate(
-        self,
-        target: str,
-        input: dict[str, Any],
-        context: dict[str, Any],
-        *,
-        projection: dict[str, Any] = ...,
-    ) -> Any: ...
-
     def wall_create_with_opening(
         self,
         opening: dict[str, Any],
@@ -2835,6 +2864,7 @@ class GeneratedCommandNamespaces:
     animation: AnimationCommands
     animation_rig_graph: AnimationRigGraphCommands
     asset: AssetCommands
+    asset_durable: AssetDurableCommands
     audio: AudioCommands
     audio_media: AudioMediaCommands
     blueprint: BlueprintCommands
@@ -2886,6 +2916,9 @@ class GeneratedClientBindingsMixin:
 
     @property
     def asset(self) -> AssetCommands: ...
+
+    @property
+    def asset_durable(self) -> AssetDurableCommands: ...
 
     @property
     def audio(self) -> AudioCommands: ...

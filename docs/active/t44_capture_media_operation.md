@@ -29,6 +29,44 @@ and `parameters` for only that policy's documented fields. Asset subjects use
 `capture-subject:viewport:active`. If a policy accepts `output_file`, it names
 the final owned artifact; native work still uses operation-owned staging.
 
+`command_detail(command_id="capture.image.execute")` dynamically projects the
+current image-policy catalog into the `policy_id` input schema and places any
+policy-specific parameter schemas under `parameters.schema` at
+`x-uai-policy-contracts`. This projection comes from the same policy registry
+that executes the request, so the SDK tutorial does not maintain a second list.
+
+## Transform-candidate visual preview
+
+`policy:image-capture:transform-candidates/v1` is a current policy, not a
+historical alias. Pass one exact Actor object path and 1-15 candidates:
+
+```python
+started = client.capture.image_execute(
+    subject_ref="capture-subject:actor:/Game/Maps/MyMap.MyMap:PersistentLevel.MyActor",
+    policy_id="policy:image-capture:transform-candidates/v1",
+    parameters={
+        "candidates": [
+            {"label": "left", "relative_to_original": True,
+             "transform": {"location": {"x": 0, "y": -100, "z": 0}}},
+            {"label": "right", "relative_to_original": True,
+             "transform": {"location": {"x": 0, "y": 100, "z": 0}}},
+        ],
+        "format": "png",
+        "max_size": 720,
+    },
+)
+```
+
+The policy captures the original frame plus each temporary candidate from the
+current Level viewport and publishes one operation-owned frame sheet. The 15
+candidate limit keeps the complete sheet at no more than 16 frames. It does not
+focus the Editor, score candidates, choose one, or persist a candidate. Every
+terminal mechanics path restores the Actor transform, package dirty state,
+Actor selection, and temporary viewport realtime override; success fails closed
+unless those restorations are observed. After comparison, persist the chosen
+value separately with `world.object_transform.update` and verify it with
+`world.object_transform.read`.
+
 ## Image policy migration table
 
 | Retired historical identity | Current `capture.image.execute` policy | `parameters` responsibility |

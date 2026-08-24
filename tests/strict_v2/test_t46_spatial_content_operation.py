@@ -27,7 +27,7 @@ METHODS = {
     "world.object_align": ("world", "object_align"),
     "world.object_snap_to_surface": ("world", "object_snap_to_surface"),
     "world.object_transform.read": ("world", "object_transform_read"),
-    "world.transform_candidates.evaluate": ("world", "transform_candidates_evaluate"),
+    "world.object_transform.update": ("world", "object_transform_update"),
 }
 class _FakeClient:
     def __init__(self): self.calls: list[tuple[str, dict[str, Any], str]] = []
@@ -51,7 +51,7 @@ def test_all_8_spatial_content_commands_have_exact_default_bindings():
     assert len(METHODS) == 8 and len(set(METHODS)) == 8
     _bindings()
 def test_default_named_method_preserves_one_exact_request():
-    binding = _bindings()["world.object_transform.read"]; client = _FakeClient(); params = _params(binding)
+    binding = _bindings()["world.object_transform.update"]; client = _FakeClient(); params = _params(binding)
     getattr(getattr(bind_generated_commands(client), binding.namespace), binding.method)(**params)
     assert client.calls == [(binding.command_id, params, binding.binding_hash)]
 def test_default_projection_contains_no_transport_or_spatial_business_logic():

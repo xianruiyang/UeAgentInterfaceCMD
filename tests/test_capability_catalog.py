@@ -243,6 +243,35 @@ def test_high_value_recovery_units_are_explicit_and_non_overclaiming() -> None:
     assert unified["blockers"] == []
 
 
+def test_durable_maintenance_is_not_owned_by_asset_or_operation_commands() -> None:
+    catalog = load(CATALOG_PATH)
+    units = units_by_id(catalog)
+
+    durable_ids = {
+        "asset_durable.journal.read",
+        "asset_durable.journal.reconcile",
+    }
+    durable = units["CU-DURABLE-MAINTENANCE"]
+    assert set(durable["current_command_ids"]) == durable_ids
+    assert durable["activation_contribution_ids"] == [
+        "asset-durable-maintenance-owner"
+    ]
+    assert durable["evidence"]["highest_verified_layer"] == (
+        "persistence_independent_readback"
+    )
+    assert any(
+        "other than the exact 7E26" in boundary
+        for boundary in durable["evidence"]["not_proven"]
+    )
+
+    assert durable_ids.isdisjoint(
+        units["CU-ASSET-SIMPLE"]["current_command_ids"]
+    )
+    assert durable_ids.isdisjoint(
+        units["CU-OPERATION-LIFECYCLE"]["current_command_ids"]
+    )
+
+
 def test_removed_candidate_identities_have_final_non_exact_resolutions() -> None:
     catalog = load(CATALOG_PATH)
     removed = catalog["retired_candidate_current_identities"]
