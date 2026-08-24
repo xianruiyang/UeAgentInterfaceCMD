@@ -132,7 +132,19 @@ def test_safe_exit_and_compile_build_preserve_exact_params() -> None:
     _require_bindings()
     client = _RecordingClient()
     commands = bind_generated_commands(client)
-    commands.editor.safe_exit({"mode": "reject_if_dirty"})
+    commands.editor.safe_exit(
+        {
+            "mode": "reject",
+            "save_resources": [],
+            "discard_resources": [],
+        },
+        {
+            "schema": "uai.safe_exit.external_witness_ref.v1",
+            "launch_id": "1" * 32,
+            "exit_attempt_id": "2" * 32,
+            "nonce": "3" * 64,
+        },
+    )
     commands.job.compile_build(
         "plugin_editor",
         "UeAgentInterface",
@@ -141,7 +153,19 @@ def test_safe_exit_and_compile_build_preserve_exact_params() -> None:
     )
     assert client.calls[0][0:2] == (
         "editor.safe_exit",
-        {"dirty_resolution": {"mode": "reject_if_dirty"}},
+        {
+            "dirty_resolution": {
+                "mode": "reject",
+                "save_resources": [],
+                "discard_resources": [],
+            },
+            "external_witness": {
+                "schema": "uai.safe_exit.external_witness_ref.v1",
+                "launch_id": "1" * 32,
+                "exit_attempt_id": "2" * 32,
+                "nonce": "3" * 64,
+            },
+        },
     )
     assert client.calls[1][0:2] == (
         "job.compile_build",

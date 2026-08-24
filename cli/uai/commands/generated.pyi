@@ -1110,6 +1110,7 @@ class EditorCommands:
     def safe_exit(
         self,
         dirty_resolution: dict[str, Any],
+        external_witness: dict[str, Any],
     ) -> Any: ...
 
     def session(

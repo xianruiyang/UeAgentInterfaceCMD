@@ -50,7 +50,10 @@ EXPECTED_PARAMETERS: dict[str, tuple[str, ...]] = {
         "policy_id",
         "parameters",
     ),
-    "editor.safe_exit": ("dirty_resolution",),
+    "editor.safe_exit": (
+        "dirty_resolution",
+        "external_witness",
+    ),
     "operation.status": ("operation_ref",),
     "operation.resume": (
         "operation_ref",
@@ -199,7 +202,13 @@ class LongRunningSessionPublicBindingContractTests(unittest.TestCase):
                 "mode": "reject",
                 "save_resources": [],
                 "discard_resources": [],
-            }
+            },
+            {
+                "schema": "uai.safe_exit.external_witness_ref.v1",
+                "launch_id": "1" * 32,
+                "exit_attempt_id": "2" * 32,
+                "nonce": "3" * 64,
+            },
         )
         namespaces.operation.status(operation_ref)
         namespaces.operation.resume(operation_ref, 1)

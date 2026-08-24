@@ -12,8 +12,8 @@ from ._runtime import (
     OMITTED,
 )
 
-GENERATED_MANIFEST_HASH = "sha256:2f3e6a752b3a5a1a83725d600a5a9e4c3ab3a30b983ebe043d9f80354319a7fa"
-GENERATED_REGISTRY_HASH = "sha256:2221b35a6d67045add87412a09f56a49b5539714f699996e89a02fa3a7398e04"
+GENERATED_MANIFEST_HASH = "sha256:98fd21e381a215aef2571b14f43fcbacb7e2a174c2f10503fc09de51b94dd278"
+GENERATED_REGISTRY_HASH = "sha256:ad84ad420e34abc3250b71ee8b3b5b5825c32756d04b80a5fe7dc3c6eff50d4a"
 
 class AiCommands:
     __slots__ = ("_client",)
@@ -2484,9 +2484,11 @@ class EditorCommands:
     def safe_exit(
         self,
         dirty_resolution: dict[str, Any],
+        external_witness: dict[str, Any],
     ):
         params: dict[str, Any] = {}
         params["dirty_resolution"] = dirty_resolution
+        params["external_witness"] = external_witness
         return self._client.execute(
             "editor.safe_exit",
             params,
@@ -10581,12 +10583,18 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor.safe_exit",
-            binding_hash="sha256:031c0dfa83a7bce3980eb62d7e5dfb0a813c41c2b1464c7d97a179aa13d7e22d",
+            binding_hash="sha256:8a98b62ab9bf6b2faf1501ba93ef5b7214772a28ac3907e1b70ad358f64f517d",
             namespace="editor",
             method="safe_exit",
             parameters=(
                 CommandParameterBinding(
                     name="dirty_resolution",
+                    wire_type="object",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="external_witness",
                     wire_type="object",
                     required=True,
                     nullable=False,
