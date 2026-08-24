@@ -43,6 +43,9 @@
       "min_wire_version": 1,
       "max_wire_version": 1,
       "status": "active",
+      "tutorial_references": [
+        "uai-docs:fixture-command#echo-exact"
+      ],
       "binding_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     }
   ]

@@ -24,6 +24,9 @@ _WIRE_TYPES = frozenset(
     }
 )
 _HASH_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
+_TUTORIAL_REFERENCE_PATTERN = re.compile(
+    r"^(?:uai-docs|uai-skill):[^#\s]+#[^#\s]+$"
+)
 
 
 class BindingGenerationError(ValueError):
@@ -136,6 +139,35 @@ def _load_manifest(path: Path) -> dict[str, Any]:
                 raise BindingGenerationError(
                 f"{command_label}.status is unsupported"
             )
+        tutorial_references = command.get("tutorial_references")
+        if (
+            not isinstance(tutorial_references, list)
+            or not tutorial_references
+        ):
+            raise BindingGenerationError(
+                f"{command_label}.tutorial_references must be "
+                "a non-empty list"
+            )
+        seen_tutorial_references: set[str] = set()
+        for reference_index, reference in enumerate(
+            tutorial_references
+        ):
+            reference_label = (
+                f"{command_label}.tutorial_references["
+                f"{reference_index}]"
+            )
+            if (
+                not isinstance(reference, str)
+                or not _TUTORIAL_REFERENCE_PATTERN.fullmatch(reference)
+            ):
+                raise BindingGenerationError(
+                    f"{reference_label} is invalid"
+                )
+            if reference in seen_tutorial_references:
+                raise BindingGenerationError(
+                    f"duplicate tutorial reference: {reference}"
+                )
+            seen_tutorial_references.add(reference)
         for version_name in (
             "min_wire_version",
             "max_wire_version",

@@ -113,6 +113,38 @@ class StaticBindingGeneratorContractTests(unittest.TestCase):
                 "non_cpp_manifest_source_was_accepted",
             )
 
+    def test_generator_rejects_invalid_tutorial_reference(self) -> None:
+        payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
+        payload["commands"][0]["tutorial_references"] = [
+            "docs without stable logical fragment"
+        ]
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            invalid_manifest = root / "invalid_manifest.json"
+            invalid_manifest.write_text(
+                json.dumps(payload, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    str(GENERATOR),
+                    "--manifest",
+                    str(invalid_manifest),
+                    "--output-root",
+                    str(root / "output"),
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(
+                completed.returncode,
+                0,
+                "invalid_tutorial_reference_was_accepted",
+            )
+
     def test_generator_emits_static_python_and_pyi(self) -> None:
         self.assertTrue(
             GENERATOR.is_file(),
