@@ -34,12 +34,23 @@ def units_by_id(catalog: dict) -> dict[str, dict]:
     return result
 
 
+def contains_key(value: object, key: str) -> bool:
+    if isinstance(value, dict):
+        return key in value or any(
+            contains_key(item, key) for item in value.values()
+        )
+    if isinstance(value, list):
+        return any(contains_key(item, key) for item in value)
+    return False
+
+
 def test_catalog_schema_identity_and_manifest_partition_are_current() -> None:
     catalog = load(CATALOG_PATH)
     manifest = load(MANIFEST_PATH)
-    schema = load(SCHEMA_ROOT / "uai.capability_catalog.v1.schema.json")
+    schema = load(SCHEMA_ROOT / "uai.capability_catalog.v2.schema.json")
 
-    assert catalog["schema"] == schema["$id"] == "uai.capability_catalog.v1"
+    assert catalog["schema"] == schema["$id"] == "uai.capability_catalog.v2"
+    assert set(catalog) == set(schema["required"]) == set(schema["properties"])
     assert catalog["command_manifest"] == {
         "path": "Resources/UaiCommandManifest.json",
         "file_sha256": digest(MANIFEST_PATH),
@@ -57,15 +68,38 @@ def test_catalog_schema_identity_and_manifest_partition_are_current() -> None:
     assert set(assigned) == set(manifest_ids)
     assert len(assigned) == len(manifest_ids)
 
-    delivery_task_ids = {item["id"] for item in catalog["delivery_tasks"]}
+    assert "delivery_tasks" not in catalog
+    assert not contains_key(catalog, "next_task_id")
+    assert catalog["catalog_policy"] == {
+        "command_count_is_completion": False,
+        "old_task_done_is_current_evidence": False,
+        "historical_exact_successor_is_current_without_revalidation": False,
+        "unit_completion_requires": [
+            "exact public ingress",
+            "unique mechanics owner",
+            "real UE mechanics",
+            "applicable settle and persistence",
+            "independent readback",
+            "failure and cleanup",
+            "current documentation and distribution",
+        ],
+        "unproven_scope_creates_task": False,
+        "catalog_owns_task_state": False,
+        "catalog_owns_next_action": False,
+        "task_lifecycle_owner": "outer_project_task_table",
+        "new_task_requires_concrete_real_content_consumer": True,
+    }
+    unit_schema = schema["$defs"]["unit"]
     for unit in catalog["units"]:
+        assert set(unit_schema["required"]) <= set(unit) <= set(
+            unit_schema["properties"]
+        )
         assert unit["source_ids"]
         assert unit["object_types"]
         assert unit["authoring_surfaces"]
         assert unit["operations"]
         assert unit["lifecycles"]
         assert set(unit["focus_command_ids"]) <= set(unit["current_command_ids"])
-        assert unit["next_task_id"] in delivery_task_ids
         assert unit["evidence"]["not_proven"]
 
 
