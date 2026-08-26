@@ -1,7 +1,7 @@
 # AI commands through the default SDK
 
-Discover current contracts through client.command_search(...) and
-client.command_detail(...), then use:
+Discover current contracts through client.query.command_search(...) and
+client.query.command_detail(...), then use:
 
 ```python
 client.ai.behavior_tree_asset_create(...)

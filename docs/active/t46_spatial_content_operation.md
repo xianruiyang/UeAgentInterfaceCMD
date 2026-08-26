@@ -1,6 +1,6 @@
 # Spatial-content commands through the default SDK
 
-Use `client.command_search(...)` and `client.command_detail(...)` to discover
+Use `client.query.command_search(...)` and `client.query.command_detail(...)` to discover
 the current exact contract and hash, then call one of the eight normal methods:
 
 ```python

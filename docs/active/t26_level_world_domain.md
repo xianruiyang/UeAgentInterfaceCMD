@@ -17,14 +17,53 @@ The other supported carriers are `single_file` with `path` and `inline` with
 validates the complete declared file set, hashes, normalized paths, root and
 symlink boundaries before the World provider runs. Do not loop over files and
 do not use or invent `level_apply_folder` or another domain apply-file command.
-Use
-`client.blueprint.component_candidates(...)` for exact component candidates,
-`client.content_graph.diagnostics(...)` for the current target diagnostics, and
-the remaining `client.content_graph.*` methods for revision, structure, export,
-and independent readback. Use `client.command_search(...)` and
-`client.command_detail(...)` when the method or live contract is not already
-known; `uai-cli` exposes the same discovery path. This tutorial does not retain
-the old task helper or its misleading `world_actor_candidates` alias.
+Use `client.world.actor_candidates(...)` for the native Place Actors registry,
+`client.blueprint.component_candidates(...)` for exact Blueprint Component
+candidates, `client.content_graph.diagnostics(...)` for the current target
+diagnostics, and the remaining `client.content_graph.*` methods for revision,
+structure, export, and independent readback. Use
+`client.query.command_search(...)` and `client.query.command_detail(...)` when the method or
+live contract is not already known; `uai-cli` exposes the same discovery path.
+There is no task helper, legacy `node_catalog_search`, or SDK-owned candidate
+registry.
+
+Search and create one native Actor as follows:
+
+```python
+page = client.world.actor_candidates(
+    target="/Game/Maps/LV_Authoring.LV_Authoring",
+    query="Cube",
+    limit=10,
+)
+candidate = page.payload["candidates"][0]
+```
+
+Copy only `candidate["id"]` (or its unique `name`) into the Actor's
+`candidate` object. Keep `managed_id`, transform, hierarchy and
+placement context outside it:
+
+```hjson
+actors: [
+  {
+    managed_id: NativeCube
+    operation: upsert
+    candidate: { id: "candidate:..." }
+    transform: {
+      location: { x: 0, y: 0, z: 50 }
+      rotation: { pitch: 0, yaw: 0, roll: 0 }
+      scale: { x: 1, y: 1, z: 1 }
+    }
+  }
+]
+```
+
+When the search used a category other than `AllClasses`, copy
+`page.payload["context"]["placement_category"]` to the Actor's separate
+`placement_context.category`. Optional returned class, asset and factory fields
+may be supplied as assertions; they are not required selectors. The server
+re-enumerates the same native context and submits the selected native item and
+asset factory to UE's `UPlacementSubsystem`, the same owner used by current
+editor placement.
 
 The SDK contains no HTTP route, Unreal business rule, retry, parser, planner,
 recursive initialization, Actor factory, component writer, Data Layer owner,

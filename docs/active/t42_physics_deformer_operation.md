@@ -1,7 +1,7 @@
 # Physics and deformer commands through the default SDK
 
 The 15 active commands are entries in the default binding catalog. Start with
-client.command_search(...) and client.command_detail(...) so command IDs,
+client.query.command_search(...) and client.query.command_detail(...) so command IDs,
 parameter names, contract hashes, lifecycle, and failure codes come from the
 running service rather than a copied task helper.
 

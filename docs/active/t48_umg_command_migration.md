@@ -1,6 +1,6 @@
 # UMG commands through the default SDK
 
-Use client.command_search(...) and client.command_detail(...) before invoking:
+Use client.query.command_search(...) and client.query.command_detail(...) before invoking:
 
 ```python
 created = client.umg.asset_create(...)

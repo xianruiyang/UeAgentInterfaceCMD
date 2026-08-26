@@ -1,42 +1,45 @@
-# Blueprint Component candidate through the default SDK
+# Blueprint Add Component candidates through the default SDK
 
-Query the requested Component class and name through the default generated
-binding:
+Search the native Add Component registry through the generated binding:
 
 ```python
-result = client.blueprint.component_candidates(
+page = client.blueprint.component_candidates(
     target="/Game/Blueprints/BP_Example.BP_Example",
-    component_class="/Script/Engine.PointLightComponent",
-    requested_name="PointLight",
+    parent="DefaultSceneRoot",
+    query="Point Light",
+    limit=10,
 )
-candidate = result.payload["candidates"][0]
+candidate = page.payload["candidates"][0]
 ```
 
-Copy `candidate` unchanged to the Component entry in the Blueprint-root
-`uai.blueprint.edit/1` document:
+Continue with `cursor=page.payload["next_cursor"]` while `has_more` is true.
+Pass `id=candidate["id"]` to resolve one exact row again. `name` may be used
+instead only when it is unique in the same registry.
+
+The minimum Blueprint-root HJSON is:
 
 ```hjson
 "component:PointLight": {
   operation: create
-  candidate: {
-    name: PointLight
-    component_class: "/Script/Engine.PointLightComponent"
-    binding_revision: "sha256:..."
-  }
+  candidate: { id: "candidate:..." }
   parent: DefaultSceneRoot
 }
 ```
 
-Do not synthesize duplicate `name` or `class` fields; the server validates the
-candidate against current SCS state and expands the native mutation fields.
-The response-level `scs_revision` and `existing_components` are read-only
-evidence. Use the owning asset's latest public content-graph revision as the
-`expected_revision` of `client.content_graph.import_workspace(...)`.
+The retired `uai.blueprint.component.edit/1` schema has no runtime provider.
+Do not construct or submit a Component-specific HJSON root.
 
-A changed class, name availability, SCS state, or binding fails before write,
-including the exact stale code
-`blueprint_surface_component_candidate_binding_stale`. Use
-`client.command_search(...)` and `client.command_detail(...)` for the current
-contract; `uai-cli` exposes the same exact command and JSON parameter object.
-T13 remains the sole source-carrier and common recursive initialization
-authority; the SDK forwards only the selected public command.
+The map key is the Component instance name. The candidate selects the native
+Component action; it does not own the instance name, parent, operation, or
+properties. Optional `class_path` and `asset_path` are diagnostics and may be
+supplied as assertions, but they are not required creation fields.
+
+The server re-enumerates the native registry, invokes the same Component
+creation mechanics, and independently reads back the persisted SCS. Use the
+owning asset's latest public content-graph revision as `expected_revision` for
+`client.content_graph.import_workspace(...)`.
+
+Use `client.query.command_search(...)` and `client.query.command_detail(...)` for the
+current command tutorial; `uai-cli` exposes the same exact command and JSON
+parameter object. T13 remains the sole source-carrier and common recursive
+initialization authority; the SDK forwards only the selected public command.

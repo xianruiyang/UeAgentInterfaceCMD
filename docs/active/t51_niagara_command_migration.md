@@ -1,7 +1,7 @@
 # Niagara commands through the default SDK
 
-Discover the current contracts through client.command_search(...) and
-client.command_detail(...), then use:
+Discover the current contracts through client.query.command_search(...) and
+client.query.command_detail(...), then use:
 
 ```python
 client.niagara.asset_duplicate(...)

@@ -2,17 +2,28 @@
 
 Use `client.content_graph.import_workspace(...)` as the only public Widget
 Blueprint HJSON mutation ingress. Supply `source` as `inline`, `single_file`,
-or `directory`; there is no UMG-specific apply method. Use the shared
+or `directory`; there is no UMG-specific apply method. Query the creation
+surface for one target Widget Blueprint with
+`client.umg.widget_candidates(target, query=..., limit=...)`. Use the shared
 content-graph read methods and export for persisted inspection. Use
-`client.command_search(...)` and `client.command_detail(...)` when the current
+`client.query.command_search(...)` and `client.query.command_detail(...)` when the current
 method or contract is not already known; `uai-cli` exposes the same discovery
 path.
 
-The generated SDK forwards exactly one public command with its manifest
-contract hash. It contains no HTTP route, Unreal business rule, retry, HJSON
-parser, recursive initializer, Widget/Slot construction, layout, binding,
-animation, compile, save, unload, reload, or readback implementation. The
-server-side UMG provider remains the only Widget Blueprint content-graph owner.
+Each generated SDK method forwards exactly one public command with its
+manifest contract hash. It contains no HTTP route, Unreal business rule,
+retry, candidate catalog, HJSON parser, recursive initializer, Widget/Slot
+construction, layout, binding, animation, compile, save, unload, reload, or
+readback implementation. The server-side UMG provider remains the only Widget
+Blueprint content-graph owner.
+
+The candidate response is target/revision-bound. Use only an entry with
+`supported: true`, copy just `candidate: {id: ...}` or the context-unique
+`candidate: {name: ...}` into the widget create entry, and keep widget key,
+parent and index outside the candidate. `class` is optional assertion data,
+not a required creation binding. Both response coverage flags are currently
+false: loaded ordinary native widgets such as Button and TextBlock are the
+writable slice; the response is not the complete native Designer Palette.
 
 Submit one `uai.umg.edit/1` entry document whose exact root type is
 `/Script/UMGEditor.WidgetBlueprint`. Create uses

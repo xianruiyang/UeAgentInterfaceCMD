@@ -1,6 +1,6 @@
 # T31 destructive content operations through the default SDK
 
-Use `client.command_search(...)` and `client.command_detail(...)` to obtain the
+Use `client.query.command_search(...)` and `client.query.command_detail(...)` to obtain the
 current contract and hash, then call the default named method. The active set is:
 
 - `client.asset.delete`, `client.asset.fixup_redirectors`, `client.asset.move`, `client.asset.object_clone`

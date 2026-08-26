@@ -7,16 +7,27 @@ shared HJSON ingress. Each binding forwards one exact request without
 transport selection, HJSON generation, Niagara mechanics, retry, persistence,
 or cleanup.
 
-When a method is not already known, use `client.command_search(...)` and
-`client.command_detail(...)` to find and inspect its live contract. The same
-discovery flow is available in `uai-cli`; this tutorial does not maintain a
-task-specific helper or second command catalog.
+When a method is not already known, use `client.query.command_search(...)` and
+`client.query.command_detail(...)` to find and inspect its live contract. The
+same discovery flow is available in `uai-cli`; this tutorial does not maintain
+a task-specific helper or second command catalog.
 
-Call `client.niagara.module_candidates(...)` with the exact persisted Niagara target and
-its usage context. Preserve `candidate.name`, `binding_revision`, placement
-contract, required context, and `target_revision` unchanged. The executable
-name is the module asset path; a display label is never a creation identity.
-Continue paging while `has_more` is true.
+Call `client.niagara.module_candidates(...)` with the exact persisted Niagara
+System, `target_usage`, actual `target_usage_id`, and optional
+`emitter_handle_id`. The server resolves the exact native Stack group and
+returns the full Add Module action set with separate search and creation
+coverage. Continue paging while `has_more` is true. Asset-module actions are
+currently executable; scratch-pad, assignment/set-specific, wizard, and other
+unsupported action kinds remain searchable and fail before mutation.
+
+Copy only `candidate: {id: ...}` or a context-unique `{name: ...}` into the
+target stage module entry. If both selectors are supplied they must identify
+the same action. Do not copy the complete candidate row, script path, binding
+revision, category, or support explanation. Stage usage/usage-id/emitter,
+module key/order, inputs, and operation remain outside `candidate`. The server
+rebuilds the same data-processing native Stack action set during preflight and
+immediately before the first write, then executes the selected asset module
+through the same native action without opening a Niagara editor window.
 
 Call `client.content_graph.summary(...)` to obtain the current persisted revision. Preserve
 that revision and the HJSON document unchanged when calling

@@ -5,7 +5,7 @@ HJSON mutation ingress. Supply `source` as `inline`, `single_file`, or
 `directory`; no Blueprint-specific apply method is public. Read or export the
 current asset with the shared `content_graph.*` methods.
 
-Use `client.command_search(...)` and `client.command_detail(...)` when the
+Use `client.query.command_search(...)` and `client.query.command_detail(...)` when the
 generated method or current hash is not already known; `uai-cli` exposes the
 same discovery path. T13 remains the sole carrier-loading and common recursive
 initialization authority.
@@ -18,12 +18,12 @@ the manifest-selected entry owns the target Blueprint mutation.
 
 For supported node and Component creation, call
 `client.blueprint.node_candidates(...)` or
-`client.blueprint.component_candidates(...)` and place the returned
-`payload["candidates"][index]` object unchanged in the corresponding HJSON
-entry. Do not derive class aliases, duplicate native mutation fields, or replace
-the HJSON graph map key with `candidate.graph_id`. The server revalidates the
-binding immediately before write and performs the only candidate-to-native
-translation.
+`client.blueprint.component_candidates(...)` and place either
+`candidate: {name: ...}` or `candidate: {id: ...}` in the corresponding HJSON
+entry. The Component stable-map key owns the instance name; graph/pin and SCS
+parent remain outer context. Do not derive class aliases, spawners, factories,
+or duplicate native mutation fields. The server re-enumerates the same native
+menu immediately before write and invokes the resolved native action.
 
 Accept success only when `terminal_status` is `succeeded`, then independently
 read back every intended setting, member, Component, graph, node, pin, edge, or

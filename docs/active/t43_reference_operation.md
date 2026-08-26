@@ -3,8 +3,8 @@
 Discover the current contract before authoring:
 
 ```python
-matches = client.command_search("reference asset mutation")
-contract = client.command_detail(command_id="reference.asset_apply")
+matches = client.query.command_search("reference asset mutation")
+contract = client.query.command_detail(command_id="reference.asset_apply")
 result = client.reference.asset_apply(
     object_path="/Game/UAI/Reference/BP_Reference.BP_Reference",
     intent="update",

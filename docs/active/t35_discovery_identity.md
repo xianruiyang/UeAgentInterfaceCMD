@@ -34,10 +34,12 @@ Creation candidates are deliberately domain-owned. Use the matching generated
 binding—`ai.behavior_candidates`, `animation_rig_graph.candidates`,
 `audio.graph_candidates`, `blueprint.component_candidates`,
 `blueprint.node_candidates`, `material.expression_candidates`,
-`niagara.module_candidates`, or `pcg.node_candidates`—then copy the returned
-executable `name`, `binding_revision`, and required domain context unchanged
-into that domain's HJSON document. `query.content.search` does not aggregate or
-reinterpret those candidate mechanics.
+`niagara.module_candidates`, or `pcg.node_candidates`—then read that exact
+command detail. Domains already on the contextual-create contract copy only a
+compact candidate `name` or `id`; graph, pin, parent, level, stage, placement,
+and instance identity stay in the owning HJSON context. A legacy field remains
+valid only while the current command detail declares it. `query.content.search`
+does not aggregate or reinterpret those candidate mechanics.
 
 The public product receipt is stored under
 `runtimeLogs/uai-development/TROOT-UAI-35-DISCOVERY-IDENTITY-VERTICAL/20260820-r3/public_sdk_product/receipt.json`.

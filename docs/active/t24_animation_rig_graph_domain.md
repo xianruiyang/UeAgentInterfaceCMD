@@ -1,34 +1,65 @@
 # T24 Animation Rig Graph SDK Projection
 
-Use the default generated `client.animation_rig_graph.candidates(...)` method
-and the shared `client.content_graph.import_workspace(...)` HJSON ingress. Use
-`client.command_search(...)` and `client.command_detail(...)` when the method
-or current contract is not already known; `uai-cli` exposes the same discovery
-path. This tutorial does not maintain a task-specific helper or second command
-catalog.
+Use the generated `client.animation_rig_graph.candidates(...)` method and the
+shared `client.content_graph.import_workspace(...)` HJSON ingress. Use
+`client.query.command_search(...)` and `client.query.command_detail(...)` when the
+current command or tutorial contract is not already known; `uai-cli` exposes
+the same discovery path. The SDK forwards one manifest-bound command and owns no
+HTTP route, Unreal business rule, candidate registry, writer, compiler,
+persistence, or readback implementation.
 
-The SDK contains no HTTP route, Unreal business rule, retry, target classifier,
-parser, planner, RigVM writer, compile, save, or readback implementation. Each
-generated method forwards exactly one public command with the manifest contract
-hash. The server remains the only owner of
-`uai.animation_rig_graph.edit/1`, candidate semantics, explicit space
-contracts, persistence, failure state, and cleanup.
+## Search
 
-Use `client.animation_rig_graph.candidates(...)` with one persisted
-ControlRigBlueprint, IKRigDefinition, IKRetargeter, or Skeleton identity. Copy
-the returned exact candidate name, kind, binding revision, and placement-space
-requirements unchanged. Obtain the target revision with
-`client.content_graph.summary(...)`, then submit one document through
-`client.content_graph.import_workspace(...)`.
+Pass one persisted ControlRigBlueprint identity to
+`client.animation_rig_graph.candidates(target=..., query=...)`. The command
+enumerates the native default RigVM graph menu in blank context. Use the compact
+`candidate.id` for an exact selection, or `candidate.name` only when it is
+unique in that context. The query result also reports `target_revision`,
+`graph_name`, native/executable action counts, paging, and distinct search and
+creation coverage.
 
-T13 remains the sole common recursive initialization authority. T24 registers
-only the Rig/IK/Skeleton root and owned/container initialization contracts and
-consumes the T13 seam. Carrier loading and directory recursion remain in T13;
-T24 consumes only the normalized `source.kind=resolved` document set, selects
-exactly the declared `entry_file`, and rejects legacy top-level `carrier` and
-`hjson_document` fields. Placement-bearing entries carry the exact `space_ref`,
-parent, and transform context required by the selected native command.
-Successful import compiles or validates through the domain owner, saves,
-reloads, and returns independent content-graph readback. Invalid spaces,
-candidates, revisions, targets, or unsupported creation fail before write or
-roll back without residue.
+Search coverage is currently complete only for the default-graph blank context.
+Creation is intentionally partial: verified RigVM Unit spawners are writable;
+other native action kinds remain visible with
+`write_support/support_reason` and are rejected before write. Pin-drag and
+selection-dependent menus are outside this claim. IKRigDefinition,
+IKRetargeter, and Skeleton are T24 domain roots but are not accepted by this
+candidate command.
+
+## HJSON creation
+
+Copy only the selected `name` or `id` into the RigVM create edit:
+
+```hjson
+edits: [{
+  intent: create
+  semantic_id: "rigvm_node:AddSpaces"
+  value: {
+    candidate: { id: "candidate:..." }
+    position: { x: 240, y: 144 }
+  }
+}]
+```
+
+If `name` and `id` are both supplied they are conjunctive. Do not copy the
+complete search result, `target_revision`, labels, categories, support text,
+or legacy `binding_revision` into HJSON. `semantic_id` is the new instance
+identity; `position` is graph placement. Known `script_struct_ref` and
+`method` may be added beside `candidate` as assertions, not as replacement
+selectors.
+
+The server re-enumerates the same current menu during preflight and again at
+commit, then invokes the selected native `PerformAction`. Successful import
+compiles, saves, unloads/reloads, and returns independent content-graph
+readback. Ambiguous/stale selectors, search-only actions, assertion mismatch,
+invalid target/revision, compile failure, or persistence failure do not become
+silent fallback writes.
+
+## Shared lifecycle
+
+T13 remains the sole workspace loader and recursive initialization authority.
+T24 consumes only `source.kind=resolved`, selects the declared `entry_file`,
+and rejects legacy top-level `carrier` and `hjson_document` fields. Control
+Rig hierarchy, IK Rig, IK Retargeter, and Skeleton operations keep their own
+explicit parent, transform, chain, and space contracts; the compact RigVM
+candidate does not absorb those contexts.

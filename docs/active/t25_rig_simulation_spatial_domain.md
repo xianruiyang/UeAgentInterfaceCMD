@@ -5,7 +5,7 @@ read the exact existing runtime subject, its `runtime_non_persistent` revision,
 component-local frame, evaluation clock, skeletal binding, and available bones.
 Submit one `uai.rig_simulation_spatial.edit/1` document through
 `client.content_graph.import_workspace(...)` with that exact revision. Use
-`client.command_search(...)` and `client.command_detail(...)` when a method or
+`client.query.command_search(...)` and `client.query.command_detail(...)` when a method or
 live contract is not already known; `uai-cli` exposes the same discovery path.
 This tutorial does not maintain a task-specific helper or second command
 catalog.

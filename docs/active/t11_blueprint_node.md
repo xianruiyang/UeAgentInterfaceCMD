@@ -1,49 +1,60 @@
-# Blueprint node candidate through the default SDK
+# Blueprint node candidates through the default SDK
 
-Discover the current method and hash when they are not already known, then
-query the exact owning Blueprint graph:
+Discover the current method and contract hash when they are not already known,
+then query the exact owning Blueprint graph or pin-drag context:
 
 ```python
-matches = client.command_search(query="Blueprint node candidate")
-contract = client.command_detail(command_id="blueprint.node.candidates")
 result = client.blueprint.node_candidates(
     target="/Game/Blueprints/BP_Example.BP_Example",
     graph_id="graph:...",
-    query="branch",
+    query="Branch",
+    limit=10,
 )
 candidate = result.payload["candidates"][0]
 ```
 
-Copy `candidate` unchanged to the node entry in the Blueprint-root
-`uai.blueprint.edit/1` document:
+Obtain `graph_id` from the current Blueprint instead of guessing it. Call
+`content_graph.structure`, select the unique container with
+`kind="blueprint_graph"`, `value.name="EventGraph"`, and
+`value.graph_kind="event_graph"`, then pass that container's opaque `id`
+unchanged to `blueprint.node.candidates`. Do not infer the graph from its node
+types, cache an earlier GUID, or reconstruct the identifier.
+
+Copy only the exact `id`, or the `name` when it is unique in that same native
+context, into the node entry of the Blueprint-root `uai.blueprint.edit/1`
+document:
 
 ```hjson
 "event_graph:EventGraph": {
   operation: update
   graph: { graph_kind: event_graph }
   nodes: {
-    "11111111-1111-1111-1111-111111111111": {
+    "node:BranchGate": {
       operation: create
-      candidate: {
-        name: "/Script/BlueprintGraph.K2Node_IfThenElse"
-        binding_revision: "sha256:..."
-        display_name: Branch
-        graph_id: "graph:..."
-      }
+      candidate: { id: "candidate:..." }
       pos: { x: 800, y: 600 }
     }
   }
 }
 ```
 
-Do not turn `candidate.graph_id` into the graph map key and do not synthesize
-`node_type` or `node_class`; the server validates the exact binding and expands
-those native fields. The response-level `graph_revision` is read-only candidate
-evidence. Use the owning asset's latest public content-graph revision as the
-`expected_revision` of `client.content_graph.import_workspace(...)`.
+The retired `uai.blueprint.node.edit/1` schema has no runtime provider. Do not
+construct or submit a node-specific HJSON root.
 
-A changed binding fails before write, including the exact stale code
-`blueprint_surface_node_candidate_binding_stale`. The equivalent CLI call is:
+The graph map key and optional pin context remain outside `candidate`; the node
+map key remains the stable instance identity. Do not copy the complete search
+row or synthesize `node_type`, `node_class`, function owner, spawner or action
+metadata. The server re-enumerates the same native Blueprint Action Menu and
+invokes the resolved `FEdGraphSchemaAction::PerformAction` before applying
+explicit pins, edges or properties.
+
+The response-level `graph_revision` is read-only candidate evidence. Use the
+owning asset's latest public content-graph revision as `expected_revision` for
+`client.content_graph.import_workspace(...)`. Unknown, ambiguous, stale or
+wrong-context selectors fail before persistent mutation.
+
+Use `client.query.command_search(...)` and `client.query.command_detail(...)` for the live
+tutorial and nested contract; the equivalent CLI call is:
 
 ```text
 uai-cli --connection connection.toml exec blueprint.node.candidates --contract-hash <hash> --params-json <json-object>

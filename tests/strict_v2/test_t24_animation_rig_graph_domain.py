@@ -44,19 +44,19 @@ def test_t24_uses_only_default_rig_and_content_graph_bindings() -> None:
         assert re.fullmatch(r"sha256:[0-9a-f]{64}", binding.binding_hash)
 
 
-def test_t24_default_candidate_preserves_explicit_space_filters() -> None:
+def test_t24_default_candidate_forwards_compact_search_and_exact_id() -> None:
     client = _RecordingClient()
     bind_generated_commands(client).animation_rig_graph.candidates(
         "/Game/UAI/Rig_T24.Rig_T24",
-        query="Transform",
-        space_ref="root",
+        query="Add Spaces",
+        id="candidate:t24",
     )
     command_id, params, contract_hash = client.calls[0]
     assert command_id == "animation_rig_graph.candidates"
     assert params == {
         "target": "/Game/UAI/Rig_T24.Rig_T24",
-        "query": "Transform",
-        "space_ref": "root",
+        "query": "Add Spaces",
+        "id": "candidate:t24",
     }
     assert contract_hash == BINDING_CATALOG.find(command_id).binding_hash
 

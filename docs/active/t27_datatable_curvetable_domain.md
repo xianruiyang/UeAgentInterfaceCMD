@@ -1,7 +1,7 @@
 # T27 DataTable/CurveTable domain through the default SDK
 
-Discover the current contracts with `client.command_search(...)` and
-`client.command_detail(...)`, then use
+Discover the current contracts with `client.query.command_search(...)` and
+`client.query.command_detail(...)`, then use
 `client.content_graph.import_workspace(...)`,
 `client.content_graph.structure(...)` for the supported write/read pair, and
 `client.content_graph.export_workspace(...)` for verified directory export.

@@ -3,8 +3,8 @@
 Discover the current contract and a policy before calling it:
 
 ```python
-matches = client.command_search("capture image viewport niagara")
-contract = client.command_detail(command_id="capture.image.execute")
+matches = client.query.command_search("capture image viewport niagara")
+contract = client.query.command_detail(command_id="capture.image.execute")
 
 started = client.capture.image_execute(
     subject_ref="capture-subject:viewport:active",

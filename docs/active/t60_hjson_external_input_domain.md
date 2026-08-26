@@ -2,7 +2,7 @@
 
 Use the default generated `client.content_graph.import_workspace(...)` and
 `client.content_graph.export_workspace(...)` methods. Discover their live
-contracts with `client.command_search(...)` and `client.command_detail(...)`;
+contracts with `client.query.command_search(...)` and `client.query.command_detail(...)`;
 `uai-cli` exposes the same `command_search` and `command_detail` operations.
 No task-local generated helper or second command catalog remains active.
 

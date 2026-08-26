@@ -1,7 +1,7 @@
 # Animation Blueprint commands through the default SDK
 
-Discover current fields and hashes through client.command_search(...) and
-client.command_detail(...), then use:
+Discover current fields and hashes through client.query.command_search(...) and
+client.query.command_detail(...), then use:
 
 ```python
 client.animation.anim_blueprint_asset_create(...)

@@ -17,6 +17,7 @@ COMMAND_BINDINGS = {
     "content_graph.relations": ("content_graph", "relations"),
     "content_graph.structure": ("content_graph", "structure"),
     "content_graph.summary": ("content_graph", "summary"),
+    "world.actor.candidates": ("world", "actor_candidates"),
 }
 
 
@@ -77,19 +78,30 @@ def test_t26_default_candidate_and_readback_routes_preserve_identities() -> None
     commands.content_graph.diagnostics(target)
     commands.blueprint.component_candidates(
         target=target,
-        component_class="/Script/Engine.SceneComponent",
-        requested_name="EvidenceSceneT26",
+        parent="DefaultSceneRoot",
+        query="Scene",
+    )
+    commands.world.actor_candidates(
+        target=target,
+        query="Cube",
+        limit=10,
     )
     commands.content_graph.structure(target)
     assert [call[0] for call in client.calls] == [
         "content_graph.diagnostics",
         "blueprint.component.candidates",
+        "world.actor.candidates",
         "content_graph.structure",
     ]
     assert client.calls[1][1] == {
         "target": target,
-        "component_class": "/Script/Engine.SceneComponent",
-        "requested_name": "EvidenceSceneT26",
+        "parent": "DefaultSceneRoot",
+        "query": "Scene",
+    }
+    assert client.calls[2][1] == {
+        "target": target,
+        "query": "Cube",
+        "limit": 10,
     }
 
 
@@ -122,6 +134,7 @@ def test_t26_task_helper_and_tutorial_authority_are_retired() -> None:
     for document in docs:
         text = document.read_text(encoding="utf-8")
         assert "client.blueprint.component_candidates" in text
+        assert "client.world.actor_candidates" in text
         assert "client.content_graph.import_workspace" in text
         assert "client.content_graph.diagnostics" in text
         assert "command_search" in text and "command_detail" in text

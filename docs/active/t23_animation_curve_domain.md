@@ -1,7 +1,7 @@
 # T23 Animation/Curve domain through the default SDK
 
-Discover current contracts with `client.command_search(...)` and
-`client.command_detail(...)`; then use
+Discover current contracts with `client.query.command_search(...)` and
+`client.query.command_detail(...)`; then use
 `client.content_graph.import_workspace(...)`,
 `client.content_graph.structure(...)` for authoring and independent readback.
 The shared `client.content_graph.export_workspace(...)` binding remains

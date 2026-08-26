@@ -24,7 +24,7 @@ def _binding():
 def test_t12_uses_one_default_component_candidate_binding() -> None: _binding()
 
 def test_t12_named_candidate_forwards_exact_identities() -> None:
-    client=_Client(); params={"target":"/Game/UAI/StrictV2/T12.BP","component_class":"/Script/Engine.SceneComponent","requested_name":"SceneRoot"}
+    client=_Client(); params={"target":"/Game/UAI/StrictV2/T12.BP","parent":"DefaultSceneRoot","query":"Point Light","limit":10}
     bind_generated_commands(client).blueprint.component_candidates(**params)
     assert len(client.calls)==1 and client.calls[0][0]==COMMAND_ID and client.calls[0][1]==params
 

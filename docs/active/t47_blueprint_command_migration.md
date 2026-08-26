@@ -1,7 +1,7 @@
 # Blueprint commands through the default SDK
 
-Discover exact contracts with `client.command_search(...)` and
-`client.command_detail(...)`, then use the normal generated methods:
+Discover exact contracts with `client.query.command_search(...)` and
+`client.query.command_detail(...)`, then use the normal generated methods:
 
 ```python
 client.blueprint.asset_create(...)
