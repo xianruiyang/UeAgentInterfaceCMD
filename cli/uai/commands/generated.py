@@ -12,8 +12,8 @@ from ._runtime import (
     OMITTED,
 )
 
-GENERATED_MANIFEST_HASH = "sha256:5e6f960aca29c246ac2528dd6e62b35c6841dd00abb1105bdbb5662745656e5c"
-GENERATED_REGISTRY_HASH = "sha256:36c11593999f6006b540e3433de6a546bf7f892035ba2e09d258dd61ae919261"
+GENERATED_MANIFEST_HASH = "sha256:01eea87da11b3ff1c4c8293d209891fd270ad39f02fe7c97b8c170a062a0804f"
+GENERATED_REGISTRY_HASH = "sha256:05dbf08cee411326cd6a910e0ed816a122c08657a7f0e8fac26a7d1609281d39"
 
 class AiCommands:
     __slots__ = ("_client",)
@@ -29,6 +29,7 @@ class AiCommands:
         target: str,
         *,
         query: str | object = OMITTED,
+        id: str | object = OMITTED,
         limit: int | object = OMITTED,
         cursor: int | object = OMITTED,
     ):
@@ -36,6 +37,8 @@ class AiCommands:
         params["target"] = target
         if query is not OMITTED:
             params["query"] = query
+        if id is not OMITTED:
+            params["id"] = id
         if limit is not OMITTED:
             params["limit"] = limit
         if cursor is not OMITTED:
@@ -834,6 +837,35 @@ class AnimationCommands:
             params,
         )
 
+    def state_machine_candidates(
+        self,
+        target: str,
+        surface: str,
+        *,
+        class_settings: dict[str, Any] | object = OMITTED,
+        query: str | object = OMITTED,
+        id: str | object = OMITTED,
+        limit: int | object = OMITTED,
+        cursor: int | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        params["target"] = target
+        params["surface"] = surface
+        if class_settings is not OMITTED:
+            params["class_settings"] = class_settings
+        if query is not OMITTED:
+            params["query"] = query
+        if id is not OMITTED:
+            params["id"] = id
+        if limit is not OMITTED:
+            params["limit"] = limit
+        if cursor is not OMITTED:
+            params["cursor"] = cursor
+        return self._client.execute(
+            "animation.state_machine.candidates",
+            params,
+        )
+
     def subject_morph_weights_update(
         self,
         target: str,
@@ -886,7 +918,7 @@ class AnimationRigGraphCommands:
         target: str,
         *,
         query: str | object = OMITTED,
-        space_ref: str | object = OMITTED,
+        id: str | object = OMITTED,
         limit: int | object = OMITTED,
         cursor: int | object = OMITTED,
     ):
@@ -894,8 +926,8 @@ class AnimationRigGraphCommands:
         params["target"] = target
         if query is not OMITTED:
             params["query"] = query
-        if space_ref is not OMITTED:
-            params["space_ref"] = space_ref
+        if id is not OMITTED:
+            params["id"] = id
         if limit is not OMITTED:
             params["limit"] = limit
         if cursor is not OMITTED:
@@ -1984,6 +2016,7 @@ class AudioCommands:
         target: str,
         *,
         query: str | object = OMITTED,
+        id: str | object = OMITTED,
         limit: int | object = OMITTED,
         cursor: int | object = OMITTED,
     ):
@@ -1991,6 +2024,8 @@ class AudioCommands:
         params["target"] = target
         if query is not OMITTED:
             params["query"] = query
+        if id is not OMITTED:
+            params["id"] = id
         if limit is not OMITTED:
             params["limit"] = limit
         if cursor is not OMITTED:
@@ -2051,13 +2086,25 @@ class BlueprintCommands:
     def component_candidates(
         self,
         target: str,
-        component_class: str,
-        requested_name: str,
+        *,
+        parent: str | object = OMITTED,
+        query: str | object = OMITTED,
+        id: str | object = OMITTED,
+        limit: int | object = OMITTED,
+        cursor: int | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["target"] = target
-        params["component_class"] = component_class
-        params["requested_name"] = requested_name
+        if parent is not OMITTED:
+            params["parent"] = parent
+        if query is not OMITTED:
+            params["query"] = query
+        if id is not OMITTED:
+            params["id"] = id
+        if limit is not OMITTED:
+            params["limit"] = limit
+        if cursor is not OMITTED:
+            params["cursor"] = cursor
         return self._client.execute(
             "blueprint.component.candidates",
             params,
@@ -2098,12 +2145,30 @@ class BlueprintCommands:
         graph_id: str,
         *,
         query: str | object = OMITTED,
+        id: str | object = OMITTED,
+        node_guid: str | object = OMITTED,
+        pin_guid: str | object = OMITTED,
+        pin_name: str | object = OMITTED,
+        limit: int | object = OMITTED,
+        cursor: int | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["target"] = target
         params["graph_id"] = graph_id
         if query is not OMITTED:
             params["query"] = query
+        if id is not OMITTED:
+            params["id"] = id
+        if node_guid is not OMITTED:
+            params["node_guid"] = node_guid
+        if pin_guid is not OMITTED:
+            params["pin_guid"] = pin_guid
+        if pin_name is not OMITTED:
+            params["pin_name"] = pin_name
+        if limit is not OMITTED:
+            params["limit"] = limit
+        if cursor is not OMITTED:
+            params["cursor"] = cursor
         return self._client.execute(
             "blueprint.node.candidates",
             params,
@@ -3025,6 +3090,10 @@ class MaterialCommands:
         target: str,
         *,
         query: str | object = OMITTED,
+        graph_name: str | object = OMITTED,
+        node_guid: str | object = OMITTED,
+        pin_guid: str | object = OMITTED,
+        pin_name: str | object = OMITTED,
         limit: int | object = OMITTED,
         cursor: int | object = OMITTED,
     ):
@@ -3032,6 +3101,14 @@ class MaterialCommands:
         params["target"] = target
         if query is not OMITTED:
             params["query"] = query
+        if graph_name is not OMITTED:
+            params["graph_name"] = graph_name
+        if node_guid is not OMITTED:
+            params["node_guid"] = node_guid
+        if pin_guid is not OMITTED:
+            params["pin_guid"] = pin_guid
+        if pin_name is not OMITTED:
+            params["pin_name"] = pin_name
         if limit is not OMITTED:
             params["limit"] = limit
         if cursor is not OMITTED:
@@ -4160,6 +4237,8 @@ class NiagaraCommands:
         target: str,
         target_usage: str,
         *,
+        target_usage_id: str | object = OMITTED,
+        emitter_handle_id: str | object = OMITTED,
         query: str | object = OMITTED,
         limit: int | object = OMITTED,
         cursor: int | object = OMITTED,
@@ -4167,6 +4246,10 @@ class NiagaraCommands:
         params: dict[str, Any] = {}
         params["target"] = target
         params["target_usage"] = target_usage
+        if target_usage_id is not OMITTED:
+            params["target_usage_id"] = target_usage_id
+        if emitter_handle_id is not OMITTED:
+            params["emitter_handle_id"] = emitter_handle_id
         if query is not OMITTED:
             params["query"] = query
         if limit is not OMITTED:
@@ -4499,6 +4582,7 @@ class PcgCommands:
         target: str,
         *,
         query: str | object = OMITTED,
+        id: str | object = OMITTED,
         limit: int | object = OMITTED,
         cursor: int | object = OMITTED,
     ):
@@ -4506,6 +4590,8 @@ class PcgCommands:
         params["target"] = target
         if query is not OMITTED:
             params["query"] = query
+        if id is not OMITTED:
+            params["id"] = id
         if limit is not OMITTED:
             params["limit"] = limit
         if cursor is not OMITTED:
@@ -4741,10 +4827,14 @@ class QueryCommands:
         self,
         command_id: str,
         contract_hash: str,
+        *,
+        variant_id: str | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["command_id"] = command_id
         params["contract_hash"] = contract_hash
+        if variant_id is not OMITTED:
+            params["variant_id"] = variant_id
         return self._client.execute(
             "query.command.detail",
             params,
@@ -5403,6 +5493,30 @@ class UmgCommands:
             params,
         )
 
+    def widget_candidates(
+        self,
+        target: str,
+        *,
+        query: str | object = OMITTED,
+        id: str | object = OMITTED,
+        limit: int | object = OMITTED,
+        cursor: int | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        params["target"] = target
+        if query is not OMITTED:
+            params["query"] = query
+        if id is not OMITTED:
+            params["id"] = id
+        if limit is not OMITTED:
+            params["limit"] = limit
+        if cursor is not OMITTED:
+            params["cursor"] = cursor
+        return self._client.execute(
+            "umg.widget.candidates",
+            params,
+        )
+
     def widget_events_discover(
         self,
         owner_item_ref: str,
@@ -5660,6 +5774,33 @@ class WorldCommands:
         client: CommandExecutor,
     ) -> None:
         self._client = client
+
+    def actor_candidates(
+        self,
+        target: str,
+        *,
+        category: str | object = OMITTED,
+        query: str | object = OMITTED,
+        id: str | object = OMITTED,
+        limit: int | object = OMITTED,
+        cursor: int | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        params["target"] = target
+        if category is not OMITTED:
+            params["category"] = category
+        if query is not OMITTED:
+            params["query"] = query
+        if id is not OMITTED:
+            params["id"] = id
+        if limit is not OMITTED:
+            params["limit"] = limit
+        if cursor is not OMITTED:
+            params["cursor"] = cursor
+        return self._client.execute(
+            "world.actor.candidates",
+            params,
+        )
 
     def actor_create(
         self,
@@ -6448,7 +6589,7 @@ BINDING_CATALOG = CommandBindingCatalog(
     (
         CommandBinding(
             command_id="ai.behavior.candidates",
-            binding_hash="sha256:cc78fa3fcb31995d8c9155c86191c11827a6b247feca4e7800faba657c30da3e",
+            binding_hash="sha256:63ea2957031fb066fd0d216cbbc7e998ff17a9a3ba7a0b26f87e388635160dc6",
             namespace="ai",
             method="behavior_candidates",
             parameters=(
@@ -6460,6 +6601,12 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="query",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="id",
                     wire_type="string",
                     required=False,
                     nullable=False,
@@ -6483,7 +6630,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="ai.behavior_tree.asset.create",
-            binding_hash="sha256:b5405005d8022bcf9907194e84358a8520be82c8fb6a56cbc28e177c63500917",
+            binding_hash="sha256:883e625e85133cb16582d74ca70547808010906b7cb8ca316df6a4920f6504dc",
             namespace="ai",
             method="behavior_tree_asset_create",
             parameters=(
@@ -6506,7 +6653,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="ai.behavior_tree.graph.apply",
-            binding_hash="sha256:3bc346cdd93de9711a41fdcbd9b2e351d6d5e42d601290185d0c9d3e7557847c",
+            binding_hash="sha256:79dade558033f627b106174f038be223852c98016cb5cf2330517aaba236c18a",
             namespace="ai",
             method="behavior_tree_graph_apply",
             parameters=(
@@ -6529,7 +6676,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="ai.blackboard.asset.create",
-            binding_hash="sha256:9f5f6c83aefcac8958ae0e92b33c3f604694e296bee426d645e5cda726f0cc7c",
+            binding_hash="sha256:619250cf53426e61a0eced9b8512d96f045ab8f52e8c462ba4e2bd01877cac6b",
             namespace="ai",
             method="blackboard_asset_create",
             parameters=(
@@ -6552,7 +6699,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="ai.blackboard.schema.apply",
-            binding_hash="sha256:736875e1dfd1f5a4618599750722a3f69952946bb9864ba4b5d62a0e4a47f8c7",
+            binding_hash="sha256:025dbb8ad1f0851ba33c84df10cc7d96aee3d6b47165a4a0df85e803c0cfa95a",
             namespace="ai",
             method="blackboard_schema_apply",
             parameters=(
@@ -6575,7 +6722,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="ai.eqs.asset.create",
-            binding_hash="sha256:c5b75ae7a061c6bb9cdfb865de9bc90a11ca9893bfd2583a228fcf607e53db94",
+            binding_hash="sha256:001bb3a2c8a6b83309564820bb0f299f0fd0cbd46bf5bdce02d5b93323fc73e5",
             namespace="ai",
             method="eqs_asset_create",
             parameters=(
@@ -6598,7 +6745,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="ai.eqs.graph.apply",
-            binding_hash="sha256:2c971e2d58b77db85649397f41a27287f75b5ef7981a273c0a304c63faebb710",
+            binding_hash="sha256:2c8c86cdae13f2bbe01edcdc0538f959343f72b539f3cf2bcfa6a9de3d1ab1f1",
             namespace="ai",
             method="eqs_graph_apply",
             parameters=(
@@ -6621,7 +6768,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="ai.smart_object_definition.apply",
-            binding_hash="sha256:3e8b5180198447f81d475620e25a61af7c29a98c26dbc99be1ce98998ab02f18",
+            binding_hash="sha256:4a78d6a83ed29e94ace88474ac8ca64fbe12694f7227d1d10ce9466f004ce4cd",
             namespace="ai",
             method="smart_object_definition_apply",
             parameters=(
@@ -6644,7 +6791,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="ai.smart_object_definition.asset.create",
-            binding_hash="sha256:f9bfabde311ca5927be00df650bbec735694172d90fce1042a8c84bdddb6513f",
+            binding_hash="sha256:4a70c181f2b80a02e5fee385b2f0d562a6ec3ee13612036330fef2a097118474",
             namespace="ai",
             method="smart_object_definition_asset_create",
             parameters=(
@@ -6667,7 +6814,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="ai.state_tree.asset.create",
-            binding_hash="sha256:15b8b5f4698f56acbe2fe28c044529b8a005a7659282b359f6a24464d82b2a3f",
+            binding_hash="sha256:2ce4454f223d9826f20a8b248eee6059f8d04a722454a8989b687e05d8a01da6",
             namespace="ai",
             method="state_tree_asset_create",
             parameters=(
@@ -6690,7 +6837,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="ai.state_tree.hierarchy.apply",
-            binding_hash="sha256:beb0ff518aa7402b770ad152282b0759f5fc90adae6062b324afbe1363f98b91",
+            binding_hash="sha256:fc0287d737272032cd52c5920345436a993edd7bd5f5cb4b16661014775ee3a9",
             namespace="ai",
             method="state_tree_hierarchy_apply",
             parameters=(
@@ -6713,7 +6860,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.anim_blueprint.asset.create",
-            binding_hash="sha256:cd42a1b9eb5afba707fb08e54ed6f18619af4dc01a02b24c1c12fed72d24e2cb",
+            binding_hash="sha256:e57faefca86efe9ab7c59ebacca0053b2867e597128c1a1de00a36ad87939c2a",
             namespace="animation",
             method="anim_blueprint_asset_create",
             parameters=(
@@ -6748,7 +6895,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.anim_blueprint.graph.apply",
-            binding_hash="sha256:c502a058a07baa15209d625a80a7912eb1d53f902ede0aa48bf190ddb408529c",
+            binding_hash="sha256:4babbb771d417dc7db9743526285aa799adb5b133f26c376785935a73168a2c9",
             namespace="animation",
             method="anim_blueprint_graph_apply",
             parameters=(
@@ -6771,7 +6918,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.anim_blueprint.layer_interface.asset.create",
-            binding_hash="sha256:79448c0db11d449a1266f9755e21c1424cd0e34bee355c4a0f3d42fe5674cf44",
+            binding_hash="sha256:a66c0bdf01570f6370ec16b992b547ca0a76c537bdbc4db098f1a688f5a6ed4b",
             namespace="animation",
             method="anim_blueprint_layer_interface_asset_create",
             parameters=(
@@ -6794,7 +6941,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.blend_space.asset.create",
-            binding_hash="sha256:35d04d9fc777087576ca4bf0b7ac9b324ca1e94760742e7d574a084b9016100e",
+            binding_hash="sha256:66078b89337d755d7a4cd4b6ed0d4053defc4726bd5f41bc03f7a06b14afd257",
             namespace="animation",
             method="blend_space_asset_create",
             parameters=(
@@ -6829,7 +6976,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.blend_space.definition.apply",
-            binding_hash="sha256:f0d033149840c01bab2d4744a5940b3503a159f36ed5d2eb48e8ff108d13d600",
+            binding_hash="sha256:8e82671f7a86feee19a015f9c07221616113795850c052fd1bca8f90c3e86064",
             namespace="animation",
             method="blend_space_definition_apply",
             parameters=(
@@ -6858,7 +7005,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.blend_space.sample",
-            binding_hash="sha256:b815b35a10f13999ef493f5c97dad5556cb2cf4c58809cd9d330b14dcab12343",
+            binding_hash="sha256:52b957c587710ca57b1d847bf2a599ee88c4b25f46eb99ad145b726fc61fc4ed",
             namespace="animation",
             method="blend_space_sample",
             parameters=(
@@ -6893,7 +7040,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.control_rig.asset.create",
-            binding_hash="sha256:58fbb3bd0a31b682785fe62fb01f8ff1ef3c752b81a9022888909c496c484878",
+            binding_hash="sha256:d5464cfc78d91d161692e2d2fe5de795b16ce9e36220cfa8775c6ed328da788d",
             namespace="animation",
             method="control_rig_asset_create",
             parameters=(
@@ -6922,7 +7069,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.control_rig.hierarchy_graph.apply",
-            binding_hash="sha256:6c3a3920a0647cd5c0f35c2fd9972262403330b71e2b8260160effd82be1e23e",
+            binding_hash="sha256:66da5dbb1f2ce696105bf4a295223251ad299476ca490545ce5f37cefd85ba40",
             namespace="animation",
             method="control_rig_hierarchy_graph_apply",
             parameters=(
@@ -6945,7 +7092,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.control_rig.shape_library.apply",
-            binding_hash="sha256:83d3db0846535a3bcf8bb7275f1895214a53c8efa81fd80c1ec8e7e6623fd0be",
+            binding_hash="sha256:093c9309876ae2145c89afd576a192d728cc3fc4ceebdddb7166eea92fcfda35",
             namespace="animation",
             method="control_rig_shape_library_apply",
             parameters=(
@@ -6968,7 +7115,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.control_rig.shape_library.asset.create",
-            binding_hash="sha256:0d9c66529eab430d512c1ae5c74ecc8857b2ba534dda4c14e17e6ab5dd71b22b",
+            binding_hash="sha256:0a6e00f2150ff930b819b58b42eef1f255a7b487d220b28d6bcb9289421f93af",
             namespace="animation",
             method="control_rig_shape_library_asset_create",
             parameters=(
@@ -6991,7 +7138,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.deformer_graph.asset.create",
-            binding_hash="sha256:fa03338fb877cb4d816765642fb92e420e112aa311c00805138087d9882bb234",
+            binding_hash="sha256:eaa2ba3c932933ec7db8e914d3d4cbd7164c1d9e8a931cbb508fcd91e39c6e05",
             namespace="animation",
             method="deformer_graph_asset_create",
             parameters=(
@@ -7020,7 +7167,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.deformer_graph.topology.apply",
-            binding_hash="sha256:c891aeda6999469f5a65b80426f195ae00e1424362522864ae79d1184edc48e8",
+            binding_hash="sha256:efa30212b201bd7e8c62e9ec2008d4a4339612857027ea13374b9fc2d002cbfe",
             namespace="animation",
             method="deformer_graph_topology_apply",
             parameters=(
@@ -7043,7 +7190,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.deformer_source_library.asset.create",
-            binding_hash="sha256:fb9124c6b7960ea698d9111285d9f0ebfb0317b4b520955fb797a1dd479fe8e6",
+            binding_hash="sha256:4709d72d775a6ba3e08c941ed6026ee2bc8f26ec1f5f76969281f51da1fba74f",
             namespace="animation",
             method="deformer_source_library_asset_create",
             parameters=(
@@ -7072,7 +7219,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.deformer_source_library.bindings.apply",
-            binding_hash="sha256:c21daf9eefa66a87211e9803c144fae487dbaa8b4685d74ebcecb4cbeb9db46c",
+            binding_hash="sha256:830fc335552c1a3bc03b8d3ba7a1c12bca858d3fa8399a51683581e6db5df599",
             namespace="animation",
             method="deformer_source_library_bindings_apply",
             parameters=(
@@ -7101,7 +7248,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.ik_probe_candidate.apply",
-            binding_hash="sha256:c64b19191047e7c953a9acd31d9a2032debb3bd60f44268eb0e9059701c21ebf",
+            binding_hash="sha256:2b9c94cabd1d63a0eddae995b469e94c5638c2bbbc8b9d2d340b3f9e96d740d7",
             namespace="animation",
             method="ik_probe_candidate_apply",
             parameters=(
@@ -7136,7 +7283,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.ik_retargeter.asset.create",
-            binding_hash="sha256:f526937609557e04efa4b20f876f7b9592a675a5d7c8ee620d6446664fa63dcb",
+            binding_hash="sha256:c8f0ce79b2796aa133b615ce210e606a019fc57805e3e7784438448ec869dbd5",
             namespace="animation",
             method="ik_retargeter_asset_create",
             parameters=(
@@ -7171,7 +7318,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.ik_retargeter.definition.apply",
-            binding_hash="sha256:36dcf6f1cd344d1186bd717442e66f05774267fcd5d50bec9bec065a3bf7271f",
+            binding_hash="sha256:4c44639c13f11c1a387c1c9e05fee65d29c4b4ffffcdc92da113d32c2718f7c2",
             namespace="animation",
             method="ik_retargeter_definition_apply",
             parameters=(
@@ -7206,7 +7353,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.ik_retargeter.settings.apply",
-            binding_hash="sha256:ee666c2c006452a7a39bd23eb57b62d95a50ca8f715f72129f4a19fe6c513872",
+            binding_hash="sha256:d1c691fd09ab6fa5290ffa83aa93a639c60f0230364b07ba97e2dd33a1330ce6",
             namespace="animation",
             method="ik_retargeter_settings_apply",
             parameters=(
@@ -7229,7 +7376,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.ik_rig.asset.create",
-            binding_hash="sha256:25dca060e884fb80d35e0ac14ffc30fb0d293d966dcf1270bea930fb07441ac5",
+            binding_hash="sha256:c7ad2e7be6e2fdd581faa4d9292c97cacd4e2986bca2f39449740959c1de8df3",
             namespace="animation",
             method="ik_rig_asset_create",
             parameters=(
@@ -7258,7 +7405,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.ik_rig.definition.apply",
-            binding_hash="sha256:2da4cb93c93d327df14efc0cc4b608601194bb35ae76f4f24021a05ee5e4e447",
+            binding_hash="sha256:f6754c7135b64f45d57322c0bc29dee69884ea9423ea2af0312305d45fd3ad87",
             namespace="animation",
             method="ik_rig_definition_apply",
             parameters=(
@@ -7299,7 +7446,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.ik_rig.definition.auto_generate",
-            binding_hash="sha256:23cd7471e19397c96bc7e0c23c2d4432f05d0002acb4cc7e42d35d454740e111",
+            binding_hash="sha256:961701aebfde7edbcf886371316b96a74570f0ada81462807dff00e79abb46df",
             namespace="animation",
             method="ik_rig_definition_auto_generate",
             parameters=(
@@ -7328,7 +7475,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.mesh_deformer_collection.asset.create",
-            binding_hash="sha256:9e2526347f1eb0b0f09d0ce4d2191d77dd6e78b60861dbd27836bdc298af372d",
+            binding_hash="sha256:70a3d96f8dac0e53d48517070715643e0ef9f65eb441f8f23dacf5e23ed85192",
             namespace="animation",
             method="mesh_deformer_collection_asset_create",
             parameters=(
@@ -7351,7 +7498,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.mesh_deformer_collection.entries.apply",
-            binding_hash="sha256:8413309ffad5aa4a07f7daaa974713b6d4ae404050f52e90ed876100f27b7674",
+            binding_hash="sha256:3986b08672c8ee9da0a92f7a9aaf20c808ae87817a75a017f5f0cdab6f44f6e3",
             namespace="animation",
             method="mesh_deformer_collection_entries_apply",
             parameters=(
@@ -7374,7 +7521,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.ml_deformer.asset.create",
-            binding_hash="sha256:55771ca751739836e34aaf84b8c7d6ccad20137cfa2afe4fd293049271e610a1",
+            binding_hash="sha256:12b6b14cb74c09da16b795f93cea2391c60ea4504eb4b1b3834059b8e6c6520d",
             namespace="animation",
             method="ml_deformer_asset_create",
             parameters=(
@@ -7403,7 +7550,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.ml_deformer.configuration.apply",
-            binding_hash="sha256:2707dad643621e43df85b71d582679da7d94b157619c11979c00cfd85a7fe7e7",
+            binding_hash="sha256:abce50f6fca17ec22d0756c1bd19449797b67f4eacaa1a4676cee9124c45e200",
             namespace="animation",
             method="ml_deformer_configuration_apply",
             parameters=(
@@ -7450,7 +7597,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.montage.create",
-            binding_hash="sha256:c7cbb41dd21871063ee0945e71840e0adddc0de902b3756f87e501a0a9f1e9a2",
+            binding_hash="sha256:109056f72ba64188de04be43f99c0c40301bd41a020d3b2e9c3d7519ef0f489c",
             namespace="animation",
             method="montage_create",
             parameters=(
@@ -7479,7 +7626,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.montage.read",
-            binding_hash="sha256:f502c13211448860fe140298281e372d9ceb274ac0a247bdd258e0bc5b3b8511",
+            binding_hash="sha256:0b914bfacf362a8dd01267f5d5f3e0abc23516f8f0af8e086aad8a2f881e7202",
             namespace="animation",
             method="montage_read",
             parameters=(
@@ -7514,7 +7661,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.montage.structure.replace",
-            binding_hash="sha256:5ab228b8d5ad57f4c2bae6b4337460b6a03b2e49f225b2645de3e10a5873d661",
+            binding_hash="sha256:400ee9e41fa70e5b79eedc36d4d4fee98efaf69a980888a5a2640c38279ce1af",
             namespace="animation",
             method="montage_structure_replace",
             parameters=(
@@ -7549,7 +7696,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.sequence.bone_tracks.replace",
-            binding_hash="sha256:d56a4e8cb1bf8a072541c95cc6296efd1add5214ac4ce34a9e8458266ab36289",
+            binding_hash="sha256:f1443927a50fa27d97e441a74f4f87fa908a18e5eaf35644b50ed5c34bb6c696",
             namespace="animation",
             method="sequence_bone_tracks_replace",
             parameters=(
@@ -7584,7 +7731,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.sequence.curves.update",
-            binding_hash="sha256:68ea29ee300a113366e09d5f419c7b935c12a07d542ba2cff8de6014deb33543",
+            binding_hash="sha256:3e9fdfcbfcb9e23d517737c96aa883c4a79ef24e014a36625144a19a99424964",
             namespace="animation",
             method="sequence_curves_update",
             parameters=(
@@ -7619,7 +7766,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.sequence.events.update",
-            binding_hash="sha256:e47d626e1b7f30fe3fb5e382ce7fa68784670eb6d427ccbb52981600bb49594f",
+            binding_hash="sha256:c9805652ea979f05cae0cbe1622179fb726d58d78d8ce3ee7796c63c2c256dbe",
             namespace="animation",
             method="sequence_events_update",
             parameters=(
@@ -7654,7 +7801,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.sequence.metadata.update",
-            binding_hash="sha256:ec2cbdcb09f11e1819851bb4e639dcb49ad27a9915131b4169cb8ce97e0af3d7",
+            binding_hash="sha256:9d1da189bc954bc03d8521d763a9efee542115bfb6c854e59c7ad972ed028b4d",
             namespace="animation",
             method="sequence_metadata_update",
             parameters=(
@@ -7689,7 +7836,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.sequence.pose.sample",
-            binding_hash="sha256:dc55730bc6254338d51da8f9d64628041eeb631dff3f21d6b9ef0de5be7ef873",
+            binding_hash="sha256:f485fbab2b1f7ec2de81895d8b00be755f146d1404dbfec526562cfa6a4bf3e7",
             namespace="animation",
             method="sequence_pose_sample",
             parameters=(
@@ -7724,7 +7871,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.sequence.read",
-            binding_hash="sha256:194b0e8a62623a022a512b9a442befde35f3df9fc3c3b8415b741dee9ab1926e",
+            binding_hash="sha256:e3b0790776345806448bd815c090b17f613fb73f5f346549af64d06e3f4b6cae",
             namespace="animation",
             method="sequence_read",
             parameters=(
@@ -7759,7 +7906,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.sequence.root_motion.analyze",
-            binding_hash="sha256:198f09005d77d88513c643aee4f09da1a31efb6929b532af1b44dba3a57b300d",
+            binding_hash="sha256:97510e5ef0c1021cf2ead0304bd1c0bd4ebf482463f75d61f811fa1cddc189ad",
             namespace="animation",
             method="sequence_root_motion_analyze",
             parameters=(
@@ -7794,7 +7941,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.skeleton.compatibility.apply",
-            binding_hash="sha256:625180de7609c7d01d992d929f6346d35a9e79d7fd8838150a3e60331e883f83",
+            binding_hash="sha256:43e1640555d85cd95727f90426f0dc6eb6f371822ca2a99d40a026249b2ebddd",
             namespace="animation",
             method="skeleton_compatibility_apply",
             parameters=(
@@ -7817,7 +7964,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.skeleton.definition.apply",
-            binding_hash="sha256:3199a681440e6fb59c100e866375ca180ab74b0fe972f3f1cf116876ea288ef1",
+            binding_hash="sha256:34560203153f77421fbd7be05633559f3c2dd590705efaafa5395852e1e420de",
             namespace="animation",
             method="skeleton_definition_apply",
             parameters=(
@@ -7840,7 +7987,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.skeleton.slots.read",
-            binding_hash="sha256:bc602da166e70181a3acba996e6b2b930941bb728fda94f9d8495d720551fe96",
+            binding_hash="sha256:939c2b8870f7470e84986e1e1b1606012ff3299d8d1dffe30d39868537e7b52d",
             namespace="animation",
             method="skeleton_slots_read",
             parameters=(
@@ -7875,7 +8022,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.skeleton.virtual_bone.apply",
-            binding_hash="sha256:28aa6023a8cc42cb5cc8dc706f250781f2c2ffc9e88a67d59b715631fe2457b6",
+            binding_hash="sha256:202034a97fb90c22b562e948aea85b5bfee599053a2b67cef545fcbcd153b6f9",
             namespace="animation",
             method="skeleton_virtual_bone_apply",
             parameters=(
@@ -7915,8 +8062,61 @@ BINDING_CATALOG = CommandBindingCatalog(
             status="active",
         ),
         CommandBinding(
+            command_id="animation.state_machine.candidates",
+            binding_hash="sha256:2d98d8632cee07a35a389d1677c0002181a577c3004a7747eb3365afcac9c1b1",
+            namespace="animation",
+            method="state_machine_candidates",
+            parameters=(
+                CommandParameterBinding(
+                    name="target",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="surface",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="class_settings",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="query",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="id",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="limit",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="cursor",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
             command_id="animation.subject.morph_weights.update",
-            binding_hash="sha256:f5f41f8bb07442fced2214fde3b1dbe1ae02d52ca837b99abbf8a48b4ae06518",
+            binding_hash="sha256:8a2a26e7b58dbe3b772dfbfdad251c0b2e8280a5e24b6ad275750a5a965a465d",
             namespace="animation",
             method="subject_morph_weights_update",
             parameters=(
@@ -7951,7 +8151,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation.subject.pose.update",
-            binding_hash="sha256:8200e39c83912d03dd91ffd13befc8706c171e3a99dbe941b2ec636c5ab4c257",
+            binding_hash="sha256:69616a4c6937ebb706243a4aa6a6a40f3b5196e4bd5f65ae94fc4a12bec5c1b1",
             namespace="animation",
             method="subject_pose_update",
             parameters=(
@@ -7986,7 +8186,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="animation_rig_graph.candidates",
-            binding_hash="sha256:74d66ae9e128d5ef04237fd55065843d2e52ad7b36e3e2da5ede064d149f23c3",
+            binding_hash="sha256:5562e45efe73d87184ef68bbd308c2f1e491a6110d13acba637d24519fc6dce2",
             namespace="animation_rig_graph",
             method="candidates",
             parameters=(
@@ -8003,7 +8203,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                     nullable=False,
                 ),
                 CommandParameterBinding(
-                    name="space_ref",
+                    name="id",
                     wire_type="string",
                     required=False,
                     nullable=False,
@@ -8027,7 +8227,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.audio_effect_preset.create",
-            binding_hash="sha256:4001e3aa6ad67926174312fd44e7a052fc8e84d613c9de1ce47c594fa15f9e06",
+            binding_hash="sha256:ba6a0ba8d00e2a0a5cb9a637d5e355bd2cdce34e2f92bd4f4255c7d02fb7e220",
             namespace="asset",
             method="audio_effect_preset_create",
             parameters=(
@@ -8050,7 +8250,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.audio_effect_preset.update",
-            binding_hash="sha256:35b6c3fe14831300abb1d2889d5e1c3b4eb1208be0bd83037353c314c8ee328c",
+            binding_hash="sha256:3545222de9449fefe7d5dfa7c1d819d157b4a5d92e70d69498bbbd4a7e8c6bb3",
             namespace="asset",
             method="audio_effect_preset_update",
             parameters=(
@@ -8079,7 +8279,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.collection",
-            binding_hash="sha256:6d104e788233668299d43d20d51ff2d3a6c36949d712d00388f115f901cd203c",
+            binding_hash="sha256:533cc9547ef18579e66541eedc39ca5e7e1a954a4176ab661db775db19d49a1d",
             namespace="asset",
             method="collection",
             parameters=(
@@ -8114,7 +8314,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.curve.update",
-            binding_hash="sha256:c5e16f8771ed2a5159168b7235aa76fda01239ad070f2e8e19f84f4d79366b64",
+            binding_hash="sha256:5efa8a0dd21b209c10037cc13266385fc1967ebff654937584e90b3471f7d21b",
             namespace="asset",
             method="curve_update",
             parameters=(
@@ -8143,7 +8343,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.data_layer.create",
-            binding_hash="sha256:989e4272bf6c7208e20f996ee2262d70e18a42c8136ac4e38d052c1fcdd6fc53",
+            binding_hash="sha256:5b715eeb7d5aa4870c142e170c627322606720ab8f7817dd98be728d4513bb7a",
             namespace="asset",
             method="data_layer_create",
             parameters=(
@@ -8160,7 +8360,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.data_object.create",
-            binding_hash="sha256:01d30bbb776c118b719d1be6f1427c636de83d7c140e8a2952290183584761cc",
+            binding_hash="sha256:29e02596af27a7de42d89af12014c5551a5a8807a482df4f3490d4235cff743e",
             namespace="asset",
             method="data_object_create",
             parameters=(
@@ -8183,7 +8383,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.data_object.update",
-            binding_hash="sha256:a85f94f1b392a5509b666fc53b430fc18032240768feb98a553d55c7b13b271d",
+            binding_hash="sha256:59d7b9d9b53132620c6cb37ebda334daa8693e498ba2824d59ff0edd027d4a1b",
             namespace="asset",
             method="data_object_update",
             parameters=(
@@ -8212,7 +8412,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.data_table.replace",
-            binding_hash="sha256:94aa0c0a2584889b4b3b4732dbdd7a4be1cdd809ec480433e2aa8c5308191c6d",
+            binding_hash="sha256:4555d9f7e1221b79ab3f5de1d3b441607593c557f7f308b52391152d1c1b6c06",
             namespace="asset",
             method="data_table_replace",
             parameters=(
@@ -8241,7 +8441,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.delete",
-            binding_hash="sha256:bac326a3752ba2401c49483502960d6654423023c55e98d80c7e4cf81ce4bafc",
+            binding_hash="sha256:5b70a245344851ea0e44d6a610ddfd60de53dda91a52f2d6e92bf4b2bec50a61",
             namespace="asset",
             method="delete",
             parameters=(
@@ -8264,7 +8464,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.factory.candidates",
-            binding_hash="sha256:a748b1108b63a7919c14a01afe44d3afa738626d160d31ee85eae50f0d1203f6",
+            binding_hash="sha256:b96329ebc295e0f400143209c3614b6cdf4123d8ec0489e43b2294abe4a10848",
             namespace="asset",
             method="factory_candidates",
             parameters=(
@@ -8299,7 +8499,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.fixup_redirectors",
-            binding_hash="sha256:f1f0603ed1c9fea51bc5b7bd59262ffaeb6a58d1acffe673d27831111c69db41",
+            binding_hash="sha256:8be92965fab792aace4c5d7175c82af71c7b5bf0fc6b443e4eb214c7d0db1640",
             namespace="asset",
             method="fixup_redirectors",
             parameters=(
@@ -8322,7 +8522,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.input_action.create",
-            binding_hash="sha256:b944d81e1e09c0090f08653106a97dc99c6be8e99bf63847d4228a74418b2966",
+            binding_hash="sha256:9715ce582909453f405c9bf7b0ccd49be29ce3d575183641e5274f3f8dde0c48",
             namespace="asset",
             method="input_action_create",
             parameters=(
@@ -8339,7 +8539,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.input_action.update",
-            binding_hash="sha256:b662896ee45ad97de6fa8be04084fad1616fdbd1bc1c08d155acabfd99bbbe0b",
+            binding_hash="sha256:9ffa7df22efed12e23e47454f864e004fd88aa629cc53af7e94ec088097205c4",
             namespace="asset",
             method="input_action_update",
             parameters=(
@@ -8368,7 +8568,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.input_mapping_context.create",
-            binding_hash="sha256:1f6a8769876808614b2942a49d13659448feead51ce5187ff87e3ffd219acf5c",
+            binding_hash="sha256:e066afcd81f78d28f3b6df734aec4ae7f3343b0903abc8692b3b1ca27f9e822d",
             namespace="asset",
             method="input_mapping_context_create",
             parameters=(
@@ -8385,7 +8585,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.input_mapping_context.update",
-            binding_hash="sha256:ca71679177207c9fab17cfca16e06e47bc17a1a36653e8873e1da2cd60ff60f3",
+            binding_hash="sha256:44cae8b776d9cf590bf75a6e6a9c9e834456bb3199dae5e019f123bb6dbb3c43",
             namespace="asset",
             method="input_mapping_context_update",
             parameters=(
@@ -8414,7 +8614,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.media_player.create",
-            binding_hash="sha256:9612f93448565121cd3d35a0a8ee08bea7e7b1934139e874baf37311cf0c231b",
+            binding_hash="sha256:f2a4baf6b4013831e5753f7d3f3f4509b9434c6baa8fe998fc6c05105dfc7d5e",
             namespace="asset",
             method="media_player_create",
             parameters=(
@@ -8431,7 +8631,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.media_player.update",
-            binding_hash="sha256:400bd92654e69d60a2b1528acacb596a9aac43881d5d9931ef865130836fa8d4",
+            binding_hash="sha256:d225a08de6542e989865ddc1cab828e3faa43be22ecca1b65d89b3034f388449",
             namespace="asset",
             method="media_player_update",
             parameters=(
@@ -8460,7 +8660,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.media_source.create",
-            binding_hash="sha256:0e28a51a63aea556bc85a811efd84ad32813192fc1d0ee72d57618588faf78be",
+            binding_hash="sha256:4f58b6f131d890c225af1f9b5433f2f2f0e3055fe197edeaf55856217d766858",
             namespace="asset",
             method="media_source_create",
             parameters=(
@@ -8483,7 +8683,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.media_source.update",
-            binding_hash="sha256:4335ca0b302c11f2eab65d607adbafa7e8d2e7724da9c4715201bd213a12aa9b",
+            binding_hash="sha256:16ee2be1ae906dc019bb94bf91e969ed288c642800004bdcbac399581bab1129",
             namespace="asset",
             method="media_source_update",
             parameters=(
@@ -8512,7 +8712,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.media_texture.create",
-            binding_hash="sha256:3fc69834b9ae14ff78a901220f1e83be8c825fd9e465b9474b5114b971b1a4c6",
+            binding_hash="sha256:4872213dea25a4674bce7841e94d9497ba85a80f9c671d2cc774068c4adb0aa7",
             namespace="asset",
             method="media_texture_create",
             parameters=(
@@ -8529,7 +8729,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.media_texture.update",
-            binding_hash="sha256:24547e933adf363b5b5b740c5d948e27f5cb82656e9b4903d20743ab564c948d",
+            binding_hash="sha256:7399bc70a17efd842925b406b637c4501f277e3d307d4b78d01f1fe81e46f1b1",
             namespace="asset",
             method="media_texture_update",
             parameters=(
@@ -8558,7 +8758,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.move",
-            binding_hash="sha256:a9fdcaae85fe55891cfe6df9efa2c26da550e0108fdcbcab71f23170cca879c8",
+            binding_hash="sha256:48cb5dd766b188d6f655775d479072a9496e9b5688e0dfdd71a0e7231b400b44",
             namespace="asset",
             method="move",
             parameters=(
@@ -8587,7 +8787,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.object.clone",
-            binding_hash="sha256:7fd21f68b58967c33800d783f570d85b6e517293d07cab0416f740df069dd7a2",
+            binding_hash="sha256:b10549a0732229cb7923bcca3213e0ce8c2cd3f452ad04b764fdcb573a73d35e",
             namespace="asset",
             method="object_clone",
             parameters=(
@@ -8622,7 +8822,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.paper_flipbook.create",
-            binding_hash="sha256:69762e88f0d788f1a2b894be3eabb96f9c8a622da9f22f0ddaf5567a288cf9e2",
+            binding_hash="sha256:7c4852ad77da85a07bab3e998f4e42f026c5107d1a339fe6c99604d8c4f4a64c",
             namespace="asset",
             method="paper_flipbook_create",
             parameters=(
@@ -8639,7 +8839,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.paper_flipbook.update",
-            binding_hash="sha256:ed2fabf4118a7b65c3bab3ee01c0c75282719a8defd1fa233a454fbaa06fc10f",
+            binding_hash="sha256:be389e4421c098e0f66fa49a54626e24373b05ec1a11b5348978483b4c9b71df",
             namespace="asset",
             method="paper_flipbook_update",
             parameters=(
@@ -8668,7 +8868,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.paper_sprite.create",
-            binding_hash="sha256:14c18578af5ee2c7286e8d577d2cb2b0fcc1c3c4b28b5c293d8cffbd6d662138",
+            binding_hash="sha256:7245e5dc944188e0fee5523898fbd9559ab6ab6a527c8f50f1bb0486b715f7e0",
             namespace="asset",
             method="paper_sprite_create",
             parameters=(
@@ -8685,7 +8885,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.paper_sprite.update",
-            binding_hash="sha256:32d1881af1909484132c0c7e77cd11c51a2e85d18b790f819c55953ecaede50a",
+            binding_hash="sha256:6e25bf10cc2e7db91459ef04cf61588a71025337d952b64f73e70b21eb70a0ec",
             namespace="asset",
             method="paper_sprite_update",
             parameters=(
@@ -8714,7 +8914,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.paper_tilemap.update",
-            binding_hash="sha256:e89ea24c524e8c8c628395dca30cd6b1d8f5d5fde771710780262dbf1930d20a",
+            binding_hash="sha256:308733ebb67b617b01405a548cc9351ba0b5810ea5de5a19f1d4ba40e8484346",
             namespace="asset",
             method="paper_tilemap_update",
             parameters=(
@@ -8743,7 +8943,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.paper_tileset.update",
-            binding_hash="sha256:17062d550a32c907de095b5f4dfc0660cac31a143a46ef4e45e392f9bb7ee371",
+            binding_hash="sha256:94ecb41f5237724c3c53cd190d0b9f6ad3255618dc4740324cee15cefbd1b3ed",
             namespace="asset",
             method="paper_tileset_update",
             parameters=(
@@ -8772,7 +8972,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.properties",
-            binding_hash="sha256:df8755c244fb0fb6d82c9a812558007e051128e47985ca7153b0293caf2e7105",
+            binding_hash="sha256:2c207b9b53794ffc02ddf2d776ee74058c62f1b60aadc50ff86f2d2a382871c7",
             namespace="asset",
             method="properties",
             parameters=(
@@ -8807,7 +9007,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.registry_record",
-            binding_hash="sha256:3773fe7145e2adca22de6e9665177f5d37f03c0bddc019dc5f1761a09ef9ce8d",
+            binding_hash="sha256:758bd5454b7f1c3cae3a8016cc22045e710fa4ffb4c085184d9829b1a84cf69b",
             namespace="asset",
             method="registry_record",
             parameters=(
@@ -8842,7 +9042,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.registry_relations",
-            binding_hash="sha256:e3a36043d31e6b4346bf268faa958f73692d10b328dc8bbaf3e8871737bc2d53",
+            binding_hash="sha256:117fb1e7d795eba1d7a755b3587d0d9a9674a3cfa766e176e4f550eb07d47111",
             namespace="asset",
             method="registry_relations",
             parameters=(
@@ -8877,7 +9077,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.reimport_sound_wave",
-            binding_hash="sha256:4b7d0053510499a4dfabcc26c4ae92f6fb7e1ba62e2ab60d68609636f5b22a0e",
+            binding_hash="sha256:311b41cad86e70ec3e12081f4bec2952d47fe6aacfab4fefd0cacc511414afaf",
             namespace="asset",
             method="reimport_sound_wave",
             parameters=(
@@ -8906,7 +9106,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.reimport_sparse_volume_texture",
-            binding_hash="sha256:81d754593776cd3405fb98edd6b54326c32f6e351e27dc9062abcb9757601de2",
+            binding_hash="sha256:4c1f50a33978bbc420656b5eb20879b2cb1888e60ff70ba474a69885dd938e47",
             namespace="asset",
             method="reimport_sparse_volume_texture",
             parameters=(
@@ -8935,7 +9135,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.reimport_static_mesh",
-            binding_hash="sha256:65c954693d077114e7b5f963cd88c4f7e41b423c6de637d32b04151521cd30ed",
+            binding_hash="sha256:eb586fb5b29159400042ff734f18bf5d9e1a6e160dc309c3c994a4f2ccb6a8e7",
             namespace="asset",
             method="reimport_static_mesh",
             parameters=(
@@ -8964,7 +9164,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.reimport_texture",
-            binding_hash="sha256:551b94c9d42aede64dba50c528868d6aa217cef0e9b23bdd7cec9c60ff90cb49",
+            binding_hash="sha256:b6454c0f7deac38624abf493a776061e7a2a026ac1b146df7ff4f273454ed43e",
             namespace="asset",
             method="reimport_texture",
             parameters=(
@@ -8993,7 +9193,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.relations",
-            binding_hash="sha256:51558add543f8daedd26eeb163d5e1abfb7584e912483ed8409669992112715f",
+            binding_hash="sha256:efd79bb67bfec6ce81fdd052ff99b374886cb112761bde21bf74093fb54ca480",
             namespace="asset",
             method="relations",
             parameters=(
@@ -9028,7 +9228,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.render_target.create",
-            binding_hash="sha256:3cc71a852ccdf40e5521d6ed3744dc480f994d7530e44eba572745536e60b2bb",
+            binding_hash="sha256:da8f1a3e52d3904500928b2c33a9065cd2f0ad2800132ecde313af2376f772e6",
             namespace="asset",
             method="render_target_create",
             parameters=(
@@ -9045,7 +9245,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.render_target.update",
-            binding_hash="sha256:b98bb689e8b558fe16ea2d52d980eddb033c2c951482efc433ca96b9ca5d3347",
+            binding_hash="sha256:4466fa98b7d6963878d05aeb55284cd25c558a411591752888e5c92f381189ad",
             namespace="asset",
             method="render_target_update",
             parameters=(
@@ -9074,7 +9274,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.runtime_virtual_texture.create",
-            binding_hash="sha256:6563ff78ff1c730a60ee00f1f0f3657eb9eebf1efd8e0e6bc15a076177c38ddc",
+            binding_hash="sha256:755229c64d8af6fe58741fac06d32bc69ceda4c0a3823e0730322d9b1820f701",
             namespace="asset",
             method="runtime_virtual_texture_create",
             parameters=(
@@ -9091,7 +9291,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.runtime_virtual_texture.update",
-            binding_hash="sha256:c4fe1c3531e28accd8917cdcaa9969d08f1903ccbb6117832030be0e8711e1fe",
+            binding_hash="sha256:dc184b6906b4ba671c433e7f1d704f5513591af440e054ee8e26dd0aba8c09e7",
             namespace="asset",
             method="runtime_virtual_texture_update",
             parameters=(
@@ -9120,7 +9320,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sample",
-            binding_hash="sha256:9e1808a74d9afbe7c8fbbde6477ad1340677827557563af127e0892ec62df6a2",
+            binding_hash="sha256:80433c862a660bb548c82125311fba38e371265dfe8c81da62e1b378f25884c7",
             namespace="asset",
             method="sample",
             parameters=(
@@ -9155,7 +9355,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.skeletal_mesh.update",
-            binding_hash="sha256:798f298eac50a02731c90a81f26ea7df52497a4089a1c0bef43f9a40f6ee095d",
+            binding_hash="sha256:1fff0f157bb4394c673e2c5baa4f31ddbe64f415b0089f5758a04f2b7a2ec6ac",
             namespace="asset",
             method="skeletal_mesh_update",
             parameters=(
@@ -9184,7 +9384,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sound_attenuation.create",
-            binding_hash="sha256:7dbb316e82d7c4b1a0cd0b9576f32a3a5f6bad327c1e564769e3a64ae08a1d4c",
+            binding_hash="sha256:0d2ad729d87dd3c67de347adda57555ce7ff000761ea25467c8324d00a2664ef",
             namespace="asset",
             method="sound_attenuation_create",
             parameters=(
@@ -9201,7 +9401,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sound_attenuation.update",
-            binding_hash="sha256:5acc0af3252e9ecc955127b8d3e77b6d5d78501eedf2863a779993d4d96ae664",
+            binding_hash="sha256:2e5be43ec4eaaf0f34db68582f730efdf209f3c7424c60488fb7be529c3b5306",
             namespace="asset",
             method="sound_attenuation_update",
             parameters=(
@@ -9230,7 +9430,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sound_class.create",
-            binding_hash="sha256:7c868b8c1de1c9ee70a67be3be4ba77d0c81f37be834d51023ebba581c03e286",
+            binding_hash="sha256:be7d80dde6b2b22ebce5134d61bb558493ca8aafe5877927469b8534207abf4b",
             namespace="asset",
             method="sound_class_create",
             parameters=(
@@ -9247,7 +9447,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sound_class.update",
-            binding_hash="sha256:a419b0ad507a9492f996e78e62d2eb5e4407aa2a7b1035006359816d4506c27b",
+            binding_hash="sha256:78648290052c3c1571a1839c8829e731afd5de9125510f24a4167cd9a1bd8f50",
             namespace="asset",
             method="sound_class_update",
             parameters=(
@@ -9276,7 +9476,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sound_concurrency.create",
-            binding_hash="sha256:3a30afa3b49ed2a33a50b1f8521a3a72a7b5d189db6df8be5b78d8edde799e9c",
+            binding_hash="sha256:d57a90349137d1dcb2c22bd4942b9c777332dcd89027354be4d424374b7945c0",
             namespace="asset",
             method="sound_concurrency_create",
             parameters=(
@@ -9293,7 +9493,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sound_concurrency.update",
-            binding_hash="sha256:9f2e9d15bd1522e8bc425acf6d372eb831f88747aa077b0697b95394895be1b4",
+            binding_hash="sha256:29f11f4826b1bea9bbe727b28b8a92258f041bda8a7cfdf96830a2cbf39afbf4",
             namespace="asset",
             method="sound_concurrency_update",
             parameters=(
@@ -9322,7 +9522,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sound_mix.create",
-            binding_hash="sha256:503316e0ca55ada350973e92d71b93f87930e459c8511c3f8e9205761b1c9178",
+            binding_hash="sha256:169dc5204d0927c659cb7ead4725c78be091f13e1096c99561885f7fe71d3418",
             namespace="asset",
             method="sound_mix_create",
             parameters=(
@@ -9339,7 +9539,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sound_mix.update",
-            binding_hash="sha256:cffd0a00e1dd740f24d24752f2de4e29a7932de01a7b93a9641f63f4ee0cae82",
+            binding_hash="sha256:e9fc796995913547e5a3a3aac98eb98394e9167ebc47be4c2796dbe54c0c1a81",
             namespace="asset",
             method="sound_mix_update",
             parameters=(
@@ -9368,7 +9568,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sound_submix.create",
-            binding_hash="sha256:091f27ec3776dee3ae11b0b8ec7c1de7ff9490ea2ed8bb71e5b5c9b5f97aeef0",
+            binding_hash="sha256:90c4339722870f167cc47301425a2f8a7c9cdca1eff119fc424a17912bdcbba4",
             namespace="asset",
             method="sound_submix_create",
             parameters=(
@@ -9391,7 +9591,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sound_submix.update",
-            binding_hash="sha256:3b8c9ea5dbbbe05488a208bbaf6aeeaffd44222839b2605563b2d12e4a9a0241",
+            binding_hash="sha256:f40c65faf48c80a58d11f259c21db9e37e5b41c6cef958836db90534d20976ce",
             namespace="asset",
             method="sound_submix_update",
             parameters=(
@@ -9420,7 +9620,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sparse_volume_texture.update",
-            binding_hash="sha256:65d817e2c132b62f6debc16cc1425c42c31966649f6942f0bad56b49b790635d",
+            binding_hash="sha256:8218cd67785566830d2317098c38e350bdd2ad1003c2e0386df1b729d8af158b",
             namespace="asset",
             method="sparse_volume_texture_update",
             parameters=(
@@ -9449,7 +9649,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.static_mesh.update",
-            binding_hash="sha256:20df972a21626ddd2671316e1e3b4dd30737eed8609d8f904c2e3e05d56fe0d0",
+            binding_hash="sha256:d512b2df6cddcf7e355e4d528ea32817e535596118ff9c94cc0372d474ae2ceb",
             namespace="asset",
             method="static_mesh_update",
             parameters=(
@@ -9478,7 +9678,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.subuv_animation.create",
-            binding_hash="sha256:e4dcd5f9c889a6c250a31eb7aad08568cd42fa7a331b8c15fd5fd69b4afb53d9",
+            binding_hash="sha256:9e4984f298ab89facb623206d50d50068b4e42c9f2685b89c1659d0e508fa517",
             namespace="asset",
             method="subuv_animation_create",
             parameters=(
@@ -9495,7 +9695,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.subuv_animation.update",
-            binding_hash="sha256:7c1c81654a79423db60e29c4ccbb865b53fbb4ab4dfa6dec119c30de28f1099d",
+            binding_hash="sha256:128d58ca9d634915491ac79b01bba20f082d5c8a50c4d9d2b4d503e7ef51d286",
             namespace="asset",
             method="subuv_animation_update",
             parameters=(
@@ -9524,7 +9724,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.summary",
-            binding_hash="sha256:e62387a929d5684ace3842ecc6c7423532dbafc49ec73152b8872ed52b52daae",
+            binding_hash="sha256:56c8ac3da2e0dd2c3fdff19795fa9880322ea27782a88cf40545c17af45fd836",
             namespace="asset",
             method="summary",
             parameters=(
@@ -9559,7 +9759,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.texture_array.create",
-            binding_hash="sha256:99fb6a71a35e1486d531f01ad18162bcfa7ccecfc7bb334e6851584030122367",
+            binding_hash="sha256:233b388701b61ce63efc20dd6f3b901f178eb1e1247b000b3031c4e40b261539",
             namespace="asset",
             method="texture_array_create",
             parameters=(
@@ -9576,7 +9776,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.texture_array.replace",
-            binding_hash="sha256:34aed10ec26e2225102d59eaf1ac0ef9c2020ec991df3bd334896aded0899b36",
+            binding_hash="sha256:5e0160e8b1b6c02899808a9c78560cf4ee2eed48c028fea0c2e7704b783b2217",
             namespace="asset",
             method="texture_array_replace",
             parameters=(
@@ -9605,7 +9805,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.texture_collection.create",
-            binding_hash="sha256:3d241bad0a2d2f0feee4218954d24eedb75a481d6077ec6d2aa85ec94db5d342",
+            binding_hash="sha256:bad7e4063d9c9fc40027b40279c45f32649b78b7ba0c0ca90acb456e99425953",
             namespace="asset",
             method="texture_collection_create",
             parameters=(
@@ -9622,7 +9822,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.texture_collection.update",
-            binding_hash="sha256:9aef718a441a3c10f9a52f7d5d6f0b4aabf3b316ce5665b65aa087ca46e154bc",
+            binding_hash="sha256:36255051343cb02f6b72e4d0d9dc26101321277dbcd3c1cd6578e5e7c4d80d60",
             namespace="asset",
             method="texture_collection_update",
             parameters=(
@@ -9651,7 +9851,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.texture_cube.create",
-            binding_hash="sha256:9838bd36a804f578f0f50a1aad824cac381010f5c7cda68c6c66e952eee23a0f",
+            binding_hash="sha256:303a8ea98dea3b5930e96bc6c18d77cb8c8807d2e0fd38012067fd90b4c910cd",
             namespace="asset",
             method="texture_cube_create",
             parameters=(
@@ -9668,7 +9868,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.texture_cube.replace",
-            binding_hash="sha256:8c66896e2459d9a2e58c1a4ac78b34d8c4e9770e8726e60ce8e3310d78210363",
+            binding_hash="sha256:8b9bcd7aa4d84bb90d34ff8515bcb910b8def01616358ab50ab092e0f03c6a49",
             namespace="asset",
             method="texture_cube_replace",
             parameters=(
@@ -9697,7 +9897,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.texture_cube_array.create",
-            binding_hash="sha256:b02b643f201fbdaac87908deb4e52a21fd6fc71799e6fcc990decc823abe57c3",
+            binding_hash="sha256:2f6c34d4f7d112b754edf792d1dea1681331dfc87219c3d5505db7843989e7cc",
             namespace="asset",
             method="texture_cube_array_create",
             parameters=(
@@ -9714,7 +9914,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.texture_cube_array.replace",
-            binding_hash="sha256:0521396c3e18fa804e89c33a7fb8dd9f71fac011a04393c998fc8e7d522ff2ae",
+            binding_hash="sha256:fdc2743011483a78f4ad55c71042685670ef14e7ca5b7e2db9d0ba40f9bb6820",
             namespace="asset",
             method="texture_cube_array_replace",
             parameters=(
@@ -9743,7 +9943,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.validation",
-            binding_hash="sha256:aaf8fc7643cd3dce8491df12790e0ff11347634d106e05b1af054535ad1f2f07",
+            binding_hash="sha256:f954e70cde74c8cc2d3cb650f99f763e112e880a1cc33a535e25b1ebe650b5ca",
             namespace="asset",
             method="validation",
             parameters=(
@@ -9778,7 +9978,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.volume_texture.create",
-            binding_hash="sha256:0348d3161708a5250f2839e776134e5bae3ba4f41a430f7cbc83b7567b04a291",
+            binding_hash="sha256:7b7238a8411f15ceac0c79b69b9edf9ec1a9b4dc85860ffa3370b1e8ce6e6171",
             namespace="asset",
             method="volume_texture_create",
             parameters=(
@@ -9795,7 +9995,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.volume_texture.replace",
-            binding_hash="sha256:26c52ff01d6c5cd230904a2edfd1cc1b1d979ec2822e4546fe3222c7319a337e",
+            binding_hash="sha256:8cf01b220d2020afc9a484c034a90e6c09d5db2a15ab8c3c9591a84495d98fb7",
             namespace="asset",
             method="volume_texture_replace",
             parameters=(
@@ -9824,7 +10024,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset_durable.journal.read",
-            binding_hash="sha256:e252bb72ef40d6780901c824fcd37933b7afa07119f84c3e5f4e7234ba005125",
+            binding_hash="sha256:eb293e498d696dfa2db5f1fcce8ed1c4a701554cf21d591124ead7555d058001",
             namespace="asset_durable",
             method="journal_read",
             parameters=(
@@ -9841,7 +10041,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset_durable.journal.reconcile",
-            binding_hash="sha256:3fee929abb997b9b5bf9b39cfbdb2d113e0e8dcc632f8bcbce6a74da47e6fa7a",
+            binding_hash="sha256:664e365d7948827e139e2d2a949ae092bbc87c2b225d8595e2d50b4bf2f09fb7",
             namespace="asset_durable",
             method="journal_reconcile",
             parameters=(
@@ -9876,7 +10076,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="audio.graph.candidates",
-            binding_hash="sha256:63e00dad492a215f4ed9a32f0fcd0692fd0225b57385b251361b224c393e6597",
+            binding_hash="sha256:eab35ecaa8581ec83682bf3e4e095fffda4089863a8a2684f4a332ffe3c6ebf9",
             namespace="audio",
             method="graph_candidates",
             parameters=(
@@ -9888,6 +10088,12 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="query",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="id",
                     wire_type="string",
                     required=False,
                     nullable=False,
@@ -9911,7 +10117,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="audio_media.asset.create",
-            binding_hash="sha256:93b77ba7bfd06d2ab022c758db3ae90af6f42974f5253a287528c1b18a80a796",
+            binding_hash="sha256:005868e76c170f2202d7528729008b6ebc3262772494b5485e5a0f318d0b6777",
             namespace="audio_media",
             method="asset_create",
             parameters=(
@@ -9940,7 +10146,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="blueprint.asset.create",
-            binding_hash="sha256:8ae68e414d34ce97c616369ca12fe7b95d70f4a9132ddf1b51c8abccd3397cf3",
+            binding_hash="sha256:5d154134ea5ee921d60713bdc4b4ffe25141f78d90ed077397c4b68a3d9b5a69",
             namespace="blueprint",
             method="asset_create",
             parameters=(
@@ -9969,7 +10175,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="blueprint.component.candidates",
-            binding_hash="sha256:cd3653ed504cd8cd478cb1d676cdf4b29155edfa7281a90f579928076f23f8ba",
+            binding_hash="sha256:3851a8fb24e2aee18ae47bc1ff14718bd42043d865166edf94a6046f151a6233",
             namespace="blueprint",
             method="component_candidates",
             parameters=(
@@ -9980,15 +10186,33 @@ BINDING_CATALOG = CommandBindingCatalog(
                     nullable=False,
                 ),
                 CommandParameterBinding(
-                    name="component_class",
+                    name="parent",
                     wire_type="string",
-                    required=True,
+                    required=False,
                     nullable=False,
                 ),
                 CommandParameterBinding(
-                    name="requested_name",
+                    name="query",
                     wire_type="string",
-                    required=True,
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="id",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="limit",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="cursor",
+                    wire_type="integer",
+                    required=False,
                     nullable=False,
                 ),
             ),
@@ -9998,7 +10222,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="blueprint.component.events.discover",
-            binding_hash="sha256:ff643b1c1311eef19b1c55755327b908e0a6184a31cfd4dab85fad3defe93691",
+            binding_hash="sha256:b10f63f3fb9c78994ef809d5600e1f458145ef8625d9f0aeb9e29236105c8ed3",
             namespace="blueprint",
             method="component_events_discover",
             parameters=(
@@ -10051,7 +10275,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="blueprint.node.candidates",
-            binding_hash="sha256:98d4e0a7c21ccd46f42875166886c6f07bc8932c58ce7b381f41088027445558",
+            binding_hash="sha256:ec963823b446742d725082f0cc8a64623c6a806c2dd4fd7aadd304f085bbaefe",
             namespace="blueprint",
             method="node_candidates",
             parameters=(
@@ -10073,6 +10297,42 @@ BINDING_CATALOG = CommandBindingCatalog(
                     required=False,
                     nullable=False,
                 ),
+                CommandParameterBinding(
+                    name="id",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="node_guid",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="pin_guid",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="pin_name",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="limit",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="cursor",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                ),
             ),
             min_wire_version=1,
             max_wire_version=1,
@@ -10080,7 +10340,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="capture.image.execute",
-            binding_hash="sha256:e8e32230712add95a27c1399c4146b6a13670a8b1b2c0a9487eb58c502fa36b3",
+            binding_hash="sha256:0c51c5dcfec66a6855f8c66641d31e7fa707f8a0e3828f92d821827cb051d12d",
             namespace="capture",
             method="image_execute",
             parameters=(
@@ -10109,7 +10369,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="capture.media.execute",
-            binding_hash="sha256:7f0cccd504825fd49b00a28d84e466828549fa4ce77f71f403d11ce4ed6d026a",
+            binding_hash="sha256:b4ea6b7ac6c495f1fcfed297c389ffeb7bca8e3bcfc8e89713252c125e72a1b0",
             namespace="capture",
             method="media_execute",
             parameters=(
@@ -10138,7 +10398,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="capture.render.execute",
-            binding_hash="sha256:3cc3c1c86bb5efdda7551bd63e92b7f92f0110a139577138f8e3e8ea4f148663",
+            binding_hash="sha256:f922a4e31a58a3c95b74bfe5790e6c8eacc0aa44ce3c910b14b5e338fb6d8d01",
             namespace="capture",
             method="render_execute",
             parameters=(
@@ -10167,7 +10427,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="config.resolved_value",
-            binding_hash="sha256:ff96596da95140959275a5193282bb4879bb56fdbccf9c18a616097af4ee275a",
+            binding_hash="sha256:d0dea4c3af987554dc70c444b7b1190acd6499b8908c08f8c8d9383ae79a44fe",
             namespace="config",
             method="resolved_value",
             parameters=(
@@ -10196,7 +10456,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="config.section",
-            binding_hash="sha256:11a8d0958bd623da7b9649a25e6d3e9a434f7e4c7fd78280a45d1ea3516bbe76",
+            binding_hash="sha256:3558f6dc27193d01e97c710fedd4411d64a3b3bad258e7dda9e551b804e1a51c",
             namespace="config",
             method="section",
             parameters=(
@@ -10225,7 +10485,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.authoring_schema",
-            binding_hash="sha256:a9aa7c017b7edb1f19509019998c01633786168dc2ffc1a737a1e9b0f30bde80",
+            binding_hash="sha256:21491e0557add9b41cab5aff0b39761dc24303738184f2d9c4cee66d75692d9d",
             namespace="content_graph",
             method="authoring_schema",
             parameters=(
@@ -10242,7 +10502,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.compound",
-            binding_hash="sha256:0cf5a46a482db7d71f715002fe26c1c600c5a3bf4291328ea873f611a90b3eb9",
+            binding_hash="sha256:6c1d66355210b4dd63461ec561678773c42f2dd975556412be799ea88edc4462",
             namespace="content_graph",
             method="compound",
             parameters=(
@@ -10277,7 +10537,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.diagnostics",
-            binding_hash="sha256:8d42bbe76f7ae476328f0c873cd55b98cdbbbd10533ff6d83215f35e32f230ae",
+            binding_hash="sha256:1578e3c5367b1928cdc0bb5984d8df6a00b8ad3b19ea8e4792e5db617b287660",
             namespace="content_graph",
             method="diagnostics",
             parameters=(
@@ -10312,7 +10572,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.export_workspace",
-            binding_hash="sha256:4117a13cc08abbc40cfe36c4bb062b604ba598e982a9893fcd092d12206be1b2",
+            binding_hash="sha256:769cd8f5456bec8d3d296cf5aa335ad0c4c8513234d0ac616462058b486804be",
             namespace="content_graph",
             method="export_workspace",
             parameters=(
@@ -10341,7 +10601,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.import_workspace",
-            binding_hash="sha256:d9f2bb00c671fe54ad15b45f96a29a05e5291808d76f528dda39986282ea9b43",
+            binding_hash="sha256:6e9ee32df4d7d7d64430ebeb51cff3579e0513e490d0022cf56840d7704b5b1e",
             namespace="content_graph",
             method="import_workspace",
             parameters=(
@@ -10382,7 +10642,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.items",
-            binding_hash="sha256:46149d5c4770cdc2a9acc23298564fd2ca997d0f3dd93168a4a069997ac7ec16",
+            binding_hash="sha256:d2ef4febbc773ce4b81d345cc92aed6d0fca57d125e2e3af1d85ce55af91c486",
             namespace="content_graph",
             method="items",
             parameters=(
@@ -10417,7 +10677,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.properties",
-            binding_hash="sha256:4b59f653fd063a5cb70f5892a7bd09f8bae833eb0058de6f013818c3c0d41964",
+            binding_hash="sha256:111bdb1f7b2af9663b38004b0b5eacac0cd80324d99b15da2b8e32a9edab818a",
             namespace="content_graph",
             method="properties",
             parameters=(
@@ -10452,7 +10712,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.relations",
-            binding_hash="sha256:df4087d36a0aeca2d49b66a86b9a1485c7b351a1ea92316a0c8dedea7cd33d94",
+            binding_hash="sha256:d0504af869d09e68cc40f79f4dcfa340cf4470526d253379c6e761bc13f31822",
             namespace="content_graph",
             method="relations",
             parameters=(
@@ -10487,7 +10747,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.structure",
-            binding_hash="sha256:c785378a2e94acde49ce8734534e04718b46eaabbda4058fa63c74117dc529e4",
+            binding_hash="sha256:931a44a45e9d04d40f1069975b350209a87da325b66f35257db88ac83050c3fb",
             namespace="content_graph",
             method="structure",
             parameters=(
@@ -10522,7 +10782,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.summary",
-            binding_hash="sha256:33c332bb2baf050083d46c984f7a334679c3c9ed69679cd2d46a4d74df0fda3a",
+            binding_hash="sha256:5bbba2c9f172bea2130965ea06fd5dde50955c749254e4247981b410f939d6e1",
             namespace="content_graph",
             method="summary",
             parameters=(
@@ -10557,7 +10817,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="deformer.evaluation.sample",
-            binding_hash="sha256:14ede0954ecc6038bd934b8fae524e95655bfb8bd108e220a1af1305d3faa060",
+            binding_hash="sha256:1223cf2633f0e0a78432fe4f8ee05144dbe02278d63fc6b3fd2b3814a7dd46b5",
             namespace="deformer",
             method="evaluation_sample",
             parameters=(
@@ -10592,7 +10852,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="deformer.geometry.sample",
-            binding_hash="sha256:76fa4fc6be5825d00144429e310adfbc573ee5d9b49dda0fd2318ffedd9c9e23",
+            binding_hash="sha256:7ee5f744a7cc291d34de4cad4603d48ca70358758c603f35e4ee5e3165e4270f",
             namespace="deformer",
             method="geometry_sample",
             parameters=(
@@ -10627,7 +10887,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="deformer.training_inputs.validate",
-            binding_hash="sha256:2319dff88d60c5845b0f65a8bb3c3a7e1e00fa083da990c78f0de7e8bbca6d8b",
+            binding_hash="sha256:e5dc1bfc7ea46df05593f3db370f746ae9de7df952b958ed358f25a98312a3a3",
             namespace="deformer",
             method="training_inputs_validate",
             parameters=(
@@ -10662,7 +10922,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor.dirty_resources",
-            binding_hash="sha256:18c25fc0e040a26220d20a681b1d6acf42434ff0a78203d568b7199fe77158a6",
+            binding_hash="sha256:65b9b94e7ea0619533056e6efeb001cd18afc8849bf98897774269b5e24d71a1",
             namespace="editor",
             method="dirty_resources",
             parameters=(
@@ -10691,7 +10951,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor.open_assets",
-            binding_hash="sha256:5debf213cb1e11de713a815e9a005e8a5d61ec0c21333197b9bbfcf6e10c4a6e",
+            binding_hash="sha256:5594467113635655ef6a4a5dc7c028149a0efd2ed22b6b802afb5a51d4839a02",
             namespace="editor",
             method="open_assets",
             parameters=(
@@ -10720,7 +10980,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor.safe_exit",
-            binding_hash="sha256:8a98b62ab9bf6b2faf1501ba93ef5b7214772a28ac3907e1b70ad358f64f517d",
+            binding_hash="sha256:cad3a46246a2c405f6ebfeb370e732be9211e58626aa05691b4c74dcda3798d6",
             namespace="editor",
             method="safe_exit",
             parameters=(
@@ -10743,7 +11003,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor.session",
-            binding_hash="sha256:ea257355420f8fe5197030bf5ce9a141e699830772cd2446ce716c85335b4f37",
+            binding_hash="sha256:5529357f9719bdc7a9dafcf3c2dfb444d6b8d25058294b87d7a04775b3fdb017",
             namespace="editor",
             method="session",
             parameters=(
@@ -10778,7 +11038,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor_project.config_section.update",
-            binding_hash="sha256:62ecbc12372840264e1a01dee66e597587a213b3f32af929fa959ba0ea3f1e6d",
+            binding_hash="sha256:ea9e077b98ea2aa7731c0d3b1562ab36528141c753a9fddd8350c1defadb35b3",
             namespace="editor_project",
             method="config_section_update",
             parameters=(
@@ -10807,7 +11067,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor_project.device_profile.update",
-            binding_hash="sha256:e1235139f39c804254e5c8812b0e68b7a79f394afd43a3aefe6cd096dec0d0a6",
+            binding_hash="sha256:9a5522d3c17437c87d86e135677b468c099f7104e47825868f413cc23d29936c",
             namespace="editor_project",
             method="device_profile_update",
             parameters=(
@@ -10836,7 +11096,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor_project.localization_target.update",
-            binding_hash="sha256:6b9ddce1396a98d254e563247ebbca4cae7bfe87d2fba55a2b477f43746fa210",
+            binding_hash="sha256:208e1b6a1bafc9912e54efcf24475cf061333cc43e657618a5250c09344983cd",
             namespace="editor_project",
             method="localization_target_update",
             parameters=(
@@ -10865,7 +11125,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor_project.platform_config.update",
-            binding_hash="sha256:2617092f713bbccd99613016076111b8713aae002bd3cd3246c7a5aaac7e9cc4",
+            binding_hash="sha256:7758f948570beee5de929f1afcaa9f50556812745d93b86dbf3bb7faff2b9ff0",
             namespace="editor_project",
             method="platform_config_update",
             parameters=(
@@ -10894,7 +11154,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor_project.project_settings.update",
-            binding_hash="sha256:3e0b0d21cfc96230bc7ba83f4e704722e24a435ed61a260addc060ce1a037aa3",
+            binding_hash="sha256:11d9a227961313e9e92a49d4df02b49b47d1135873e546e9ea23f1e05ccdaf1b",
             namespace="editor_project",
             method="project_settings_update",
             parameters=(
@@ -10923,7 +11183,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor_project.scalability_group.update",
-            binding_hash="sha256:8168f8f660c74f8b35ddf8b05b8ae4ad23c0cf9d054f8470a883ca2cba13f302",
+            binding_hash="sha256:10a87e0d90b7698d7f9fc0259ffa01c6185d59742a3e5897987e3650437ec248",
             namespace="editor_project",
             method="scalability_group_update",
             parameters=(
@@ -10952,7 +11212,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor_project.string_table.update",
-            binding_hash="sha256:c8aa83ed2db8e991fcaf1ef53f3aeead4a282a69218a41c46583f2518a8a4c3a",
+            binding_hash="sha256:c1f1a462f664286b3a47d2cdbdf20a8447946d5bff9dc5f6bc55705af0decd34",
             namespace="editor_project",
             method="string_table_update",
             parameters=(
@@ -10981,7 +11241,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.fbx.animation.import",
-            binding_hash="sha256:e5f598c771849ebe1da07e53b1fa4c6608df1c507d6c628c571d3667ffc6e7b9",
+            binding_hash="sha256:4dbabf692ca342862a7a3cc534a680732a7b1025f67262aa49c2ed60ad3fa0bf",
             namespace="external",
             method="fbx_animation_import",
             parameters=(
@@ -11016,7 +11276,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.fbx.skeletal_mesh.import",
-            binding_hash="sha256:94475f51d3e9ae0e9288de2c9cc7c602978e9f72df025e2600a25f4cdbf43611",
+            binding_hash="sha256:912fdb74df2f8eb964375aeda496d0d0fcbb2e00b66e4c96a0ccb3b5fdf01697",
             namespace="external",
             method="fbx_skeletal_mesh_import",
             parameters=(
@@ -11045,7 +11305,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.geometry_cache.import",
-            binding_hash="sha256:7e644ab70183e8e466efed3e3ef7174b64733c4eb30cbc9ef48f043490fa8f2c",
+            binding_hash="sha256:86def36f8920552f7b3870eb994074fd9dd712f36e6facbcff8229daadfa9cfc",
             namespace="external",
             method="geometry_cache_import",
             parameters=(
@@ -11074,7 +11334,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.light_profile.import",
-            binding_hash="sha256:8c16f3ad2aec134df541fba60688a551abfab42887e3b38462dab74cfccf525e",
+            binding_hash="sha256:bded3ec8a6e92d5c79f78fe8d28c58f67968b6b53288faa2834d9ceef4be56ae",
             namespace="external",
             method="light_profile_import",
             parameters=(
@@ -11103,7 +11363,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.localization.po.import",
-            binding_hash="sha256:75d21efbfc6a9afe9089c61d6b584b448504d6e68ea9b393f9dd04dbdb746c23",
+            binding_hash="sha256:ae29ac22e84be10ca4267aadf6132c0281840643b3b5ffb796eabaaf7fa5e928",
             namespace="external",
             method="localization_po_import",
             parameters=(
@@ -11126,7 +11386,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.skin_weight_profile.import",
-            binding_hash="sha256:0a17d19b47e9879a352b94baa029ca2d5086d44486cdc926af591cc952934443",
+            binding_hash="sha256:4e351149af0c1a47c82753bd6bc134872a4c80d62878039334cfe27d063a1fa6",
             namespace="external",
             method="skin_weight_profile_import",
             parameters=(
@@ -11161,7 +11421,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.sound_wave.import",
-            binding_hash="sha256:ef388f98b96b9ee9357df9388cf51d9fa9e7e7a0f4d90ae1d6430510d3bcce98",
+            binding_hash="sha256:1d6a2ec5b52fc38a3104c50892a3c2823e59df9eedbdcfba0078ee38f5bd2f59",
             namespace="external",
             method="sound_wave_import",
             parameters=(
@@ -11190,7 +11450,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.sparse_volume_texture.import",
-            binding_hash="sha256:4c4b6e523c22a46dc689a9981fa9724dac97611414cc67753cf38ff4716d7a27",
+            binding_hash="sha256:6df678fc777376922c94e2d81b747077934fc02cf0d2b3c9bb2a48b6b9d1ec82",
             namespace="external",
             method="sparse_volume_texture_import",
             parameters=(
@@ -11219,7 +11479,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.texture.import",
-            binding_hash="sha256:f3fef6a3d346d49b966782ea9dd417acaba4547a06d80fd2610794bf797039d8",
+            binding_hash="sha256:f2d44a9b9e580fd914395f994f72b2f6f2d552590ac8eba15fd49b436afcc252",
             namespace="external",
             method="texture_import",
             parameters=(
@@ -11248,7 +11508,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="graph.layout.apply",
-            binding_hash="sha256:b991cff2d9b8a2bb436a8da7ac33de5091dbc3f074e277a41325343519169f78",
+            binding_hash="sha256:88fa4b491f9f69c2e7435838405096286de19298b028a2af2b1092c085ccdec9",
             namespace="graph",
             method="layout_apply",
             parameters=(
@@ -11289,7 +11549,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="graph.view.read",
-            binding_hash="sha256:ed36413dfbfd70779d28aa6783f04186110a20772247b73673483aa4c9a26e8b",
+            binding_hash="sha256:3bf663a9628c2f6e8f3833a2ecc53f82087b70a50ace729c752ae3c01f088114",
             namespace="graph",
             method="view_read",
             parameters=(
@@ -11324,7 +11584,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="graph.view.update",
-            binding_hash="sha256:d8e441ca867f93ca4a0d2ba201a47c516764141b347e7e2ee81f629b023213c0",
+            binding_hash="sha256:40eb529bf9b1a1b909beb40ddd3a9131e2a1e9447e25323da76cbc19b112ccec",
             namespace="graph",
             method="view_update",
             parameters=(
@@ -11359,7 +11619,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="job.compile_build",
-            binding_hash="sha256:b1519970de40ca3b656a3a66b49a5fb5785589cd2ba5056b949d828993d3c79c",
+            binding_hash="sha256:6e08b024b0b6758745042aaa81b9692c66e4dbd028fde2e72276496db4a56d9f",
             namespace="job",
             method="compile_build",
             parameters=(
@@ -11394,7 +11654,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="landscape.create",
-            binding_hash="sha256:a003b0a1a590bf2703fb64f130b54b201dc17b53bcb11f6cebd664d2bced4871",
+            binding_hash="sha256:c6560da317251ec178130e66defbb40451b0cba6fca22b41e4f83f02c5b0effb",
             namespace="landscape",
             method="create",
             parameters=(
@@ -11435,7 +11695,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="landscape.height.read",
-            binding_hash="sha256:b88b72bd3132c728b920a2360ec61f3dcd92ff2f5a9a55d92930ae5fa2cb812e",
+            binding_hash="sha256:5b245a09fdf22e05a47aaf30162dd90889ab2aa7966f06e429cd2df4e8186617",
             namespace="landscape",
             method="height_read",
             parameters=(
@@ -11470,7 +11730,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="landscape.height_delta",
-            binding_hash="sha256:61d4d61151d2f14e451e752efeb9443f6970c5edcb8adde2036355a6412c9b34",
+            binding_hash="sha256:e102500d9eb690472a49bb2e69d930b986b8bee8ddfb2c026313368a3153da7c",
             namespace="landscape",
             method="height_delta",
             parameters=(
@@ -11505,7 +11765,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="material.asset.create",
-            binding_hash="sha256:9c49740b66525888280afaf8f1d1f8284efbd7b435723e2010493a8a59507c7e",
+            binding_hash="sha256:59043df221c4f718b838f1c29770127d7e0f3257094b1e524d2183c7d4c51b65",
             namespace="material",
             method="asset_create",
             parameters=(
@@ -11534,7 +11794,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="material.expression.candidates",
-            binding_hash="sha256:b65d94bf9979ec25e04f745d58b7c2013db217b21e3cd4a89b07c7885ae7a6af",
+            binding_hash="sha256:6821837a3b19da592880306135fa6c0f8fdeb75fe1a242afd89e3f78a32f6b69",
             namespace="material",
             method="expression_candidates",
             parameters=(
@@ -11546,6 +11806,30 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="query",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="graph_name",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="node_guid",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="pin_guid",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="pin_name",
                     wire_type="string",
                     required=False,
                     nullable=False,
@@ -11569,7 +11853,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="material.function.graph.apply",
-            binding_hash="sha256:0e7638612644663ed3a256eff4ee16c79539fbd6bd8bf8f6b0cd3eb50fa7d6e4",
+            binding_hash="sha256:d677ded727ccf1528739c7cdd8dc27194ec49888048e231b8529c8471cb06db1",
             namespace="material",
             method="function_graph_apply",
             parameters=(
@@ -11592,7 +11876,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="material.graph.apply",
-            binding_hash="sha256:49d0bb907d4c18c281211969c1545be7205f9187d6efb889de4012ef675c4e3f",
+            binding_hash="sha256:87a6c149a27a4736f51cc8cd47085e66dcd5e8308ec122a3c548d07391835491",
             namespace="material",
             method="graph_apply",
             parameters=(
@@ -11615,7 +11899,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="material_instance.asset.create",
-            binding_hash="sha256:774ee2b3e47342fcea1b75e37242d1dff2832a9dff1e9a3fdbf0e3f49c9a4f29",
+            binding_hash="sha256:b436429395faeca2edaa840c28ae21640fe36f76a067d111e0cfdc3aa3c060f4",
             namespace="material_instance",
             method="asset_create",
             parameters=(
@@ -11644,7 +11928,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="material_instance.parameters.apply",
-            binding_hash="sha256:357887f9beff111b67ed2f8133b50a92833e2cab7b24dad21caf0ddfef6b3223",
+            binding_hash="sha256:64d3ed9e7c4b5c5ddc8003b4b544f4c536809a96d52d73689e4ea4ba602402f6",
             namespace="material_instance",
             method="parameters_apply",
             parameters=(
@@ -11667,7 +11951,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.attribute.material_slot.add",
-            binding_hash="sha256:7f7cf258fee34cb973dfeec8063c7c061b8f86c7cdbefdd5b298819b975c6d64",
+            binding_hash="sha256:81d1fb212f0162549a45548c7ddce45f1055ef32b0b8824940f0991ecf488609",
             namespace="mesh",
             method="attribute_material_slot_add",
             parameters=(
@@ -11702,7 +11986,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.attribute.material_slot.assign",
-            binding_hash="sha256:625f66f0fc7c06773dff2ce97def6052547d5c992b4903e9cfc488ca873221d7",
+            binding_hash="sha256:df37875e4782a091e549d271017453cf71a8cd195d4e204e4d6423c86363e65c",
             namespace="mesh",
             method="attribute_material_slot_assign",
             parameters=(
@@ -11737,7 +12021,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.attribute.normals.recompute",
-            binding_hash="sha256:a0ee563116eb8e728f8e5edc07f0fc77325a44b9598a68004d9ea5594ccf4ee8",
+            binding_hash="sha256:979ae710286ccb7ff101959396db822891a7a51e399fbe1197acb812f598a943",
             namespace="mesh",
             method="attribute_normals_recompute",
             parameters=(
@@ -11778,7 +12062,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.attribute.uv.auto",
-            binding_hash="sha256:fc4c8b7c60d608f8d651f9f922c0e6572b530d21092a70d6dbc50e725803ac8c",
+            binding_hash="sha256:424c8b9ad93f63b4cdafc7a8c4fd2d2425cf42adf2978a7ea35e5600f60db372",
             namespace="mesh",
             method="attribute_uv_auto",
             parameters=(
@@ -11831,7 +12115,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.attribute.uv.project",
-            binding_hash="sha256:4cca9d65e067cf4fa12d27038500b1e98642120113ad07e1fee86240f443163e",
+            binding_hash="sha256:023caa2487482ac7233214d9e4adcff676f0e61bbc43391d0704b6712faf5eb0",
             namespace="mesh",
             method="attribute_uv_project",
             parameters=(
@@ -11884,7 +12168,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.collision.convex.generate",
-            binding_hash="sha256:75a1691a758dcebbcfd29441842b2de1ce25d1d4b2d54e7d74a6c09e098b5f93",
+            binding_hash="sha256:cde126ff4f55ce5734efa76413f8cb6879f305cb014a3e8e0a9ee0dc05d1e07a",
             namespace="mesh",
             method="collision_convex_generate",
             parameters=(
@@ -11931,7 +12215,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.collision.simple.generate",
-            binding_hash="sha256:ae5c1733601185084283d58d52538db28163cb2d03a4cd531417a5e4db81866e",
+            binding_hash="sha256:2165474dfa586ddf2d7df47d10f16fb47e6c6683214992e0fd0c22ae551ecd33",
             namespace="mesh",
             method="collision_simple_generate",
             parameters=(
@@ -11972,7 +12256,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.element.select_by_ray",
-            binding_hash="sha256:b3d0a641bd2cbc5f3b908c88e44c5ea689ee11a84df87dd24705001619e16cbf",
+            binding_hash="sha256:6230946462c0e46d7237e63b4559ce41919fa395353a137e28bc670886569311",
             namespace="mesh",
             method="element_select_by_ray",
             parameters=(
@@ -12007,7 +12291,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.modeling_session",
-            binding_hash="sha256:bb4a2c973914bb0a3fc4191f91e88f98451a70c1cd6da604c5d9334bb01c82bd",
+            binding_hash="sha256:f5dcbda1bb519c446101494361c4dc240a7c570a64c7051ddfec48422c07c765",
             namespace="mesh",
             method="modeling_session",
             parameters=(
@@ -12048,7 +12332,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.pivot.update",
-            binding_hash="sha256:c2720be15240423ab2bda59a15cf5d5dccf1fc7d8a53d8074135e95509a8c248",
+            binding_hash="sha256:65ef0e663becbb50b65511c529a6739c869e5a4094cc86f43bb61edee4ba76bb",
             namespace="mesh",
             method="pivot_update",
             parameters=(
@@ -12083,7 +12367,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.box.create",
-            binding_hash="sha256:a180dcf67845e424898cd9eb0de6de6bea43cdbdc6699216187307e5cdad02c5",
+            binding_hash="sha256:8b68e53b3b3786b0d5a026ddfdbbec66b0c0f2eea551c7b7a77a7c712a5d149e",
             namespace="mesh",
             method="primitive_box_create",
             parameters=(
@@ -12124,7 +12408,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.cylinder.create",
-            binding_hash="sha256:103525d4676cc66ac0888ce3a069f083c43a985e13f7397cca6f1b592ad830b2",
+            binding_hash="sha256:1837c8e869813663060b6a6cbdc47bd72e2251817bb446ad319bb73d4cd8ddde",
             namespace="mesh",
             method="primitive_cylinder_create",
             parameters=(
@@ -12183,7 +12467,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.plane.create",
-            binding_hash="sha256:a9c17dabe26125cac9da32510e8379ad68ed27a88198673aae8298fa7d33e78d",
+            binding_hash="sha256:a625784d6dc3373314652f7edb0fbd3546a63cc00fd3e3482d9a1678b009de0d",
             namespace="mesh",
             method="primitive_plane_create",
             parameters=(
@@ -12224,7 +12508,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.ramp.create",
-            binding_hash="sha256:b37b2513b7d8bb82dfdc567e4d6e9de01972af78d0806bdc4f43677771efd035",
+            binding_hash="sha256:17947ab94e72a6bf5127de165cd00aa083ff5fb7aa474cf348e96bbcc778b589",
             namespace="mesh",
             method="primitive_ramp_create",
             parameters=(
@@ -12265,7 +12549,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.ramp_corner.create",
-            binding_hash="sha256:2f9cfe1e140651a97204f08d77aee76fa7a624aab1aba8a4d572b97d987843c3",
+            binding_hash="sha256:ea5df8ab0dd7fba666a05a021a83e7d4fbdd232ab40bd5598d4ddfd1a6175743",
             namespace="mesh",
             method="primitive_ramp_corner_create",
             parameters=(
@@ -12300,7 +12584,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.sphere.create",
-            binding_hash="sha256:73d941434eacd86a2d5c5fd58e67d6510c7e3421623cc0cbf889dfda4db5a761",
+            binding_hash="sha256:74eb9b52de922ab062cb864ad3155d35914700fde9262f84c0c9c8efa750634f",
             namespace="mesh",
             method="primitive_sphere_create",
             parameters=(
@@ -12341,7 +12625,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.stairs.create",
-            binding_hash="sha256:04c63aff94768551de8a89d932ac618fd48b3f48d9e5b24ce47d3c319186d219",
+            binding_hash="sha256:2e05557c03a389ea0e60f664712097e1f076e94f8e506cd57d042025b913581e",
             namespace="mesh",
             method="primitive_stairs_create",
             parameters=(
@@ -12400,7 +12684,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.boolean",
-            binding_hash="sha256:e0b3f7c50e7d44ecc206b3596b63b5da74b3f3c89a1e9257dd64b46a6fb3ec95",
+            binding_hash="sha256:85c0bfc8b80902cee69dd9e0d5f354940d12bfab9243ad5905487a4d3e921d3a",
             namespace="mesh",
             method="topology_boolean",
             parameters=(
@@ -12459,7 +12743,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.edges.bevel",
-            binding_hash="sha256:e57710ee7cc3286c18f1986594e97bc0676765eb55c5293704364ec07ed68874",
+            binding_hash="sha256:d173c9be0d4e0bf1de678a280ba4d77df9c1ebb242002041ff1d6a07abe6c44f",
             namespace="mesh",
             method="topology_edges_bevel",
             parameters=(
@@ -12512,7 +12796,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.edges.weld",
-            binding_hash="sha256:624ebce4573bb1b34964f161947e29dd99f397a09b61000b71a1836b6c681ee9",
+            binding_hash="sha256:563104715649aafc0a13ef763c1d4fc9eae2583cc500e55895100c722dfb737b",
             namespace="mesh",
             method="topology_edges_weld",
             parameters=(
@@ -12547,7 +12831,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.faces.duplicate",
-            binding_hash="sha256:aeb382bc86a5e1d5c33b8b978459086124a5671e14cfc0c53674f95da8af0c29",
+            binding_hash="sha256:8a8630e5631d9674a8684657a9a459043e888dc5ee2038d1278f9bfac92cc629",
             namespace="mesh",
             method="topology_faces_duplicate",
             parameters=(
@@ -12588,7 +12872,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.faces.extrude",
-            binding_hash="sha256:eda73907fde60be42cafbab4f63d6510369ee83aa3d6c3aa100de359c15c5b93",
+            binding_hash="sha256:a075e2f2080b015062818bba742509e920c8c25df7f1cd08a0e158f84a73ebf3",
             namespace="mesh",
             method="topology_faces_extrude",
             parameters=(
@@ -12641,7 +12925,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.faces.inset",
-            binding_hash="sha256:0013707989daed85280e4a93e5ac9151910449aa6d6d90f5e7dc9f6515ac4e70",
+            binding_hash="sha256:84aaf35f04a51d79a06f0a8d907c9b2ba1d2dc818f468b970241c0838b136c8e",
             namespace="mesh",
             method="topology_faces_inset",
             parameters=(
@@ -12688,7 +12972,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.faces.offset",
-            binding_hash="sha256:11c64b4c9593c6ade1e1026fcd0db43eb85d88f135683ab7916fce04084e1206",
+            binding_hash="sha256:77eb79c592e7660a53fb649b9cfac92d435ddc94cc347cf54ba7260d73fdffbb",
             namespace="mesh",
             method="topology_faces_offset",
             parameters=(
@@ -12735,7 +13019,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.faces.push_pull",
-            binding_hash="sha256:0474d98b9dc3d15e48ebd0d76e237a03f99f8f61a565dfe4a0b03959385c4ccd",
+            binding_hash="sha256:2881a0b7522e4326dc20fe80f0c4cc1a7b4cef3103cfd240d1928206dc92fdc7",
             namespace="mesh",
             method="topology_faces_push_pull",
             parameters=(
@@ -12788,7 +13072,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.holes.fill",
-            binding_hash="sha256:691ce5e7230d0761085dcc76615ab8e3d467a1643d7bd8072c4518653876da16",
+            binding_hash="sha256:60265b7de2185ba689dfc6c69343151f562a38c18e6061c67007c106f6f4df7b",
             namespace="mesh",
             method="topology_holes_fill",
             parameters=(
@@ -12823,7 +13107,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.mesh_cut",
-            binding_hash="sha256:1aa0e44c972bb7eedac805bab58cb3cec2fa22e7d1c0a2f0147e24eb6923c1e9",
+            binding_hash="sha256:78877338647a604e9d81b1fff527846c82df4a7dde0ab5acfe3aa314dc6757f6",
             namespace="mesh",
             method="topology_mesh_cut",
             parameters=(
@@ -12882,7 +13166,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.mirror",
-            binding_hash="sha256:e7754354fbf0d832c4b4929b6d2f25cc3f0f0f00d8266403ebc2a3a6947dd396",
+            binding_hash="sha256:822f2208c1d70e87f312dbf389b1f02312d04eadf17d0aae05e5b0804e2add96",
             namespace="mesh",
             method="topology_mirror",
             parameters=(
@@ -12929,7 +13213,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.plane_cut",
-            binding_hash="sha256:14dd09ff028cbc0f41b6013ce7840b51963db306a18960576e479a955ef7354d",
+            binding_hash="sha256:081c56c7fc590818879d9db6d91cda131a1ea7e343f31a926658c6beec626706",
             namespace="mesh",
             method="topology_plane_cut",
             parameters=(
@@ -12976,7 +13260,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.remesh",
-            binding_hash="sha256:09417e8b54e79f1b8de227af8ec546ed7519e7e8df12e6e3c7f481ddb2201f92",
+            binding_hash="sha256:b911f6fbbaf652ae571d044f2d988ae3ee839a023e0aecc3d6c24803bc4f1729",
             namespace="mesh",
             method="topology_remesh",
             parameters=(
@@ -13029,7 +13313,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.simplify",
-            binding_hash="sha256:48cb07140c78f39b98c5729e6753580e81bed6b426fbf587f045dea0cf0379ec",
+            binding_hash="sha256:8de5300367854b56607e7f93efc58360b06ef944243e542ea4596c311937a53d",
             namespace="mesh",
             method="topology_simplify",
             parameters=(
@@ -13070,7 +13354,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.subdivide",
-            binding_hash="sha256:1640d3e4a61df7a4281af1ae0c8966c25d3a4e2667f6ef53ff1d4dafb46159db",
+            binding_hash="sha256:6aef2333d718d834e0de95328d529161965a350619b381cad36333af66aece57",
             namespace="mesh",
             method="topology_subdivide",
             parameters=(
@@ -13105,7 +13389,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.trim",
-            binding_hash="sha256:22ff6acfe9142f130962ab4e807845785f3f0c4f51f56f197955fa069f837312",
+            binding_hash="sha256:11d048e6c1561923e3f30c5eb6d4a3e8f7291a4b77537b74f2404e3acacf8794",
             namespace="mesh",
             method="topology_trim",
             parameters=(
@@ -13164,7 +13448,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.topology.voxel_boolean",
-            binding_hash="sha256:72c7d20d4362b57e47f51fe84c3e0083c90b2fc985baab425c1acd86045595e7",
+            binding_hash="sha256:6fc3936c86f94ca82b2c928754f3c6c05b491e606ca25b43de489083d810ce6b",
             namespace="mesh",
             method="topology_voxel_boolean",
             parameters=(
@@ -13229,7 +13513,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.transform.bake",
-            binding_hash="sha256:00d848939886752ac0bd6a716f5bfa340e568bd9a0f43b3ef9e12a32a755bb1e",
+            binding_hash="sha256:e76df729a009b2dd2eb9fe9e63772644a76938e6cb62687076e9ce89164d52e9",
             namespace="mesh",
             method="transform_bake",
             parameters=(
@@ -13264,7 +13548,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.voxel_grid.apply",
-            binding_hash="sha256:4db44a29632c296ead66d97c7222020da5d110b6c9beb2c4193a3ece57e08564",
+            binding_hash="sha256:dd726a08de1498177080cb778ac5541c398b62931c85894be1a4e62876bd21dc",
             namespace="mesh",
             method="voxel_grid_apply",
             parameters=(
@@ -13311,7 +13595,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.voxel_grid.session",
-            binding_hash="sha256:99edcf22eb94d749faef9d7973802d8f3313b8b43eb3e826cd954081d4b5fb89",
+            binding_hash="sha256:4bf01305e0fa9e8c50cc296bc14340c4d11e658fde2637310e90ec6965511593",
             namespace="mesh",
             method="voxel_grid_session",
             parameters=(
@@ -13406,7 +13690,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="metasound.graph.compile_settle",
-            binding_hash="sha256:55d9d3250bebaa893edfe9f890ebdb978e1c745c4f2a3a87712a7eb53e14a9ec",
+            binding_hash="sha256:7fe36568429f5cc7702c91455fa5e4c47d45f5b1c875d69a4d7bb6f8235e6ab9",
             namespace="metasound",
             method="graph_compile_settle",
             parameters=(
@@ -13435,7 +13719,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="metasound.graph.default.mutate",
-            binding_hash="sha256:4626b5d4dfebd65fa9a1b387a0a191fe94dd027cf8e47fb78e234a0a42018a15",
+            binding_hash="sha256:10c6a17a00dd14edf2e574b50ec23727f1d2c5a866b181f016a68fe09b4dc5ec",
             namespace="metasound",
             method="graph_default_mutate",
             parameters=(
@@ -13482,7 +13766,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="metasound.graph.interface.mutate",
-            binding_hash="sha256:e910bdfeb26d2bbf94c1e4227ab617f2d9f39ad2ec8dc19c6293477014e85a7f",
+            binding_hash="sha256:7dbc72e5ec176c22ebbfa956f0f123369155dac0918256ed82754d5265325894",
             namespace="metasound",
             method="graph_interface_mutate",
             parameters=(
@@ -13505,7 +13789,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="metasound.graph.link.mutate",
-            binding_hash="sha256:6d354114b9621827817d62430e2381a371087c0746c2dc7c4c31e876fd2cd4a8",
+            binding_hash="sha256:3c2d7e4e8f368e3c565060c2b7147d5746f07bdff8aeac226d5e92b0a21c4125",
             namespace="metasound",
             method="graph_link_mutate",
             parameters=(
@@ -13528,7 +13812,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="metasound.graph.node.mutate",
-            binding_hash="sha256:df16d8362e83ee6b5c29e88c093e71414b01866e47ce41cc3393471144bd68b8",
+            binding_hash="sha256:0e90076e2c0e3d3a7d3b3e7ab8e51a4e6643f459be3b03476b940c22e86157d0",
             namespace="metasound",
             method="graph_node_mutate",
             parameters=(
@@ -13551,7 +13835,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="modeling.actor.mesh.replace",
-            binding_hash="sha256:109691c674b438cf7a3697191d1d0fd78d74765862afd712a724d141b82ef540",
+            binding_hash="sha256:c637285768168750f1f8c9b43f85e6dc1a7962867ee6f22a33efcb500fb3b1fb",
             namespace="modeling",
             method="actor_mesh_replace",
             parameters=(
@@ -13580,7 +13864,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="modeling.asset.material_slot.remove",
-            binding_hash="sha256:eb91efab83586601733916cb2c8d5894124491bd698bd0e2ce4e1be4086ed8e4",
+            binding_hash="sha256:7f734663f00bd46e47b6fd030a4afd4b3e5c24956bad92016c9077390a1750f5",
             namespace="modeling",
             method="asset_material_slot_remove",
             parameters=(
@@ -13609,7 +13893,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="modeling.voxel.bounds.remove",
-            binding_hash="sha256:a166a0123600c72494c708b4da85ad3c5e8b348d30403df44820ca0561c9bc26",
+            binding_hash="sha256:793424e520536a1ce46632257561db557c30fb6728b7d4fbc491c95e32cfe9a1",
             namespace="modeling",
             method="voxel_bounds_remove",
             parameters=(
@@ -13680,7 +13964,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="niagara.asset.duplicate",
-            binding_hash="sha256:79ed82bd8da201d5b7f46be462e2412df1acd73d2d52192f29dc291a8d548a72",
+            binding_hash="sha256:be66e08602b42e2419cd2b4b80b10ff9dbfcff1aca6fe280f15ed4abfdee9b68",
             namespace="niagara",
             method="asset_duplicate",
             parameters=(
@@ -13703,7 +13987,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="niagara.compile_refresh_settle",
-            binding_hash="sha256:2bee4970990b499edbe221203e876f46c0ede84bc2fe99151c27847ec696861b",
+            binding_hash="sha256:eaadd5f125e7b94b7b7fd5daab987ebe922ac7609ad83367b897eb61e764e315",
             namespace="niagara",
             method="compile_refresh_settle",
             parameters=(
@@ -13720,7 +14004,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="niagara.compound.apply",
-            binding_hash="sha256:ed15c256adf236faa01956ee420422b8144562aa40540bc925ba7cb197672260",
+            binding_hash="sha256:fa5e2ff9b1593ff27df6fda42cbadff31941468c65c479513adf1862923d113f",
             namespace="niagara",
             method="compound_apply",
             parameters=(
@@ -13767,7 +14051,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="niagara.emitter.asset.create",
-            binding_hash="sha256:44040363152c6e10007aaa09c6252ea54c1449c768a7569f99f8e501ef52227c",
+            binding_hash="sha256:f28046aad479ec3dce5cbc6ec45a6758e11796725426f10b8c459d4b43344219",
             namespace="niagara",
             method="emitter_asset_create",
             parameters=(
@@ -13796,7 +14080,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="niagara.module.candidates",
-            binding_hash="sha256:1181e867d319f3be7ad6a82a2e7f25d3b7829b731cea1fedf50cfc551c1e0466",
+            binding_hash="sha256:71707734fbcf3fa15967143f2bf95fc0bbd9d2d2cb0466c56b7d3917b1158210",
             namespace="niagara",
             method="module_candidates",
             parameters=(
@@ -13810,6 +14094,18 @@ BINDING_CATALOG = CommandBindingCatalog(
                     name="target_usage",
                     wire_type="string",
                     required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="target_usage_id",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="emitter_handle_id",
+                    wire_type="string",
+                    required=False,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -13837,7 +14133,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="niagara.renderer_event_parameter.apply",
-            binding_hash="sha256:941159e5a1d68584f7ef367a17a7b4dcb89591832da4a4bd69928d725cab7090",
+            binding_hash="sha256:ac4011feb960862734b4bbc0b78ee005d44e063f3b586d0f9af588aef65bcd17",
             namespace="niagara",
             method="renderer_event_parameter_apply",
             parameters=(
@@ -13884,7 +14180,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="niagara.stack.issue_fix",
-            binding_hash="sha256:c56767887d0b9fb0f77ab1e2319e8deea49da721306306034cd0d1a737394a83",
+            binding_hash="sha256:711fe22e9a0b881668add6bbba912517a8394c3375f4f5980619367355fddad7",
             namespace="niagara",
             method="stack_issue_fix",
             parameters=(
@@ -13919,7 +14215,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="niagara.stack.reorder",
-            binding_hash="sha256:ce178c79a9c492e4d78599216d0cc4f8444933148748478f1bddd93a40e1692b",
+            binding_hash="sha256:209fe5c904fa4552ac4f03dda56db2fd61f1caa152af3dbbebc43b9c98670b40",
             namespace="niagara",
             method="stack_reorder",
             parameters=(
@@ -13960,7 +14256,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="niagara.system.asset.create",
-            binding_hash="sha256:c07960961cfea4c21893b4300fa73fd6af81bc3faf858ef3bb52836b6b9b50d2",
+            binding_hash="sha256:81cea69505c20496d0970f707b88ec94fe3fdbc0ccd81d21bccd0f78e9fd6d3b",
             namespace="niagara",
             method="system_asset_create",
             parameters=(
@@ -13989,7 +14285,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="operation.cancel",
-            binding_hash="sha256:1ecd63b3075bed22fcc4ef4af35c5636d9bc77b9466e1ba19b105180d6f6ee2b",
+            binding_hash="sha256:b23ca8c4479ae1e3e6004fbdb589bbb76c5294e331b3edd57d94ef2a5bbbb77a",
             namespace="operation",
             method="cancel",
             parameters=(
@@ -14012,7 +14308,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="operation.plan.execute",
-            binding_hash="sha256:44c2cbc9a8e7935fc8261005153b072835d51f47ce8f3969434a4482445cb1c5",
+            binding_hash="sha256:755be6ae2d9afe2ae4bd64111a4cdc39915de1340b32cc905a77e65cfacc8369",
             namespace="operation",
             method="plan_execute",
             parameters=(
@@ -14041,7 +14337,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="operation.receipt",
-            binding_hash="sha256:749b6a3c99830f45a5fc26650741039d1778091db825264a896f3baddf8b6cc5",
+            binding_hash="sha256:4d7aa549e0c14db34849fe1956a076080cdb84eb5c05019ac0f1b0b099e6842e",
             namespace="operation",
             method="receipt",
             parameters=(
@@ -14058,7 +14354,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="operation.reconcile",
-            binding_hash="sha256:09f66735183cd63160f6fb822f73bd72cc12115a1629e766180a259afec10fde",
+            binding_hash="sha256:f03eefc336366c65be663870777f504b5e62c2f0f8a5de6bc3d7c9f6c4048d40",
             namespace="operation",
             method="reconcile",
             parameters=(
@@ -14081,7 +14377,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="operation.release",
-            binding_hash="sha256:5a3c53095b0b7ad3357df0724faaaffed355d381a8950bd48a8a6066a40b17f2",
+            binding_hash="sha256:36e377a58fda4063d9505222aa73f2e9cda72c4b1a2cd7718dbe1162ea872df5",
             namespace="operation",
             method="release",
             parameters=(
@@ -14098,7 +14394,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="operation.resume",
-            binding_hash="sha256:62c99562f5a3cbfccb456b49d63e96e5d324a70e11b4ac4a4b7a0a169e43b794",
+            binding_hash="sha256:c78b6fa0276eb846044af9ec8c14dac40011490aa542c8ba8f909bc9dfc62ca6",
             namespace="operation",
             method="resume",
             parameters=(
@@ -14121,7 +14417,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="operation.status",
-            binding_hash="sha256:01d6476f6aad8537079dd8421d3d8165db690ea897ce32c695c388835e670dba",
+            binding_hash="sha256:e63679d14a63f648d034747c9f82b35dffe9d137446fe3f1d19686f10458026a",
             namespace="operation",
             method="status",
             parameters=(
@@ -14138,7 +14434,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="pcg.component.apply",
-            binding_hash="sha256:5b9c39b530c9419a34ec2147acb16f2d0113c6f99840bbdee5d8a9e5bfddf8f2",
+            binding_hash="sha256:90b38ba15176bc0f297ce342c36ee026c7a514107b80ba3a7646f43bca4fc59e",
             namespace="pcg",
             method="component_apply",
             parameters=(
@@ -14167,7 +14463,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="pcg.component.world_binding.apply",
-            binding_hash="sha256:1c0946b756245b6589a8fbae96ddd7938d6c253b715f81040e6fad3a0702a24f",
+            binding_hash="sha256:2b87d1079945d597c59e030be0261dc1bb8d04317bc983c81df4084bb5486105",
             namespace="pcg",
             method="component_world_binding_apply",
             parameters=(
@@ -14202,7 +14498,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="pcg.data_asset.apply",
-            binding_hash="sha256:3ff02049506fc10dd60b4d3608372c8b8d4c002d1065bfbf5f9f933362e53265",
+            binding_hash="sha256:97f9adba988bb9de017e553fae8e9ee4916acdaeb6d7062256e4b309dbed19dd",
             namespace="pcg",
             method="data_asset_apply",
             parameters=(
@@ -14243,7 +14539,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="pcg.data_asset.create_from_level",
-            binding_hash="sha256:8d004e20770c32376b1d75cc6349f7f0c56687feabbc9e0533f77ee5f83522fb",
+            binding_hash="sha256:a90cdd2764117936938604cd92712c47b34cf53109fd9f4b173311d47b70700b",
             namespace="pcg",
             method="data_asset_create_from_level",
             parameters=(
@@ -14272,7 +14568,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="pcg.generated_spatial_data.read",
-            binding_hash="sha256:d22c39cf57fe791bf97c89c4c21542df4372ed475d8bd6952b93f9c309e1054c",
+            binding_hash="sha256:30a2c20e6b8fe3625dc597b7e5dd60ef1f1d2a158569e0d5aa58fa453b7d9bd3",
             namespace="pcg",
             method="generated_spatial_data_read",
             parameters=(
@@ -14307,7 +14603,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="pcg.graph.apply",
-            binding_hash="sha256:18656cde12f0a8043e1c608ca0a7df57e9165b119878719956e427e8eca89251",
+            binding_hash="sha256:5c427b90feda6b6ea8d2d1ef73957fd81c7d8f7540c58f06193a9cffbefb295a",
             namespace="pcg",
             method="graph_apply",
             parameters=(
@@ -14330,7 +14626,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="pcg.graph.asset.create",
-            binding_hash="sha256:3e33a1676f758b46298cf911925a237fbbb0f692bff96fc4c6eb4d900012d035",
+            binding_hash="sha256:970a97470117493fd6112dea539e0b403a9ae330dba9f08443fe92bce5fc72aa",
             namespace="pcg",
             method="graph_asset_create",
             parameters=(
@@ -14353,7 +14649,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="pcg.graph_instance.apply",
-            binding_hash="sha256:865c11d49bf9a4ee9839441f8abee5b53b28882172bc62f91ff8de40b7d2e191",
+            binding_hash="sha256:14a033a2ccc200de62d99f6c5c098943ee92c4a64f0d01a696ea646907e3877b",
             namespace="pcg",
             method="graph_instance_apply",
             parameters=(
@@ -14382,7 +14678,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="pcg.graph_parameters.apply",
-            binding_hash="sha256:c7f5bdb2ce728e34a77c255042385efb2a4dffd12730651cf44d238239968d19",
+            binding_hash="sha256:84b0b05d9e0f9b9f6bdf1a206eed1d591b64ff493ff8ea91fb8d7e7fde0bce02",
             namespace="pcg",
             method="graph_parameters_apply",
             parameters=(
@@ -14405,7 +14701,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="pcg.node.candidates",
-            binding_hash="sha256:2a1115d4ed60a9b1139278a0bd17efa6696d5a70c7b554e8f05462777f7267d3",
+            binding_hash="sha256:92520b44d48859b457e8fff3f104aa6057443193f75324b8933cfe77d9a44214",
             namespace="pcg",
             method="node_candidates",
             parameters=(
@@ -14417,6 +14713,12 @@ BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="query",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="id",
                     wire_type="string",
                     required=False,
                     nullable=False,
@@ -14440,7 +14742,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="pcg.partition.spatial_state.read",
-            binding_hash="sha256:3f99330341f5a76d81adc40116a08e0478f228469fc9016bc946ba4ad3644028",
+            binding_hash="sha256:f9827b1aa4fe8445ca4b5bf912c6870e00066626cc8e5ae697169cd2c8ce2b13",
             namespace="pcg",
             method="partition_spatial_state_read",
             parameters=(
@@ -14475,7 +14777,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="physics.asset.structure.replace",
-            binding_hash="sha256:508561028d8e68b64ef2490832f569d33170cdaf70b8dd21b1159629d8a1f454",
+            binding_hash="sha256:bb0d75993b1a118ff8218330df1eb8bfab966781542207190e308709167588df",
             namespace="physics",
             method="asset_structure_replace",
             parameters=(
@@ -14510,7 +14812,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="physics.constraint.update",
-            binding_hash="sha256:5c5c67c13d23b0d3bc921a5a9c7992cb6ac980400964afcac863c89d14e70da0",
+            binding_hash="sha256:1af9598f9570bc75b6285fccc4967fa99faa51187a286627248e9ffea6366594",
             namespace="physics",
             method="constraint_update",
             parameters=(
@@ -14545,7 +14847,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="physics.material.update",
-            binding_hash="sha256:3ebbec2c81a8f5dd9d89b4836130db1ecf564efbdb9f4b119179d7d02b1449c3",
+            binding_hash="sha256:ad0c57ac9a095de1945e2042244963a2cfd28d8309ac4caa30cd4177dec67bb9",
             namespace="physics",
             method="material_update",
             parameters=(
@@ -14580,7 +14882,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="physics.simulation.probe",
-            binding_hash="sha256:5ec87aa66abb4007be84840af717fe29c67e01fafd3f00dcbc865ae447052f6a",
+            binding_hash="sha256:8bf96196e43bf8b84d11e25175491eca77fef3e1311088ecfb14a8bad2c4f155",
             namespace="physics",
             method="simulation_probe",
             parameters=(
@@ -14615,7 +14917,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="project.platform",
-            binding_hash="sha256:39310c674fdc95e7180906fc4d2296f2e2984d7ef243765e6d98da2927fbc28e",
+            binding_hash="sha256:e1ac3ba82a1487163a6cad2fdb28b2ec586ccae8c20f8a92913ef3eb7c591d3f",
             namespace="project",
             method="platform",
             parameters=(
@@ -14644,7 +14946,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="project.settings",
-            binding_hash="sha256:a962de3f7ab01439288a414576c87b27062d7f7f2d4680b4425206fef7f10791",
+            binding_hash="sha256:8ec7c9f7077431d498bbd1adc68b41162f70f591f5941304beeee10812acb004",
             namespace="project",
             method="settings",
             parameters=(
@@ -14673,7 +14975,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="project.summary",
-            binding_hash="sha256:abc22e1c26892758d80b64e25d0ff1d7a20fdcdd0e7d55c844918c581a6edcf3",
+            binding_hash="sha256:10ebb53f6d7beb11d1ec060f1228051be3ebe5aaaed53ff3ea28994536101d80",
             namespace="project",
             method="summary",
             parameters=(
@@ -14702,7 +15004,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="project.validation",
-            binding_hash="sha256:0d0c867beaf6ec8180060843dae28fc1e5a65fe0c3b71b1e87c3525238f78d46",
+            binding_hash="sha256:349f6af74650ce90f1e291515fd877a06a30f81150ebed291519a82f17643ad9",
             namespace="project",
             method="validation",
             parameters=(
@@ -14731,7 +15033,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="query.calibration.read",
-            binding_hash="sha256:3bac8ef382dcd4d6a4c631d13de0ea918569f4cb70fefee3ef08de16c30d1349",
+            binding_hash="sha256:1f6da25af9341be4d0530f3174f529a0e99046dadb3b6b3fa652777bc374845d",
             namespace="query",
             method="calibration_read",
             parameters=(
@@ -14766,7 +15068,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="query.command.detail",
-            binding_hash="sha256:e40bc15770b133639104ab89bb09de77c2a19f3a84985aafd02713c3289f2765",
+            binding_hash="sha256:8cbf17cb04da2eb3dc8c426a302b00b9a37985317ac7baa6fb99fc6ed7adeaac",
             namespace="query",
             method="command_detail",
             parameters=(
@@ -14782,6 +15084,12 @@ BINDING_CATALOG = CommandBindingCatalog(
                     required=True,
                     nullable=False,
                 ),
+                CommandParameterBinding(
+                    name="variant_id",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
             ),
             min_wire_version=1,
             max_wire_version=1,
@@ -14789,7 +15097,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="query.command.search",
-            binding_hash="sha256:5e625c558e8ada9eb4e18b1491d31c76c2f4335c52120345ed483e89563787d8",
+            binding_hash="sha256:0c659dc3a73242f61f516bc1483c73b9c424d863d9dc158acc127ffcd2757b64",
             namespace="query",
             method="command_search",
             parameters=(
@@ -14818,7 +15126,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="query.content.search",
-            binding_hash="sha256:0e6693e7b5c5a9628675f13cacb61f6728a2d73f691858a6ec5d4b6459aba01b",
+            binding_hash="sha256:6f67f9ee61421d28c1008881d5123e4afbaaef516ff56e7c8ec1e5498bbf69d0",
             namespace="query",
             method="content_search",
             parameters=(
@@ -14883,7 +15191,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="reference.asset_apply",
-            binding_hash="sha256:0d4a782d8c0174a8ef81edb26bb62bff59e9fa83d098b05333793a4d0c83c088",
+            binding_hash="sha256:d7cc5e7ee764e946322a893f7596f4724866e2cfdb4133a64b2c4f16d722befe",
             namespace="reference",
             method="asset_apply",
             parameters=(
@@ -14912,7 +15220,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="reference.asset_read",
-            binding_hash="sha256:75bddca4ce64d3c49d0d87b254bdb40457900336f9b1e79fdc4d829f1398dfdd",
+            binding_hash="sha256:507bc174a585020b803e6fbec519f05f6f794e7cc9599eb2511e306414a06412",
             namespace="reference",
             method="asset_read",
             parameters=(
@@ -14941,7 +15249,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="reference.origin.resolve",
-            binding_hash="sha256:24d83481ae5d6f6bb0f3064d1aad31732ec25a7dc9f30c348c28d8e0f59d6090",
+            binding_hash="sha256:4c4b72fa373a8b51a5b93ff44d72367eab62727356101693de62928653117134",
             namespace="reference",
             method="origin_resolve",
             parameters=(
@@ -14970,7 +15278,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="rig.control.bake.animation",
-            binding_hash="sha256:028306f82acc6e306c3e02fce562ea50f64f12d5411eec9ec57d056a04c0e4e1",
+            binding_hash="sha256:7551e853a4676d242e0712d75078190543ef5a011ecda4885939c2226d224d48",
             namespace="rig",
             method="control_bake_animation",
             parameters=(
@@ -15005,7 +15313,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="rig.control.bake.controls",
-            binding_hash="sha256:45f1042d61532cd0955f1bd3ce7a77dfff7dddad4e572a09ff0e999265e6ce07",
+            binding_hash="sha256:1e6d0f713cd0be9f3f951cf639254cb24212d5201211f38d63ad3f85980ca181",
             namespace="rig",
             method="control_bake_controls",
             parameters=(
@@ -15040,7 +15348,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="rig.ik.definition.update",
-            binding_hash="sha256:c4f67ddaf04a0587c2e46f15667ff98598eac03141a56a3ede02f794c29c1433",
+            binding_hash="sha256:80e06480ab979ac904d100c9a5fb2417ffae9242eb8bed9a47e1dc7f05b24e6d",
             namespace="rig",
             method="ik_definition_update",
             parameters=(
@@ -15075,7 +15383,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="rig.retarget.assets.generate",
-            binding_hash="sha256:74e2abf121755fe9f6bfa3ecacad766f706985698ced5fba073954b94b38b58c",
+            binding_hash="sha256:c85b6a316400910bafa03906f6b4bfece6a267a40abd4bec43920d0a03aae200",
             namespace="rig",
             method="retarget_assets_generate",
             parameters=(
@@ -15104,7 +15412,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="rig.retarget.definition.update",
-            binding_hash="sha256:b3419ea84c92e29072884db431f86dae9ced8d358c3a0e3a505e44c67fa555ce",
+            binding_hash="sha256:ac035ad1bbb81afab171b6b3439722cf47382509f26ffd3c082e0068eec0d03e",
             namespace="rig",
             method="retarget_definition_update",
             parameters=(
@@ -15139,7 +15447,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="rig.retarget.pose.auto_align",
-            binding_hash="sha256:5d282e8719a6c12bee9dcb2d1276f028b155f4d4443eba56eb873aef0001d5cf",
+            binding_hash="sha256:8cf341db767e5e4bffd8ac47daeca7e50ed6f3a15d4214a184f0af291060e780",
             namespace="rig",
             method="retarget_pose_auto_align",
             parameters=(
@@ -15174,7 +15482,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="rig.retarget.pose.update",
-            binding_hash="sha256:103213eb02f23458ace453e7929afd0e95921b84489612f0bfc75c1740e63f1f",
+            binding_hash="sha256:5134bbcdc45c630199f4aab44643fbd9e62aa4a8a445f07dd726c616ac9ee8d8",
             namespace="rig",
             method="retarget_pose_update",
             parameters=(
@@ -15209,7 +15517,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="rig.skeleton.preview_mesh.bind",
-            binding_hash="sha256:c3bf16eed5078e46d80cf3d8d1d397776b52563de8ef2d73308d742199309d82",
+            binding_hash="sha256:9dfba4588cdc3b4c94042dbd9419ec86fdcbc0b3bd8ead2032938c972db21ed1",
             namespace="rig",
             method="skeleton_preview_mesh_bind",
             parameters=(
@@ -15244,7 +15552,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="rig.skeleton.socket.update",
-            binding_hash="sha256:f6326d2d8599a21bd17d7f7f6fb24fb5467f428eab477f8912888d9e500db579",
+            binding_hash="sha256:2246aeb239a9a0f8f01f39daa2da1d000323443c2bbec429a1d4d74c280c5837",
             namespace="rig",
             method="skeleton_socket_update",
             parameters=(
@@ -15279,7 +15587,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="skeletal_mesh.remove_morph_target",
-            binding_hash="sha256:42387c91e71eb0038f4d2400a42f19a27cc9141fbe0d1c8ce6786646638138ee",
+            binding_hash="sha256:43e4f4ac21c820d538a19362f95aac612a115f2657373a0770093f86be16f124",
             namespace="skeletal_mesh",
             method="remove_morph_target",
             parameters=(
@@ -15308,7 +15616,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="skeletal_mesh.remove_skin_weight_profile",
-            binding_hash="sha256:6bcd3d3ca2df2ebe5512778f4b13d174ec1f8b21047b14e0a53c3eedffa60d40",
+            binding_hash="sha256:9a14b1b2c12a646c8bd5905af3bb852c14e0b4e58daef3a3660a99307382afb9",
             namespace="skeletal_mesh",
             method="remove_skin_weight_profile",
             parameters=(
@@ -15337,7 +15645,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="sound_cue.graph.compile_settle",
-            binding_hash="sha256:7b93d1c5be1818c9fa72cb9831dd4c67ed5e006c2265033a5acfeb69938d26c3",
+            binding_hash="sha256:43bd7b32e0c65f0b5cb643088a0c81235346da15a0b0e9912f0021cc2db6fad1",
             namespace="sound_cue",
             method="graph_compile_settle",
             parameters=(
@@ -15366,7 +15674,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="sound_cue.graph.node.mutate",
-            binding_hash="sha256:39c194b8e91624919a68b19343efac0cf5616b0a072dcc9556ad8b6e3810b4db",
+            binding_hash="sha256:3ed271033d8fd906e694a18afe0ed22f31c9660ed5ac5306b8c826af335c2949",
             namespace="sound_cue",
             method="graph_node_mutate",
             parameters=(
@@ -15389,7 +15697,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="sound_cue.graph.relation.mutate",
-            binding_hash="sha256:2eea2491a3e26a92f37c088e04bade6e7f2a070edf9bcbe065ea204d95e0dbe4",
+            binding_hash="sha256:0624fec837223117100fb1f805e619cabf2a6edf63c691aac4f87a069e06d65b",
             namespace="sound_cue",
             method="graph_relation_mutate",
             parameters=(
@@ -15412,7 +15720,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="sound_cue.graph.root.mutate",
-            binding_hash="sha256:dd86eae918f4573483daeba2a018a26d320e742126026661548945875a523bc2",
+            binding_hash="sha256:d2a2a31f786e7d5c6ea5b0527b63a73e58b6b7e66e5b7683c903eb0a9571f14d",
             namespace="sound_cue",
             method="graph_root_mutate",
             parameters=(
@@ -15441,7 +15749,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="texture_graph.artifact.bake",
-            binding_hash="sha256:fd9ebb0adf667f930eb345febd3e315c420925d061080ad89edb6d55a02cb2f2",
+            binding_hash="sha256:4f1e4f3c3cf50df98e1cdc4b68432168dd3e89432e0e9bea7c33b4855223e132",
             namespace="texture_graph",
             method="artifact_bake",
             parameters=(
@@ -15470,7 +15778,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="texture_graph.artifact.capture",
-            binding_hash="sha256:7208eab37f925347aa1e05990b0aa95210ad89335b7a65a1ba62b277f2734cb9",
+            binding_hash="sha256:f206bea7712bb6431ab9b2f3745ba1aa47c9289a1604279d420eb267b9cb3979",
             namespace="texture_graph",
             method="artifact_capture",
             parameters=(
@@ -15499,7 +15807,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="texture_graph.graph.link.mutate",
-            binding_hash="sha256:66a278e1d9338ba40f8db312187e390b9106af80a0a791fdd23e1afd9336e089",
+            binding_hash="sha256:8378346234d466ee8c31237df6e4c7f2fa3778883ec5f91611f3a0c539d23980",
             namespace="texture_graph",
             method="graph_link_mutate",
             parameters=(
@@ -15522,7 +15830,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="texture_graph.graph.node.mutate",
-            binding_hash="sha256:51965aec401fb7c374afd355029d5bc2e7df6cd4fc604cc352fbf7c5cf082c05",
+            binding_hash="sha256:4023a585b76ea86d19b90a8f2bd9af1d02ef4072fad28a5a72da9d17b1cd092c",
             namespace="texture_graph",
             method="graph_node_mutate",
             parameters=(
@@ -15545,7 +15853,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="texture_graph.graph.parameter.mutate",
-            binding_hash="sha256:8fc062d0e03749922d91741fe3f0bfadfc4ca8eb98d975b239af9d9b16785b10",
+            binding_hash="sha256:67bae5ec5ad50889fcb8177bbe92b1f2dbf1394c33ddd54020fab084014f59d8",
             namespace="texture_graph",
             method="graph_parameter_mutate",
             parameters=(
@@ -15568,7 +15876,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="texture_graph.graph.validate_evaluate_settle",
-            binding_hash="sha256:1c4e2bcadfe5a76e103dbb50124ad20c029b2fb71bdb198678d5b1e8625550d0",
+            binding_hash="sha256:9be0ac49ac19a0cf1394f61fa04be6a74f1a64fa25fc8e637388cdf46dab475a",
             namespace="texture_graph",
             method="graph_validate_evaluate_settle",
             parameters=(
@@ -15597,7 +15905,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="texture_graph.runtime.probe",
-            binding_hash="sha256:83b1e0bb6a31b110e2bf500e2469458e436f11a17a14477875344a32f1e07433",
+            binding_hash="sha256:87f66b6baff704549a13690d3060590a89d37c2261007b2940ad2335aa916856",
             namespace="texture_graph",
             method="runtime_probe",
             parameters=(
@@ -15626,7 +15934,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="timeline.sequence.create",
-            binding_hash="sha256:d759133c3d9049c9360b56d0b8fa5f06c139296cf51a59ca281fdb8c0453b896",
+            binding_hash="sha256:bf97a1af6903fcb840984d9483330ad72e21db424d8ad7a06f2b5b5cd4e083e5",
             namespace="timeline",
             method="sequence_create",
             parameters=(
@@ -15655,7 +15963,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="timeline.sequence.read",
-            binding_hash="sha256:f34bb4235c24ccb37f413dc48cad494a613c9bbc9858f14466dd2c59353df496",
+            binding_hash="sha256:bc882c54ce7e75a729a082b60556bf04db0d7fc43768a42fb4a0a9a47cdc3fe2",
             namespace="timeline",
             method="sequence_read",
             parameters=(
@@ -15690,7 +15998,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="timeline.sequence.settings.update",
-            binding_hash="sha256:23fb13e38e48d55c84827028ee7c3b27c532c2b5878e8cda6f707a05e6ca9269",
+            binding_hash="sha256:387f5ee146bf9ddf5f160ec20536465ba143418fdb863fc616d97645ab846378",
             namespace="timeline",
             method="sequence_settings_update",
             parameters=(
@@ -15725,7 +16033,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="timeline.sequence.structure.replace",
-            binding_hash="sha256:9d9ba71e5f2dd710badaef01c599898f179978110e48cd48d3a38e3c938c8e5b",
+            binding_hash="sha256:db2d8425bdf07e942d02ccf138a7870df813d5ee42bdce55163bf9c12fe5a57f",
             namespace="timeline",
             method="sequence_structure_replace",
             parameters=(
@@ -15760,7 +16068,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="timeline.widget_animation.read",
-            binding_hash="sha256:b93a77ee478fca8cfbbbe7ca4521a16befdfd0eac666e63dbd2201c54a12723a",
+            binding_hash="sha256:cb8a0c6163334624fc36745c1bcfa99d7eaaabf5a3fa6f78b5a5871fd57297c1",
             namespace="timeline",
             method="widget_animation_read",
             parameters=(
@@ -15795,7 +16103,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="umg.asset.create",
-            binding_hash="sha256:50057ea65d4f0b50d2c523eb55a1d976e3a4232917ade1d3ebdb464c67139a30",
+            binding_hash="sha256:9104582047f13134c6300e363da15e290ec6790d7c0920cee95d6aaa6590faca",
             namespace="umg",
             method="asset_create",
             parameters=(
@@ -15817,8 +16125,49 @@ BINDING_CATALOG = CommandBindingCatalog(
             status="active",
         ),
         CommandBinding(
+            command_id="umg.widget.candidates",
+            binding_hash="sha256:9cf442545efd4ae6f6494f7863f69292d25b15e454329383f917aeabf8d6e40c",
+            namespace="umg",
+            method="widget_candidates",
+            parameters=(
+                CommandParameterBinding(
+                    name="target",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="query",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="id",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="limit",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="cursor",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
             command_id="umg.widget.events.discover",
-            binding_hash="sha256:47a5e6b6f4e24d856d9521e2a3a0d480f28652be6f3cad018d034e4d686b6119",
+            binding_hash="sha256:07d6cb418bcfd3a837a03e13716c7a8a7ac024686bdf4d979ddf289c2252e213",
             namespace="umg",
             method="widget_events_discover",
             parameters=(
@@ -15841,7 +16190,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.actor.pick",
-            binding_hash="sha256:cd1a55cafa731168c5025b8ba1a558729493b2241bdb5eadba75f1a20c7829bd",
+            binding_hash="sha256:a84004ac93bb937ebca38b02c59d234b6280979caa8194c788211e8dfa24dab0",
             namespace="viewport",
             method="actor_pick",
             parameters=(
@@ -15876,7 +16225,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.actor.select",
-            binding_hash="sha256:bf4c48300886648fde81d1d84fa9530d7585aa79a88a094b1623fed760d0e8ff",
+            binding_hash="sha256:55d281f66f397906525cc9cf3dd206dbeb600a5addfa6528e2837f839725f63d",
             namespace="viewport",
             method="actor_select",
             parameters=(
@@ -15911,7 +16260,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.camera.frame",
-            binding_hash="sha256:9006f06a10335ba5bec5ef023971480020915011922b2cac528763d9f7151ee3",
+            binding_hash="sha256:014f0dd90f01e7df9366ba4ae6729d6c074bd181b2936303e85b30b3add9ff1d",
             namespace="viewport",
             method="camera_frame",
             parameters=(
@@ -15946,7 +16295,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.instance.list",
-            binding_hash="sha256:d562eff0df17039f64b1281725b417aaa92f50592ae8bb499cb24a6b80d506fb",
+            binding_hash="sha256:b1d8f0445c6c4fd81f699de1708fbe0cc48144dded5d7bc48f71aa168778913a",
             namespace="viewport",
             method="instance_list",
             parameters=(
@@ -15975,7 +16324,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.pixel_scale.read",
-            binding_hash="sha256:b9d3defaddf142ded971b241834b89558964e0b55d65184c80190fc383146674",
+            binding_hash="sha256:25b23c58b8091ce51a1bcfa221fd7229da2d99daa49d284d3fa3f3835e175696",
             namespace="viewport",
             method="pixel_scale_read",
             parameters=(
@@ -16010,7 +16359,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.ray.deproject",
-            binding_hash="sha256:0dc218b25c6b39f4d77af458b5c882f3192c51ce38fd52e2b711dcc7241582fb",
+            binding_hash="sha256:70929b299b18085401d802666efc4a3c6ba9cfa2102547822ea51e698310d5e8",
             namespace="viewport",
             method="ray_deproject",
             parameters=(
@@ -16045,7 +16394,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.ray.trace",
-            binding_hash="sha256:e4e0d7b12efbc87a2ef6d2e6e31572521f7db100a6e116563aecdf08a9270082",
+            binding_hash="sha256:e969b1ee5f111a74542c0835dd18784b252ffd78eacd51db66453f8b081c9bc4",
             namespace="viewport",
             method="ray_trace",
             parameters=(
@@ -16080,7 +16429,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.state.read",
-            binding_hash="sha256:b024c444bc69d92c6444e1eb47a0790abce3fd460cdda31e5cb5dd8889cbd646",
+            binding_hash="sha256:91d9234beca2a585bc95547252d5af4b5fba23e10502cdc0d042b82ac145d90f",
             namespace="viewport",
             method="state_read",
             parameters=(
@@ -16115,7 +16464,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.state.restore",
-            binding_hash="sha256:db6e8b4b225bb64429ec2cc58ee92c81118d049eb58c74c610e53bcf2cc37657",
+            binding_hash="sha256:3987a0a15a64df3c35887b9b10540ac3719b00e01d8f3a07927d5f352c24befe",
             namespace="viewport",
             method="state_restore",
             parameters=(
@@ -16150,7 +16499,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.state.update",
-            binding_hash="sha256:83f651eac09eed1fe369ec86ee3f08b380e620b17672b73849279a857c596320",
+            binding_hash="sha256:ebcbace7239c6366d8b97d112299fe488e50248ffac51a0c352a1fc99d170843",
             namespace="viewport",
             method="state_update",
             parameters=(
@@ -16185,7 +16534,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.view_mode.list",
-            binding_hash="sha256:a29bbbd21fc4e59fdd818c48062846cb020c30c5bca3624b313984be5919a4f9",
+            binding_hash="sha256:595b30688feecc7710d5f774df3182f7b00eb3758632aec041a65038f7b2bc92",
             namespace="viewport",
             method="view_mode_list",
             parameters=(
@@ -16214,7 +16563,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.warning.list",
-            binding_hash="sha256:8a7270d19817fa39ec5068ec6bb88af213dd9309cc1017cb2005b564f035ccee",
+            binding_hash="sha256:03b61d1a509cdc81d33fe3960617a3ef43b7541884a0197a01f4f55331d3a322",
             namespace="viewport",
             method="warning_list",
             parameters=(
@@ -16242,8 +16591,55 @@ BINDING_CATALOG = CommandBindingCatalog(
             status="active",
         ),
         CommandBinding(
+            command_id="world.actor.candidates",
+            binding_hash="sha256:87ebfad43ffe5aebc2b0d6d7e98a02a71e88bf5e1461b4229cb2d1e757c54afe",
+            namespace="world",
+            method="actor_candidates",
+            parameters=(
+                CommandParameterBinding(
+                    name="target",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="category",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="query",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="id",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="limit",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="cursor",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
             command_id="world.actor.create",
-            binding_hash="sha256:5b8dd511f014b63793d8b6e41dad99158c2ee7d3f42bb6ff76a900378dc3578a",
+            binding_hash="sha256:eb955df1a63eb48bdb993ab347dad171f00a53b384e173042e147612309dbf80",
             namespace="world",
             method="actor_create",
             parameters=(
@@ -16284,7 +16680,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.actor_components",
-            binding_hash="sha256:2def85c5ed7ae0f04219fa9d7f24aec58daa9c5a9d803fc236e8abd7af159bcf",
+            binding_hash="sha256:5e4cff01ac4d6b0717cb05a0426a63b892ed0d648429342f08c5f15f8b3b31d4",
             namespace="world",
             method="actor_components",
             parameters=(
@@ -16319,7 +16715,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.actor_hlod_layer.update",
-            binding_hash="sha256:e6116202b148689b84adb2623977fe5aa5a39c3b05bef4b676e20b801b64c064",
+            binding_hash="sha256:c9e94f837ec7e27359fc3218ee607f936ac4944a7e014d03d5386102866fccb8",
             namespace="world",
             method="actor_hlod_layer_update",
             parameters=(
@@ -16348,7 +16744,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.actor_streaming_policy.update",
-            binding_hash="sha256:8883349bb580b5573234b41e437ec47e6caa3acfd55d94bc9944a30bbcd936aa",
+            binding_hash="sha256:4312d1ce37ea6a910705ad4686a14ca2dace055c043f1df540b92a8689640829",
             namespace="world",
             method="actor_streaming_policy_update",
             parameters=(
@@ -16371,7 +16767,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.actors",
-            binding_hash="sha256:177fc9deae0b2f9935cb8877d2197414945a413e40e1a30fa09d7ec5a8796947",
+            binding_hash="sha256:3a8d1a59729882625381be10d76214a642a565e57eff0fa05b889d22220b923f",
             namespace="world",
             method="actors",
             parameters=(
@@ -16400,7 +16796,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.capsule_path",
-            binding_hash="sha256:6048373d2caa701640eb578029b19c0c963d891ec160f0c1d4ff7cba34756335",
+            binding_hash="sha256:ef002a14a763838f678b4ccd3515ca3ae2fa34131b6ebde02a117d357bde1037",
             namespace="world",
             method="capsule_path",
             parameters=(
@@ -16429,7 +16825,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.capsule_sweep",
-            binding_hash="sha256:49c67baa586302933ecefc4aacdde50df59437e83a38b83c89125cef163292fd",
+            binding_hash="sha256:76b3b66904283828169444add9c2e56a0122d97be8f291852815396922b9349a",
             namespace="world",
             method="capsule_sweep",
             parameters=(
@@ -16458,7 +16854,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.content",
-            binding_hash="sha256:7190446e9dab341369c38bc61567f86b67d537f53811e316335509eb8988ee6c",
+            binding_hash="sha256:5c19ab8b1e5e946af17a2642d322611d2d9817202147749e0d940195ccdb3bf2",
             namespace="world",
             method="content",
             parameters=(
@@ -16487,7 +16883,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.data_layer.delete",
-            binding_hash="sha256:370ae6c2ed45b661e11954788c5a87384ad36afc24a1828b7500640bb6c555c4",
+            binding_hash="sha256:c2d52aa8dfd72cbe68b5ada3474908a1b03d6ea0d4a30bdcdf69bd6f9a365f9a",
             namespace="world",
             method="data_layer_delete",
             parameters=(
@@ -16510,7 +16906,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.data_layer_instance.create",
-            binding_hash="sha256:0a4b003217733c692cf9405303313413d77893ed589f4d7cbe7d9a37b9114057",
+            binding_hash="sha256:ce712ff5e2df3dd62934bc24b89909c0f6fa0b6d3269c452a57c7b3e30efc84f",
             namespace="world",
             method="data_layer_instance_create",
             parameters=(
@@ -16551,7 +16947,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.data_layer_relation.update",
-            binding_hash="sha256:b8815e5fa0ae2ec1c3a7c65e35f6fc23e0c1587c16c6a04bb3ccfe4125de232f",
+            binding_hash="sha256:94b216f5e740ca1c4452d7962785309d2098442106c175dde56d17a01c991f0d",
             namespace="world",
             method="data_layer_relation_update",
             parameters=(
@@ -16586,7 +16982,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.data_layer_state.update",
-            binding_hash="sha256:53fe62afbd849ec8d8e129a96e8e2b4f6f3fad383798161b7f79285c31714860",
+            binding_hash="sha256:a996a48733cb273ee54c037f24b551a57c6b41515dd01571e261700e3f56edf7",
             namespace="world",
             method="data_layer_state_update",
             parameters=(
@@ -16609,7 +17005,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.data_layers",
-            binding_hash="sha256:d53585d3f52ee86de2f74e266825fcdbafcb38f99482085fe6c6765bf0d04952",
+            binding_hash="sha256:5e3e741e194d44ab6357aa26fa2760815fcc2cad50f9fc31d7bc3cd20d727dc8",
             namespace="world",
             method="data_layers",
             parameters=(
@@ -16638,7 +17034,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.hlod_assignments",
-            binding_hash="sha256:0f1aaf9719903990fcb57c49b5d8a592dc263bfb79751e018eaf2c46060ca7db",
+            binding_hash="sha256:c1d6308ef89f6086383af0c98f497239cb2b97f05e6942e91fabd124c7583d8c",
             namespace="world",
             method="hlod_assignments",
             parameters=(
@@ -16667,7 +17063,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.level_content.delete_scope",
-            binding_hash="sha256:f99c5914309922974a8b234c0f6dc43d8db79788554c41f0f560060ece282f67",
+            binding_hash="sha256:2a875634fb6cb2db46edf23df1aab2ad3a9e4ad603e0b3c9324fd8ffb09ad870",
             namespace="world",
             method="level_content_delete_scope",
             parameters=(
@@ -16696,7 +17092,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.level_game_mode.update",
-            binding_hash="sha256:4559c567d0b55bb8e6480823fbcb414f77ce3a51b7388b9f94f782d37d540e89",
+            binding_hash="sha256:79b4043d97ead00ee40bc1de4da8123b38fd3d56fc58434d4241329003e4b66d",
             namespace="world",
             method="level_game_mode_update",
             parameters=(
@@ -16713,7 +17109,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.level_streaming.move_actors",
-            binding_hash="sha256:1d38a0fa3169876a7aadce0005d1241279601718dec76282c404c8a5e62aab97",
+            binding_hash="sha256:dc3039c3761245c3f8349a4df164a44242d5ba49b2efc211b07de25dc567432c",
             namespace="world",
             method="level_streaming_move_actors",
             parameters=(
@@ -16742,7 +17138,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.level_streaming.remove",
-            binding_hash="sha256:427ac901063c1124806f989d76279139a9c535ab596837e43e6c16fc84e3f3cd",
+            binding_hash="sha256:fc025e7b882abf3853110ef75f2db174d7d24702ba9ac3393f935f154138d615",
             namespace="world",
             method="level_streaming_remove",
             parameters=(
@@ -16765,7 +17161,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.mesh_closest_vertex",
-            binding_hash="sha256:abe5a67452dca18c455e7c67bab1b82c3f437baf00104eca8c6350996d346eda",
+            binding_hash="sha256:8863303bae9512041b36b89b1d5dcdcaee8ec8f60b3abebc90e5481df3b277d6",
             namespace="world",
             method="mesh_closest_vertex",
             parameters=(
@@ -16800,7 +17196,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.mesh_vertex_position",
-            binding_hash="sha256:381930977295bbf8305bbeab41c01fa6a2ae090645c06973ec63f239a66340dc",
+            binding_hash="sha256:048718c4a9e187e13d92247fdec8768f261b74a4772ed2599ac7dc3f5df36ebd",
             namespace="world",
             method="mesh_vertex_position",
             parameters=(
@@ -16835,7 +17231,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.nav_connectivity",
-            binding_hash="sha256:0e9a6bfeb044df1b54fd4d88f010d5fe7ea880aa99d774f062e8108c9df360fa",
+            binding_hash="sha256:1abdc8ee5da6c7206326187e46c278f9b3f6876ee1a8dd16dbc72bb838e714bf",
             namespace="world",
             method="nav_connectivity",
             parameters=(
@@ -16864,7 +17260,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.nav_find_path",
-            binding_hash="sha256:16b78418b1762020fd1c8914bd5c4fe619662b3649702f27a6105bed14e0884b",
+            binding_hash="sha256:f64cc0def1967f5bfd0a136bb2d01f4dceed69b4f9f4345fa535454a7516677e",
             namespace="world",
             method="nav_find_path",
             parameters=(
@@ -16893,7 +17289,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.nav_project_point",
-            binding_hash="sha256:bf1cb629bbc59856006d787cbe78e5275fc9025ec38a5dceea1544fd1b7806fd",
+            binding_hash="sha256:7059a720517e49bb8419ae2f68ab8b59108606520b5d8cb2e3f04cc19e1be8ab",
             namespace="world",
             method="nav_project_point",
             parameters=(
@@ -16922,7 +17318,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.nearby_shapes",
-            binding_hash="sha256:ade51fbb48ede2dfa41f30db1e4e4fbd7c033a16014709afce28f9b4e9a7b981",
+            binding_hash="sha256:6a5dae2652b7aa90bcdeaa941fa97cd1ec6af6b824dc0a84f5e9a3b75d04f1c4",
             namespace="world",
             method="nearby_shapes",
             parameters=(
@@ -16951,7 +17347,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.object_align",
-            binding_hash="sha256:e515c3a07e041cdaf7083b16670bf7bd767b6cd66518f5f05e6f37afc9c66ae9",
+            binding_hash="sha256:9bb173205c12b79372515d8d2c95247582de1550cd2fef6077993def9069555f",
             namespace="world",
             method="object_align",
             parameters=(
@@ -16986,7 +17382,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.object_snap_to_surface",
-            binding_hash="sha256:0f61d5bc08afa1adf9f195d81242dcac059b7fd56c75de8de377a6ae2c3e4618",
+            binding_hash="sha256:1ccafe676e530a3b9cf9ef1527c9e20a5f26e3355acd4141705290f9f1f07a1c",
             namespace="world",
             method="object_snap_to_surface",
             parameters=(
@@ -17021,7 +17417,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.object_transform.read",
-            binding_hash="sha256:9013657da56b5a062235b5e7d5b51926c61b3773be58d0feabf26379ab9895c0",
+            binding_hash="sha256:8f736479b33f69ddef3044b48686d1b4045e7f73458c8192c5ece089c423550a",
             namespace="world",
             method="object_transform_read",
             parameters=(
@@ -17056,7 +17452,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.object_transform.update",
-            binding_hash="sha256:6027d967e1f58049e528fd3cd86fda59fe90c9503087be5fb3e3f0d4ad8f7d54",
+            binding_hash="sha256:0c2c726a3a04c88645f24ce1bf988517fd5b5f6abfc778765e21840d2806ae43",
             namespace="world",
             method="object_transform_update",
             parameters=(
@@ -17091,7 +17487,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.overlap",
-            binding_hash="sha256:2ac5bc02cf8748636de58d9b4d51198d3008dec81f9ff03f8ba70fc421be404f",
+            binding_hash="sha256:c8ab42e2eee8b6c037c5eb9b7b7854425eae1c9c16987e4f9f41cd3952907b89",
             namespace="world",
             method="overlap",
             parameters=(
@@ -17120,7 +17516,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.partition",
-            binding_hash="sha256:50b1f26bc7fc740b59f12fffdefde9b53cabe251cfc43bea58c94e78add0cd36",
+            binding_hash="sha256:220f39a784ee79b7e09b732c5b6140dc317008048308f05eb82b59e68c6f1a36",
             namespace="world",
             method="partition",
             parameters=(
@@ -17149,7 +17545,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.partition_health",
-            binding_hash="sha256:6be67e05afad203c9f992d17f62d4b64294e26f9fe7f7fa3cac0bf60f6c03a09",
+            binding_hash="sha256:0a0d00d2e83d58c2e37e3e7bdbde53d8e5241a412cd201cb876efd8ca643b2d1",
             namespace="world",
             method="partition_health",
             parameters=(
@@ -17178,7 +17574,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.pcg.cleanup",
-            binding_hash="sha256:d94ae8f822678988fbd6583fcd676fd7f352c7e218941064d258569b2d41b0c4",
+            binding_hash="sha256:cabea4e3759c1f0abcfd30022394b5bee7857750cb856971a0d96d19de264d27",
             namespace="world",
             method="pcg_cleanup",
             parameters=(
@@ -17207,7 +17603,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.physics_component",
-            binding_hash="sha256:718cee694a910a9ba2ac60f923c8447f03ae448e01ac39737a4b7d6473ff641e",
+            binding_hash="sha256:0f6d45fc8416e00051ebbe86cd0f3fb98269c55ee2c9554ba977d0b26439f71b",
             namespace="world",
             method="physics_component",
             parameters=(
@@ -17242,7 +17638,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.physics_constraint",
-            binding_hash="sha256:7860ea575a11fbdd2e7a5fd39f3ed84815ec6e4db149e3fe21ab63208aabb750",
+            binding_hash="sha256:0d61006fd63e3ba4758d45b2314ecf4e0105912ff49e52d6517cb090ab3f78dd",
             namespace="world",
             method="physics_constraint",
             parameters=(
@@ -17277,7 +17673,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.property",
-            binding_hash="sha256:8cb46cbeaaeca935e90af97c3c743ed0cd871a1a192742eb6c37e1e76afea7b2",
+            binding_hash="sha256:2f014af565ed5c9d30a2b578e3213ae4999f28616311578a0eb2646d5873ee70",
             namespace="world",
             method="property",
             parameters=(
@@ -17312,7 +17708,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.ray_trace",
-            binding_hash="sha256:7ecce9494105fde9306fab8e3f7d58d02b01be39d96e9d01f930101dbf38d340",
+            binding_hash="sha256:95c37e276540e4afe2c25f5525268d17af863680f9ada015d5756716be8c7534",
             namespace="world",
             method="ray_trace",
             parameters=(
@@ -17341,7 +17737,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.selection",
-            binding_hash="sha256:3139297944980124dbfe76333f37c6f5b849cce10afc28959bf34e66f2f25e0a",
+            binding_hash="sha256:6030ab8a0dc12264cb77cefe741f239e31a73cf5a3be0e4e239caf8ad064d5e7",
             namespace="world",
             method="selection",
             parameters=(
@@ -17370,7 +17766,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.streaming_levels",
-            binding_hash="sha256:d65553ba378758fff24babc70597b322d02c4d00437644c1ea2e778c625e33d0",
+            binding_hash="sha256:304b491d61b09745dd874b2c0ada1e95460f0993022175eee5a5e05265c17976",
             namespace="world",
             method="streaming_levels",
             parameters=(
@@ -17399,7 +17795,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.streaming_relation.create",
-            binding_hash="sha256:d0ed471812895c1949cc802953f8c9bfa945589774ad33e679b5bf2ba871d3e3",
+            binding_hash="sha256:b1b7cfdd95329a393c071ba61b11c8cf3fc91f091f894255a49d15354f9d0d77",
             namespace="world",
             method="streaming_relation_create",
             parameters=(
@@ -17428,7 +17824,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.streaming_relation.state.update",
-            binding_hash="sha256:108b1a5aaff20142b8595c649c3a88f79c9d98d955c08a880910a9a5e77ebac5",
+            binding_hash="sha256:d0d3eda897f9d1d704ac328104d51a3189acce58b9f04d52c58a0e1568187254",
             namespace="world",
             method="streaming_relation_state_update",
             parameters=(
@@ -17451,7 +17847,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.summary",
-            binding_hash="sha256:a8930b77906631aa6408fdc7709e9442c8decbb9e6c52abc124ddd22b7a538ce",
+            binding_hash="sha256:944e098a65ecfd8fed22ce33ca3d04a5cb4bb0fda78800b9f15192ff8ad5f3cc",
             namespace="world",
             method="summary",
             parameters=(
@@ -17480,7 +17876,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.wall.create_with_opening",
-            binding_hash="sha256:e5e3f7d9de2cac4e5dd92c3810f6b36a5b93e912222536e0705366d8ecd9af15",
+            binding_hash="sha256:f6fcf741523938447646744b040521aa927a9f7f1092f3020f68abc955cde0c7",
             namespace="world",
             method="wall_create_with_opening",
             parameters=(
@@ -17515,7 +17911,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.world_partition_streaming.update",
-            binding_hash="sha256:9ab0ab862056cf4406ad15beef398d013e6fbea604c048c8cbda6b57c3dd6292",
+            binding_hash="sha256:0d64d6194b4ee900a3cfd7be9e3dde2dbc9cbbcf642a90695eb14605ab7ddbc0",
             namespace="world",
             method="world_partition_streaming_update",
             parameters=(

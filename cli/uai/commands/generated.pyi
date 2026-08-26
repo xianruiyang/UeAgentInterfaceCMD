@@ -18,6 +18,7 @@ class AiCommands:
         target: str,
         *,
         query: str = ...,
+        id: str = ...,
         limit: int = ...,
         cursor: int = ...,
     ) -> Any: ...
@@ -382,6 +383,18 @@ class AnimationCommands:
         target_ref: str,
     ) -> Any: ...
 
+    def state_machine_candidates(
+        self,
+        target: str,
+        surface: str,
+        *,
+        class_settings: dict[str, Any] = ...,
+        query: str = ...,
+        id: str = ...,
+        limit: int = ...,
+        cursor: int = ...,
+    ) -> Any: ...
+
     def subject_morph_weights_update(
         self,
         target: str,
@@ -407,7 +420,7 @@ class AnimationRigGraphCommands:
         target: str,
         *,
         query: str = ...,
-        space_ref: str = ...,
+        id: str = ...,
         limit: int = ...,
         cursor: int = ...,
     ) -> Any: ...
@@ -902,6 +915,7 @@ class AudioCommands:
         target: str,
         *,
         query: str = ...,
+        id: str = ...,
         limit: int = ...,
         cursor: int = ...,
     ) -> Any: ...
@@ -927,8 +941,12 @@ class BlueprintCommands:
     def component_candidates(
         self,
         target: str,
-        component_class: str,
-        requested_name: str,
+        *,
+        parent: str = ...,
+        query: str = ...,
+        id: str = ...,
+        limit: int = ...,
+        cursor: int = ...,
     ) -> Any: ...
 
     def component_events_discover(
@@ -949,6 +967,12 @@ class BlueprintCommands:
         graph_id: str,
         *,
         query: str = ...,
+        id: str = ...,
+        node_guid: str = ...,
+        pin_guid: str = ...,
+        pin_name: str = ...,
+        limit: int = ...,
+        cursor: int = ...,
     ) -> Any: ...
 
 class CaptureCommands:
@@ -1348,6 +1372,10 @@ class MaterialCommands:
         target: str,
         *,
         query: str = ...,
+        graph_name: str = ...,
+        node_guid: str = ...,
+        pin_guid: str = ...,
+        pin_name: str = ...,
         limit: int = ...,
         cursor: int = ...,
     ) -> Any: ...
@@ -1865,6 +1893,8 @@ class NiagaraCommands:
         target: str,
         target_usage: str,
         *,
+        target_usage_id: str = ...,
+        emitter_handle_id: str = ...,
         query: str = ...,
         limit: int = ...,
         cursor: int = ...,
@@ -2018,6 +2048,7 @@ class PcgCommands:
         target: str,
         *,
         query: str = ...,
+        id: str = ...,
         limit: int = ...,
         cursor: int = ...,
     ) -> Any: ...
@@ -2118,6 +2149,8 @@ class QueryCommands:
         self,
         command_id: str,
         contract_hash: str,
+        *,
+        variant_id: str = ...,
     ) -> Any: ...
 
     def command_search(
@@ -2399,6 +2432,16 @@ class UmgCommands:
         package_path: str,
     ) -> Any: ...
 
+    def widget_candidates(
+        self,
+        target: str,
+        *,
+        query: str = ...,
+        id: str = ...,
+        limit: int = ...,
+        cursor: int = ...,
+    ) -> Any: ...
+
     def widget_events_discover(
         self,
         owner_item_ref: str,
@@ -2513,6 +2556,17 @@ class ViewportCommands:
     ) -> Any: ...
 
 class WorldCommands:
+
+    def actor_candidates(
+        self,
+        target: str,
+        *,
+        category: str = ...,
+        query: str = ...,
+        id: str = ...,
+        limit: int = ...,
+        cursor: int = ...,
+    ) -> Any: ...
 
     def actor_create(
         self,

@@ -71,6 +71,7 @@ class _ClientContext(AbstractContextManager[_RecordingClient]):
 def _require_bindings():
     assert re.fullmatch(r"sha256:[0-9a-f]{64}", GENERATED_REGISTRY_HASH)
     command_ids = {
+        "editor.session",
         "query.command.search",
         "query.command.detail",
         "query.calibration.read",
@@ -132,6 +133,30 @@ def test_generic_exact_and_named_query_requests_are_equivalent() -> None:
         params,
     )
     assert named.calls == generic.calls
+
+
+def test_named_command_detail_forwards_exact_variant_identity() -> None:
+    bindings = _require_bindings()
+    client = _RecordingClient()
+    commands = bind_generated_commands(client)
+
+    commands.query.command_detail(
+        "editor.session",
+        bindings["editor.session"].binding_hash,
+        variant_id="policy:world-context:set-current/v1",
+    )
+
+    assert client.calls == [
+        (
+            "query.command.detail",
+            {
+                "command_id": "editor.session",
+                "contract_hash": bindings["editor.session"].binding_hash,
+                "variant_id": "policy:world-context:set-current/v1",
+            },
+            bindings["query.command.detail"].binding_hash,
+        )
+    ]
 
 
 def test_cli_default_and_exact_forms_use_the_same_discovered_binding(
