@@ -20,6 +20,15 @@ Obtain `graph_id` from the current Blueprint instead of guessing it. Call
 unchanged to `blueprint.node.candidates`. Do not infer the graph from its node
 types, cache an earlier GUID, or reconstruct the identifier.
 
+Use that same structure for compact semantic readback of existing nodes. The
+node `value` reuses the Blueprint authoring state owner: events expose
+`event_name`/`event_class`, component-bound events expose component and
+delegate identity, function calls expose `function_name` and
+`function_owner_class`, and variable nodes expose `variable_name`/`access`.
+Select and verify by these fields plus the stable node `id`; do not infer an
+identity from position, count, edges, or the raw K2 class, and do not export a
+full workspace only to recover these semantics.
+
 Copy only the exact `id`, or the `name` when it is unique in that same native
 context, into the node entry of the Blueprint-root `uai.blueprint.edit/1`
 document:
