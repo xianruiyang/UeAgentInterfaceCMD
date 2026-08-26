@@ -13,6 +13,9 @@ result = client.blueprint.node_candidates(
 candidate = result.payload["candidates"][0]
 ```
 
+One page contains at most 20 rows. Follow `next_cursor` while `has_more` is
+true before claiming the result is exhaustive or unique.
+
 Obtain `graph_id` from the current Blueprint instead of guessing it. Call
 `content_graph.structure`, select the unique container with
 `kind="blueprint_graph"`, `value.name="EventGraph"`, and
@@ -29,9 +32,13 @@ Select and verify by these fields plus the stable node `id`; do not infer an
 identity from position, count, edges, or the raw K2 class, and do not export a
 full workspace only to recover these semantics.
 
-Copy only the exact `id`, or the `name` when it is unique in that same native
+Copy the exact `id`, or the `name` when it is unique in that same native
 context, into the node entry of the Blueprint-root `uai.blueprint.edit/1`
-document:
+document. Function, event, variable and generic-node rows may additionally
+return `function_name`/`function_owner_class`, `event_name`/`event_class`,
+`variable_name`/`node_type`/`member_parent_class`, or `node_class`. These safe
+fields let the caller select without localized display-name inference and may
+be copied beside `name/id` as exact assertions:
 
 ```hjson
 "event_graph:EventGraph": {
@@ -40,7 +47,11 @@ document:
   nodes: {
     "node:BranchGate": {
       operation: create
-      candidate: { id: "candidate:..." }
+      candidate: {
+        id: "candidate:..."
+        function_name: FInterpTo
+        function_owner_class: "/Script/Engine.KismetMathLibrary"
+      }
       pos: { x: 800, y: 600 }
     }
   }
@@ -52,10 +63,13 @@ construct or submit a node-specific HJSON root.
 
 The graph map key and optional pin context remain outside `candidate`; the node
 map key remains the stable instance identity. Do not copy the complete search
-row or synthesize `node_type`, `node_class`, function owner, spawner or action
-metadata. The server re-enumerates the same native Blueprint Action Menu and
-invokes the resolved `FEdGraphSchemaAction::PerformAction` before applying
-explicit pins, edges or properties.
+row or synthesize semantic, spawner or action metadata. `native_action_signature`
+is deliberately not public. A copied semantic field is only an exact assertion
+and cannot replace `name/id`; mismatch fails before write with
+`blueprint_surface_node_candidate_metadata_mismatch`. The server re-enumerates
+the same native Blueprint Action Menu and invokes the resolved
+`FEdGraphSchemaAction::PerformAction` before applying explicit pins, edges or
+properties.
 
 The response-level `graph_revision` is read-only candidate evidence. Use the
 owning asset's latest public content-graph revision as `expected_revision` for
