@@ -6,6 +6,7 @@ from pathlib import Path
 import unittest
 
 import uai
+from uai.commands import BINDING_CATALOG
 
 try:
     from uai.commands.generated import (
@@ -81,6 +82,21 @@ class GeneratedClientBindingContractTests(unittest.TestCase):
             member,
             "client_reference_namespace_missing",
         )
+
+    def test_dormant_commands_remain_in_catalog_without_named_methods(self) -> None:
+        dormant = (
+            ("world.actors", "actors"),
+            ("world.actor_components", "actor_components"),
+            ("world.property", "property"),
+            ("world.object_transform.read", "object_transform_read"),
+            ("world.object_transform.update", "object_transform_update"),
+        )
+        namespaces, _client = self._namespaces()
+        for command_id, method in dormant:
+            binding = BINDING_CATALOG.find(command_id)
+            self.assertIsNotNone(binding)
+            self.assertEqual(binding.status, "dormant")
+            self.assertFalse(hasattr(namespaces.world, method))
 
     def test_command_search_omits_only_the_omission_sentinel(self) -> None:
         namespaces, client = self._namespaces()

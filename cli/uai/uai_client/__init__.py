@@ -111,6 +111,53 @@ class Client(GeneratedClientBindingsMixin):
     def execute_exact(self, command_id, params, *, contract_hash):
         """Send one exact projected command without aliases or replay."""
 
+        binding = self._binding_catalog.find(command_id)
+        if binding is not None and binding.status == "dormant":
+            raise UsageError(
+                code="dormant_command_confirmation_required",
+                message=(
+                    "use execute_dormant only after explicit user confirmation: "
+                    f"{command_id}"
+                ),
+            )
+        if binding is not None and binding.status in {"disabled", "deprecated"}:
+            raise UsageError(
+                code="command_binding_disabled",
+                message=f"command binding is disabled: {command_id}",
+            )
+        return self._send_exact(command_id, params, contract_hash=contract_hash)
+
+    def execute_dormant(
+        self,
+        command_id,
+        params,
+        *,
+        contract_hash,
+        user_confirmed,
+    ):
+        """Execute one dormant development command after user confirmation."""
+
+        if user_confirmed is not True:
+            raise UsageError(
+                code="dormant_command_confirmation_required",
+                message="user_confirmed must be true for a dormant command",
+            )
+        binding = self._binding_catalog.find(command_id)
+        if binding is None or binding.status != "dormant":
+            raise UsageError(
+                code="dormant_command_binding_unknown",
+                message=f"dormant command binding is unknown: {command_id}",
+            )
+        if contract_hash != binding.binding_hash:
+            raise UsageError(
+                code="command_contract_hash_invalid",
+                message="contract_hash must match the dormant catalog binding",
+            )
+        return self._send_exact(command_id, params, contract_hash=contract_hash)
+
+    def _send_exact(self, command_id, params, *, contract_hash):
+        """Validate and send one exact projected command."""
+
         if self._state != "open":
             raise UsageError(
                 code="connection_closed",

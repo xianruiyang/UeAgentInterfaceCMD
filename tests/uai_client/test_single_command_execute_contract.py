@@ -84,7 +84,7 @@ def _result(ok: bool) -> uai.Result:
 
 
 class SingleCommandExecuteContractTests(unittest.TestCase):
-    def _client(self, result: uai.Result):
+    def _client(self, result: uai.Result, *, status: str = "active"):
         self.assertIsNotNone(
             CommandBinding,
             "command_binding_model_missing",
@@ -96,6 +96,7 @@ class SingleCommandExecuteContractTests(unittest.TestCase):
         binding = CommandBinding(
             command_id="fixture.echo_exact",
             binding_hash=BINDING_HASH,
+            status=status,
         )
         catalog = CommandBindingCatalog((binding,))
         transport = _Transport()
@@ -184,6 +185,42 @@ class SingleCommandExecuteContractTests(unittest.TestCase):
             "command_binding_unknown",
         )
         self.assertEqual(protocol.calls, [])
+
+    def test_dormant_command_requires_explicit_user_confirmation(self) -> None:
+        client, protocol = self._client(_result(True), status="dormant")
+        with self.assertRaises(uai.UsageError) as exact_error:
+            client.execute_exact(
+                "fixture.echo_exact", {}, contract_hash=BINDING_HASH
+            )
+        self.assertEqual(
+            exact_error.exception.code,
+            "dormant_command_confirmation_required",
+        )
+        with self.assertRaises(uai.UsageError) as confirmation_error:
+            client.execute_dormant(
+                "fixture.echo_exact",
+                {},
+                contract_hash=BINDING_HASH,
+                user_confirmed=False,
+            )
+        self.assertEqual(
+            confirmation_error.exception.code,
+            "dormant_command_confirmation_required",
+        )
+        self.assertEqual(protocol.calls, [])
+
+    def test_confirmed_dormant_command_forwards_once(self) -> None:
+        expected = _result(True)
+        client, protocol = self._client(expected, status="dormant")
+        actual = client.execute_dormant(
+            "fixture.echo_exact",
+            {"value": 1},
+            contract_hash=BINDING_HASH,
+            user_confirmed=True,
+        )
+        self.assertIs(actual, expected)
+        self.assertEqual(len(protocol.calls), 1)
+        self.assertEqual(protocol.calls[0]["command_id"], "fixture.echo_exact")
 
 
 if __name__ == "__main__":

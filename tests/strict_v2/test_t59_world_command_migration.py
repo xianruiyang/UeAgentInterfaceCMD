@@ -51,7 +51,8 @@ def _bindings():
  v={cid:BINDING_CATALOG.find(cid) for cid in METHODS};assert all(b is not None and (b.namespace,b.method)==METHODS[cid] and re.fullmatch(r"sha256:[0-9a-f]{64}",b.binding_hash) and b.binding_hash!="sha256:"+"0"*64 for cid,b in v.items());return v
 def _params(b):
  s={"string":"fixture","integer":1,"number":1.0,"boolean":True,"array":[],"object":{}};return {p.name:s.get(p.wire_type,{}) for p in b.parameters}
-def test_exact_default_inventory():assert len(METHODS)==11;_bindings()
+def test_exact_default_inventory():
+ assert len(METHODS)==11;_bindings()
 def test_default_named_method_forwards_one_exact_request():
  b=_bindings()["world.wall.create_with_opening"];c=_FakeClient();p=_params(b);getattr(getattr(bind_generated_commands(c),b.namespace),b.method)(**p);assert c.calls==[(b.command_id,p,b.binding_hash)]
 def test_default_projection_has_no_transport_or_world_business():

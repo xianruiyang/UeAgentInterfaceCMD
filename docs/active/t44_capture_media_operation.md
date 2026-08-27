@@ -63,9 +63,10 @@ candidate limit keeps the complete sheet at no more than 16 frames. It does not
 focus the Editor, score candidates, choose one, or persist a candidate. Every
 terminal mechanics path restores the Actor transform, package dirty state,
 Actor selection, and temporary viewport realtime override; success fails closed
-unless those restorations are observed. After comparison, persist the chosen
-value separately with `world.object_transform.update` and verify it with
-`world.object_transform.read`.
+unless those restorations are observed. After comparison, read the exact Actor
+with `content_graph.items`, update its transform in the World
+`uai.world.edit/1` document, and persist the chosen value through
+`content_graph.import_workspace` using the exported revision.
 
 ## Image policy migration table
 

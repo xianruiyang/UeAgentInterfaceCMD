@@ -135,7 +135,7 @@ def _load_manifest(path: Path) -> dict[str, Any]:
                 f"{command_label}.binding_hash is invalid"
             )
         status = command.get("status")
-        if status not in {"active", "deprecated"}:
+        if status not in {"active", "dormant", "disabled", "deprecated"}:
                 raise BindingGenerationError(
                 f"{command_label}.status is unsupported"
             )

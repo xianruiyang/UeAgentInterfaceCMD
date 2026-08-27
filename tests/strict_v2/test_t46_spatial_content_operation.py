@@ -26,8 +26,10 @@ METHODS = {
     "reference.origin.resolve": ("reference", "origin_resolve"),
     "world.object_align": ("world", "object_align"),
     "world.object_snap_to_surface": ("world", "object_snap_to_surface"),
-    "world.object_transform.read": ("world", "object_transform_read"),
-    "world.object_transform.update": ("world", "object_transform_update"),
+}
+DORMANT_HJSON_COMMANDS = {
+    "world.object_transform.read",
+    "world.object_transform.update",
 }
 class _FakeClient:
     def __init__(self): self.calls: list[tuple[str, dict[str, Any], str]] = []
@@ -47,13 +49,22 @@ def _params(binding):
     samples = {"string":"fixture","integer":1,"number":1.0,"boolean":True,"array":[],"object":{}}
     return {item.name: samples.get(item.wire_type,{}) for item in binding.parameters}
 
-def test_all_8_spatial_content_commands_have_exact_default_bindings():
-    assert len(METHODS) == 8 and len(set(METHODS)) == 8
+def test_all_6_spatial_content_commands_have_exact_default_bindings():
+    assert len(METHODS) == 6 and len(set(METHODS)) == 6
     _bindings()
 def test_default_named_method_preserves_one_exact_request():
-    binding = _bindings()["world.object_transform.update"]; client = _FakeClient(); params = _params(binding)
+    binding = _bindings()["world.object_align"]; client = _FakeClient(); params = _params(binding)
     getattr(getattr(bind_generated_commands(client), binding.namespace), binding.method)(**params)
     assert client.calls == [(binding.command_id, params, binding.binding_hash)]
+
+def test_generic_world_transform_commands_are_dormant_behind_hjson():
+    assert all(
+        (binding := BINDING_CATALOG.find(command_id)) is not None
+        and binding.status == "dormant"
+        for command_id in DORMANT_HJSON_COMMANDS
+    )
+    assert BINDING_CATALOG.find("content_graph.items") is not None
+    assert BINDING_CATALOG.find("content_graph.import_workspace") is not None
 def test_default_projection_contains_no_transport_or_spatial_business_logic():
     binding = _bindings()["world.object_align"]
     method = getattr(getattr(bind_generated_commands(_FakeClient()), binding.namespace), binding.method)
@@ -68,7 +79,7 @@ def test_t46_has_no_task_specific_binding_or_tutorial_authority():
         text = document.read_text(encoding="utf-8")
         for namespace, method in METHODS.values(): assert f"client.{namespace}.{method}" in text
         assert "command_search" in text and "command_detail" in text and "uai-cli" in text
-        assert "semantic_frame_id" in text and "uai.generated_commands" not in text
+        assert "frame_id" in text and "uai.generated_commands" not in text
 
 @pytest.mark.historical_evidence
 def test_t46_historical_successor_consumes_all_5_frozen_rows_and_product_receipt():

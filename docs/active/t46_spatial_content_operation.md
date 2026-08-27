@@ -1,7 +1,8 @@
 # Spatial-content commands through the default SDK
 
-Use `client.query.command_search(...)` and `client.query.command_detail(...)` to discover
-the current exact contract and hash, then call one of the eight normal methods:
+Use `client.query.command_search(...)` and
+`client.query.command_detail(...)` to discover the current contract, then call
+one of the six normal methods:
 
 ```python
 client.mesh.element_select_by_ray(...)
@@ -10,59 +11,43 @@ client.mesh.transform_bake(...)
 client.reference.origin_resolve(...)
 client.world.object_align(...)
 client.world.object_snap_to_surface(...)
-client.world.object_transform_read(...)
-client.world.object_transform_update(...)
 ```
 
-Each method forwards one manifest command. The equivalent CLI entry is
-`uai-cli --connection connection.toml exec <command-id> --contract-hash
-<hash-from-command_detail> --params-json <json-object>`. There is no
-task-specific generated SDK projection and no historical alias.
+Each method forwards one exact manifest request. The equivalent CLI entry is
+`uai-cli ... exec <command-id>`. There is no task-specific generated SDK module
+or historical alias.
 
-For `client.world.object_align(...)`, put the exact actor or mesh identity in
-`target`, the typed request in `input`, and the frozen world/frame identities in
-`context`. `input.alignment.kind` is required:
+`world.object_transform.read` and `world.object_transform.update` are dormant.
+Read persisted Actor/Component transforms through `content_graph.structure` or
+`content_graph.items`; edit a `uai.world.edit/1` document and apply it through
+`content_graph.import_workspace`. A StaticMesh content-graph read and a selected
+World HJSON `ADynamicMeshActor` item expose the Modeling carrier revisions needed
+by specialized mesh operations. This does not claim a PIE/runtime query surface.
 
-- `anchors` uses explicit subject/reference 3D points;
-- `bounds` uses `axis` plus `source_anchor`/`target_anchor`;
-- `face` uses signed `source_face`/`target_face` and optional offset;
-- `vertex` uses a complete index pair or a unique nearest world-vertex pair.
+Normal command search and generated named SDK methods hide both dormant IDs.
+Development-only compatibility discovery uses
+`client.query.command_search(intent, mode="compatibility")`; it returns the
+active successors and `requires_user_confirmation=true`. Only when those active
+HJSON successors cannot satisfy the authorized task, and after the user agrees,
+may development code use `client.execute_dormant(..., user_confirmed=True)` or
+the CLI `--allow-dormant` form. The original exact server handlers remain the
+only compatibility implementation.
 
-All spatial inputs preserve `semantic_frame_id`, dimension, unit, basis
-evidence, observation time, conversion evidence, and the declared
-write/read/verify frames. Supply current expected revisions for writes and use
-`client.world.object_transform_read(...)` for independent readback.
+`world.object_align` supports anchor, bounds, face and vertex alignment;
+`world.object_snap_to_surface` performs bounded Editor-world ray placement.
+`expected_revisions` is optional for these two specialized operations: supplied
+revisions are validated, while omission freezes current revisions at invocation.
+Both still verify their result independently. Use World HJSON for an additional
+persisted-state readback.
 
-`world.object_transform.read` accepts exactly an Actor or StaticMesh target. An
-Actor returns its transform in the requested convertible frame. A StaticMesh
-requires an identity `mesh.geometry.local`, three-dimensional, centimeter
-verify frame and returns real mesh-description vertices plus any live component
-placement observations. In both cases its returned revision comes from the same
-WorldSpatial runtime/session as the mutation validator, so pass it unchanged as
-that target's `expected_revision`. Other UObject types or non-local StaticMesh
-frames fail before mutation. `world.object_transform.update` accepts exactly one
-complete Actor transform plus the current revision returned by the read command.
-It converts the declared transform to `unreal.world` centimeters, rejects stale
-revisions, non-finite components, non-normalized rotation, and zero scale before
-mutation, saves the Actor's map package, and verifies all ten transform
-components through an independent readback. Successful durable Actor transform,
-mesh bake, and pivot updates remain observable after reload.
+`mesh.element.select_by_ray` consumes an explicitly activated Modeling Tools
+Editor Mode selection target. `mesh.transform.bake` and `mesh.pivot.update` are
+durable geometry operations and obtain their carrier revision from a
+content-graph read. `reference.origin.resolve` remains the read-only origin
+resolver for catalog, JSON, UE object, graph-node and name references.
 
-Transform candidates are visual previews rather than a WorldSpatial scoring
-query. Discover `capture.image.execute` and select
-`policy:image-capture:transform-candidates/v1` to capture the original Actor and
-up to 15 temporary candidates from the current Level viewport into one frame
-sheet. The preview restores Editor state and never selects or persists a
-candidate; submit the chosen value through
-`client.world.object_transform_update(...)`.
-
-For `client.reference.origin_resolve(...)`, pass one `input.target` whose
-required `source` is `catalog_candidate`, `json_reference`, `ue_object`,
-`graph_node`, or `name_reference`. Use the fields named by that source; the
-result contains canonical target identity, asset/package/file/code origins,
-`resolved`, `status`, and warnings. The command is read-only.
-
-Invalid targets, frames, geometry, surfaces, source identities, or stale
-revisions fail before mutation. Cleanup restores transient selection and removes
-or restores only the owned fixture; it never closes or focuses the user's
-Editor.
+Invalid identities, frames, geometry, surfaces or stale supplied revisions fail
+before mutation. Cleanup restores only owned transient state and preserves the
+user's Editor. Spatial values retain `frame_id`, `basis_frame_id`, `dimension`,
+`unit`, `basis_evidence_id`, and `observed_at`; the SDK does not infer or convert
+these fields.

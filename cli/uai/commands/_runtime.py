@@ -84,7 +84,7 @@ class CommandBinding:
             or self.max_wire_version < self.min_wire_version
         ):
             raise ValueError("command_binding_wire_range_invalid")
-        if self.status not in {"active", "deprecated"}:
+        if self.status not in {"active", "dormant", "disabled", "deprecated"}:
             raise ValueError("command_binding_status_invalid")
 
 

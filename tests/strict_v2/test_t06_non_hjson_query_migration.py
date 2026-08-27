@@ -53,7 +53,7 @@ EXPECTED_COMMAND_IDS = {
 }
 
 HISTORICAL_SUCCESSORS = {
-    "actor_list_components": "world.actor_components",
+    "actor_list_components": "content_graph.items",
     "asset_reference_graph": "asset.registry_relations",
     "config_export_section": "config.section",
     "editor_get_open_assets": "editor.open_assets",
@@ -63,13 +63,13 @@ HISTORICAL_SUCCESSORS = {
     "level_check_overlaps": "world.overlap",
     "level_get_nearby_actor_obbs": "world.nearby_shapes",
     "level_get_selection": "world.selection",
-    "level_list_actor_components": "world.actor_components",
+    "level_list_actor_components": "content_graph.items",
     "level_streaming_query": "world.streaming_levels",
     "level_sweep_capsule": "world.capsule_sweep",
     "level_sweep_capsule_path": "world.capsule_path",
     "level_trace_world_ray": "world.ray_trace",
     "level_validate_connectivity": "world.nav_connectivity",
-    "list_actors": "world.actors",
+    "list_actors": "content_graph.structure",
     "mesh_get_closest_vertex": "world.mesh_closest_vertex",
     "mesh_get_vertex_world_position": "world.mesh_vertex_position",
     "navmesh_find_path": "world.nav_find_path",
@@ -155,20 +155,32 @@ def test_named_default_method_and_generic_execution_are_equivalent() -> None:
 def test_targeted_default_method_preserves_exact_target_and_input() -> None:
     _require_bindings()
     client = _RecordingClient()
-    target = "/Game/Maps/TestMap.TestMap:PersistentLevel.Actor_1"
-    bind_generated_commands(client).world.actor_components(
+    target = "/Game/Test.Test"
+    bind_generated_commands(client).asset.summary(
         target,
-        input={"include_inherited": True},
-        context={"state_plane": "authoring_memory"},
+        input={"include_tags": True},
+        context={"state_plane": "persisted"},
         projection={"max_items": 7},
     )
-    assert client.calls[0][0] == "world.actor_components"
+    assert client.calls[0][0] == "asset.summary"
     assert client.calls[0][1] == {
         "target": target,
-        "input": {"include_inherited": True},
-        "context": {"state_plane": "authoring_memory"},
+        "input": {"include_tags": True},
+        "context": {"state_plane": "persisted"},
         "projection": {"max_items": 7},
     }
+
+
+def test_world_hjson_replacements_are_active_and_old_queries_are_dormant() -> None:
+    assert BINDING_CATALOG.find("content_graph.structure") is not None
+    assert BINDING_CATALOG.find("content_graph.items") is not None
+    for command_id in (
+        "world.actors",
+        "world.actor_components",
+        "world.property",
+    ):
+        binding = BINDING_CATALOG.find(command_id)
+        assert binding is not None and binding.status == "dormant"
 
 
 def test_reference_asset_read_is_server_owned_not_a_client_alias() -> None:
@@ -197,7 +209,7 @@ def test_t06_has_no_task_specific_binding_or_tutorial_authority() -> None:
     for document in (task_doc, plugin_doc):
         text = document.read_text(encoding="utf-8")
         assert "client.project.summary" in text
-        assert "client.world.actor_components" in text
+        assert "client.content_graph.items" in text
         assert "client.reference.asset_read" in text
         assert "uai-cli" in text
         assert "uai.generated_commands" not in text
@@ -240,6 +252,7 @@ def test_all_historical_query_obligations_have_exact_v2_successors() -> None:
     assert len(by_id) == 21
 
     for historical_id, successor_id in HISTORICAL_SUCCESSORS.items():
+        assert BINDING_CATALOG.find(successor_id) is not None
         row = by_id[historical_id]
         frozen = frozen_rows[historical_id]
         assert row["approval"] == frozen["approval"]

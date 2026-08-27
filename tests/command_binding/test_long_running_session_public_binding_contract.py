@@ -35,6 +35,11 @@ EXPECTED_PARAMETERS: dict[str, tuple[str, ...]] = {
         "policy_id",
         "parameters",
     ),
+    "runtime.scenario.execute": (
+        "subject_ref",
+        "policy_id",
+        "parameters",
+    ),
     "capture.image.execute": (
         "subject_ref",
         "policy_id",
@@ -71,6 +76,7 @@ EXPECTED_PARAMETERS: dict[str, tuple[str, ...]] = {
 EXPECTED_METHODS: dict[str, tuple[str, str]] = {
     "job.compile_build": ("job", "compile_build"),
     "editor.session": ("editor", "session"),
+    "runtime.scenario.execute": ("runtime", "scenario_execute"),
     "capture.image.execute": ("capture", "image_execute"),
     "capture.media.execute": ("capture", "media_execute"),
     "capture.render.execute": ("capture", "render_execute"),
@@ -142,7 +148,13 @@ class LongRunningSessionPublicBindingContractTests(unittest.TestCase):
         )
         client = _Client()
         namespaces = GeneratedCommandNamespaces(client)
-        expected_namespaces = ("job", "editor", "capture", "operation")
+        expected_namespaces = (
+            "job",
+            "editor",
+            "runtime",
+            "capture",
+            "operation",
+        )
         missing_generated = [
             namespace
             for namespace in expected_namespaces
@@ -181,6 +193,20 @@ class LongRunningSessionPublicBindingContractTests(unittest.TestCase):
             "/Game/UAI/Fixture.Asset",
             "policy:asset-editor/open/v1",
             {},
+        )
+        namespaces.runtime.scenario_execute(
+            "runtime-session:pie-debug:0:fixture",
+            "policy:runtime-scenario:bounded/v1",
+            {
+                "expected_pause_epoch": 1,
+                "expected_workspace_revision": 1,
+                "limits": {
+                    "wall_seconds": 1,
+                    "game_seconds": 1,
+                    "frame_count": 1,
+                },
+                "steps": [],
+            },
         )
         namespaces.capture.image_execute(
             "viewport:owned-fixture",

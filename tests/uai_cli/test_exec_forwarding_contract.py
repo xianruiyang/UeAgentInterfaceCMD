@@ -57,6 +57,9 @@ class _Client:
     def __init__(self, result: uai.Result) -> None:
         self.result = result
         self.calls: list[tuple[str, dict[str, object]]] = []
+        self.dormant_calls: list[
+            tuple[str, dict[str, object], str, bool]
+        ] = []
         self.closed = False
 
     def execute(
@@ -65,6 +68,29 @@ class _Client:
         params: dict[str, object],
     ) -> uai.Result:
         self.calls.append((command_id, params))
+        return self.result
+
+    def execute_exact(
+        self,
+        command_id: str,
+        params: dict[str, object],
+        *,
+        contract_hash: str,
+    ) -> uai.Result:
+        self.calls.append((command_id, params))
+        return self.result
+
+    def execute_dormant(
+        self,
+        command_id: str,
+        params: dict[str, object],
+        *,
+        contract_hash: str,
+        user_confirmed: bool,
+    ) -> uai.Result:
+        self.dormant_calls.append(
+            (command_id, params, contract_hash, user_confirmed)
+        )
         return self.result
 
     def __enter__(self):
@@ -152,6 +178,34 @@ class CliExecForwardingContractTests(unittest.TestCase):
         self.assertEqual(
             json.loads(output.getvalue()),
             dict(client.result.raw_response),
+        )
+
+    def test_allow_dormant_uses_the_confirmation_entry_once(self) -> None:
+        client = _Client(_result(True))
+        with mock.patch.object(
+            cli_main.uai,
+            "connect",
+            return_value=client,
+        ):
+            with redirect_stdout(io.StringIO()):
+                exit_code = self._run_main(
+                    [
+                        "--connection",
+                        "fixture.toml",
+                        "exec",
+                        "fixture.echo_exact",
+                        "--contract-hash",
+                        BINDING_HASH,
+                        "--allow-dormant",
+                        "--params-json",
+                        "{}",
+                    ]
+                )
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(client.calls, [])
+        self.assertEqual(
+            client.dormant_calls,
+            [("fixture.echo_exact", {}, BINDING_HASH, True)],
         )
 
     def test_params_file_and_report_preserve_the_result(self) -> None:

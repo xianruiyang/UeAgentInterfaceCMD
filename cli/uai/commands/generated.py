@@ -12,8 +12,8 @@ from ._runtime import (
     OMITTED,
 )
 
-GENERATED_MANIFEST_HASH = "sha256:1504a65d392c6c97f8d8e9d50f8f1fe24917afffdf1e1e0bc31a6d8a05428621"
-GENERATED_REGISTRY_HASH = "sha256:fc8bb2f208d74d8e4368c867e9ba9c062cdc1fc4c95099f3c8d3fb83fab39c6f"
+GENERATED_MANIFEST_HASH = "sha256:8944af5bda2851272eda9183977ac4949dd4332ef74ffd46d9c215668674d61d"
+GENERATED_REGISTRY_HASH = "sha256:adaef6b43c4dc302279b2872c8e42ec97c52f205915df412b1d11f9c92545bb7"
 
 class AiCommands:
     __slots__ = ("_client",)
@@ -4846,6 +4846,7 @@ class QueryCommands:
         *,
         limit: int | object = OMITTED,
         cursor: int | object = OMITTED,
+        mode: str | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["intent"] = intent
@@ -4853,6 +4854,8 @@ class QueryCommands:
             params["limit"] = limit
         if cursor is not OMITTED:
             params["cursor"] = cursor
+        if mode is not OMITTED:
+            params["mode"] = mode
         return self._client.execute(
             "query.command.search",
             params,
@@ -5140,6 +5143,30 @@ class RigCommands:
             params["projection"] = projection
         return self._client.execute(
             "rig.skeleton.socket.update",
+            params,
+        )
+
+class RuntimeCommands:
+    __slots__ = ("_client",)
+
+    def __init__(
+        self,
+        client: CommandExecutor,
+    ) -> None:
+        self._client = client
+
+    def scenario_execute(
+        self,
+        subject_ref: str,
+        policy_id: str,
+        parameters: dict[str, Any],
+    ):
+        params: dict[str, Any] = {}
+        params["subject_ref"] = subject_ref
+        params["policy_id"] = policy_id
+        params["parameters"] = parameters
+        return self._client.execute(
+            "runtime.scenario.execute",
             params,
         )
 
@@ -5824,27 +5851,6 @@ class WorldCommands:
             params,
         )
 
-    def actor_components(
-        self,
-        target: str,
-        *,
-        input: dict[str, Any] | object = OMITTED,
-        context: dict[str, Any] | object = OMITTED,
-        projection: dict[str, Any] | object = OMITTED,
-    ):
-        params: dict[str, Any] = {}
-        params["target"] = target
-        if input is not OMITTED:
-            params["input"] = input
-        if context is not OMITTED:
-            params["context"] = context
-        if projection is not OMITTED:
-            params["projection"] = projection
-        return self._client.execute(
-            "world.actor_components",
-            params,
-        )
-
     def actor_hlod_layer_update(
         self,
         *,
@@ -5872,25 +5878,6 @@ class WorldCommands:
         params["target_refs"] = target_refs
         return self._client.execute(
             "world.actor_streaming_policy.update",
-            params,
-        )
-
-    def actors(
-        self,
-        *,
-        input: dict[str, Any] | object = OMITTED,
-        context: dict[str, Any] | object = OMITTED,
-        projection: dict[str, Any] | object = OMITTED,
-    ):
-        params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
-        if context is not OMITTED:
-            params["context"] = context
-        if projection is not OMITTED:
-            params["projection"] = projection
-        return self._client.execute(
-            "world.actors",
             params,
         )
 
@@ -6276,44 +6263,6 @@ class WorldCommands:
             params,
         )
 
-    def object_transform_read(
-        self,
-        target: str,
-        input: dict[str, Any],
-        context: dict[str, Any],
-        *,
-        projection: dict[str, Any] | object = OMITTED,
-    ):
-        params: dict[str, Any] = {}
-        params["target"] = target
-        params["input"] = input
-        params["context"] = context
-        if projection is not OMITTED:
-            params["projection"] = projection
-        return self._client.execute(
-            "world.object_transform.read",
-            params,
-        )
-
-    def object_transform_update(
-        self,
-        target: str,
-        input: dict[str, Any],
-        context: dict[str, Any],
-        *,
-        projection: dict[str, Any] | object = OMITTED,
-    ):
-        params: dict[str, Any] = {}
-        params["target"] = target
-        params["input"] = input
-        params["context"] = context
-        if projection is not OMITTED:
-            params["projection"] = projection
-        return self._client.execute(
-            "world.object_transform.update",
-            params,
-        )
-
     def overlap(
         self,
         *,
@@ -6427,27 +6376,6 @@ class WorldCommands:
             params["projection"] = projection
         return self._client.execute(
             "world.physics_constraint",
-            params,
-        )
-
-    def property(
-        self,
-        target: str,
-        *,
-        input: dict[str, Any] | object = OMITTED,
-        context: dict[str, Any] | object = OMITTED,
-        projection: dict[str, Any] | object = OMITTED,
-    ):
-        params: dict[str, Any] = {}
-        params["target"] = target
-        if input is not OMITTED:
-            params["input"] = input
-        if context is not OMITTED:
-            params["context"] = context
-        if projection is not OMITTED:
-            params["projection"] = projection
-        return self._client.execute(
-            "world.property",
             params,
         )
 
@@ -11003,7 +10931,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor.session",
-            binding_hash="sha256:5901187b24e0acd44a9d14277a2920eec8c39e3ecb5e2db4071043c41125f9dd",
+            binding_hash="sha256:e9e9bf2a65106c4ff9c3987e4a34b7a876b53091b025eca52180e67d30213823",
             namespace="editor",
             method="session",
             parameters=(
@@ -15068,7 +14996,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="query.command.detail",
-            binding_hash="sha256:779197969f28a3d3d386106c653a3bbfc2a35a5bb818471bc852fb6c0f531b09",
+            binding_hash="sha256:023e676def854a09bdbe08738eaec118c9b89c21a23d4b475d13f93a247285a9",
             namespace="query",
             method="command_detail",
             parameters=(
@@ -15097,7 +15025,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="query.command.search",
-            binding_hash="sha256:b9ff4cb525b8c31a3859ebe7c5f7a4f9619a205d5690d1d0a0866772b387e772",
+            binding_hash="sha256:bb619e9d7d7829c2ba777ad78bf11e7a1d309f11a713fe3b71a053f3d91fc741",
             namespace="query",
             method="command_search",
             parameters=(
@@ -15119,6 +15047,12 @@ BINDING_CATALOG = CommandBindingCatalog(
                     required=False,
                     nullable=False,
                 ),
+                CommandParameterBinding(
+                    name="mode",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
             ),
             min_wire_version=1,
             max_wire_version=1,
@@ -15126,7 +15060,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="query.content.search",
-            binding_hash="sha256:0e5fbdd3132f84c6386f602acc1c60750163c5319d928b60eb549e20e4a198e2",
+            binding_hash="sha256:5282535fd49d4d0ea4725a676650b288d6dbdf6cdaa4f68eabb3ce7bdf6ffd3e",
             namespace="query",
             method="content_search",
             parameters=(
@@ -15578,6 +15512,35 @@ BINDING_CATALOG = CommandBindingCatalog(
                     name="projection",
                     wire_type="object",
                     required=False,
+                    nullable=False,
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="runtime.scenario.execute",
+            binding_hash="sha256:a34e12f9c42cdeb1a979b98aa6c15754706a1bd472114ea90a9efb54f1e6a13b",
+            namespace="runtime",
+            method="scenario_execute",
+            parameters=(
+                CommandParameterBinding(
+                    name="subject_ref",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="policy_id",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="parameters",
+                    wire_type="object",
+                    required=True,
                     nullable=False,
                 ),
             ),
@@ -16680,7 +16643,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.actor_components",
-            binding_hash="sha256:2c21a1afe1f4e3ab52c2364ddbc5a32fe62da8580563c00e5a2bfc8b5fd549bb",
+            binding_hash="sha256:3208fc2d3807b0360261135f65dcc8d145736d8525265611a38b189bbed54868",
             namespace="world",
             method="actor_components",
             parameters=(
@@ -16711,7 +16674,7 @@ BINDING_CATALOG = CommandBindingCatalog(
             ),
             min_wire_version=1,
             max_wire_version=1,
-            status="active",
+            status="dormant",
         ),
         CommandBinding(
             command_id="world.actor_hlod_layer.update",
@@ -16767,7 +16730,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.actors",
-            binding_hash="sha256:6e40949bf9310cf08f8934a44cd5623335bc66cfeea18ae6ce7a6614a25573bf",
+            binding_hash="sha256:f2960e360c7e673cde0251e866f0426b5affbf03e34a7da04ae2a5c177bd74eb",
             namespace="world",
             method="actors",
             parameters=(
@@ -16792,7 +16755,7 @@ BINDING_CATALOG = CommandBindingCatalog(
             ),
             min_wire_version=1,
             max_wire_version=1,
-            status="active",
+            status="dormant",
         ),
         CommandBinding(
             command_id="world.capsule_path",
@@ -17347,7 +17310,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.object_align",
-            binding_hash="sha256:8e26731cac6e674f5cfa0d1b880a5749778a4b984aaecefce11e999f5f8cb1de",
+            binding_hash="sha256:96d6ade4b450bfe8c6627383df2b38730c9f0b03259dccb8c7e086d9f0dd50b3",
             namespace="world",
             method="object_align",
             parameters=(
@@ -17382,7 +17345,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.object_snap_to_surface",
-            binding_hash="sha256:8a362d7345c0d388dd665f092d3fd7c99030a1ef2b356d919fd77de0185160dc",
+            binding_hash="sha256:a80f687a551be464062b702b7ae76dfb0c0d1ce038fefdff398b5217b1cea0ac",
             namespace="world",
             method="object_snap_to_surface",
             parameters=(
@@ -17417,7 +17380,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.object_transform.read",
-            binding_hash="sha256:1bd45d3fc6ff1b99c94c8f1d78ade8e957f0c77c995aa61c0a127e4231494358",
+            binding_hash="sha256:e248e137a0cca73f5d5036eda999638cdc2f990153a37dc807f356bffa8f57af",
             namespace="world",
             method="object_transform_read",
             parameters=(
@@ -17448,11 +17411,11 @@ BINDING_CATALOG = CommandBindingCatalog(
             ),
             min_wire_version=1,
             max_wire_version=1,
-            status="active",
+            status="dormant",
         ),
         CommandBinding(
             command_id="world.object_transform.update",
-            binding_hash="sha256:b21d52814180c133876d502d87cf94c512cd8d7dc29c5a631c0826fa5b365969",
+            binding_hash="sha256:0d2226d1554d848acb751613d96208887bdb4daccccb0b9bda25b2931a5691af",
             namespace="world",
             method="object_transform_update",
             parameters=(
@@ -17483,7 +17446,7 @@ BINDING_CATALOG = CommandBindingCatalog(
             ),
             min_wire_version=1,
             max_wire_version=1,
-            status="active",
+            status="dormant",
         ),
         CommandBinding(
             command_id="world.overlap",
@@ -17673,7 +17636,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.property",
-            binding_hash="sha256:de868e3f7d1ac17577628746c56febb9a379e5df73d0d6c4fe645424cc5fbd9d",
+            binding_hash="sha256:e801f8bdf4d410fbf2258fabd6057d2b2cb00429449dcf36ab52eccf24b59c28",
             namespace="world",
             method="property",
             parameters=(
@@ -17704,7 +17667,7 @@ BINDING_CATALOG = CommandBindingCatalog(
             ),
             min_wire_version=1,
             max_wire_version=1,
-            status="active",
+            status="dormant",
         ),
         CommandBinding(
             command_id="world.ray_trace",
@@ -17930,7 +17893,7 @@ BINDING_CATALOG = CommandBindingCatalog(
 )
 
 class GeneratedCommandNamespaces:
-    __slots__ = ("ai", "animation", "animation_rig_graph", "asset", "asset_durable", "audio", "audio_media", "blueprint", "capture", "config", "content_graph", "deformer", "editor", "editor_project", "external", "graph", "job", "landscape", "material", "material_instance", "mesh", "metasound", "modeling", "niagara", "operation", "pcg", "physics", "project", "query", "reference", "rig", "skeletal_mesh", "sound_cue", "texture_graph", "timeline", "umg", "viewport", "world")
+    __slots__ = ("ai", "animation", "animation_rig_graph", "asset", "asset_durable", "audio", "audio_media", "blueprint", "capture", "config", "content_graph", "deformer", "editor", "editor_project", "external", "graph", "job", "landscape", "material", "material_instance", "mesh", "metasound", "modeling", "niagara", "operation", "pcg", "physics", "project", "query", "reference", "rig", "runtime", "skeletal_mesh", "sound_cue", "texture_graph", "timeline", "umg", "viewport", "world")
 
     def __init__(
         self,
@@ -17967,6 +17930,7 @@ class GeneratedCommandNamespaces:
         self.query = QueryCommands(client)
         self.reference = ReferenceCommands(client)
         self.rig = RigCommands(client)
+        self.runtime = RuntimeCommands(client)
         self.skeletal_mesh = SkeletalMeshCommands(client)
         self.sound_cue = SoundCueCommands(client)
         self.texture_graph = TextureGraphCommands(client)
@@ -18102,6 +18066,10 @@ class GeneratedClientBindingsMixin:
     @property
     def rig(self) -> RigCommands:
         return self._generated_commands.rig
+
+    @property
+    def runtime(self) -> RuntimeCommands:
+        return self._generated_commands.runtime
 
     @property
     def skeletal_mesh(self) -> SkeletalMeshCommands:

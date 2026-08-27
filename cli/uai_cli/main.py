@@ -24,6 +24,11 @@ def _add_exec_parser(commands) -> None:
     params.add_argument("--params-file")
     params.add_argument("--params-stdin", action="store_true")
     execute.add_argument(
+        "--allow-dormant",
+        action="store_true",
+        help="attest explicit user confirmation for one dormant command",
+    )
+    execute.add_argument(
         "--report",
         help="Optional path for the same lossless result JSON.",
     )
@@ -108,12 +113,25 @@ def _run_exec(args) -> int:
     params = _load_params(args)
     with uai.connect(args.connection) as client:
         if args.contract_hash:
-            result = client.execute_exact(
-                args.command_id,
-                params,
-                contract_hash=args.contract_hash,
-            )
+            if args.allow_dormant:
+                result = client.execute_dormant(
+                    args.command_id,
+                    params,
+                    contract_hash=args.contract_hash,
+                    user_confirmed=True,
+                )
+            else:
+                result = client.execute_exact(
+                    args.command_id,
+                    params,
+                    contract_hash=args.contract_hash,
+                )
         else:
+            if args.allow_dormant:
+                raise uai.UsageError(
+                    code="cli_dormant_contract_hash_required",
+                    message="--allow-dormant requires --contract-hash",
+                )
             result = client.execute(args.command_id, params)
     text = _result_json(result)
     print(text)

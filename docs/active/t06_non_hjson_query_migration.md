@@ -1,7 +1,7 @@
 # Non-HJSON Query SDK and CLI
 
 Import only `uai` and connect from one complete Connection TOML. The final
-manifest generates the normal domain namespaces for all forty-two current
+manifest generates the normal domain namespaces for all thirty-nine current
 Query routes:
 
 ```python
@@ -11,11 +11,11 @@ with uai.connect("connection.toml") as client:
     summary = client.project.summary(
         projection={"include_provenance": True, "max_items": 25},
     )
-    components = client.world.actor_components(
-        "/Game/Maps/WB_WhiteBox01.WB_WhiteBox01:PersistentLevel.Actor_1",
-        input={"include_inherited": True},
-        context={"state_plane": "authoring_memory"},
-        projection={"max_items": 25},
+    components = client.content_graph.items(
+        "/Game/Maps/WB_WhiteBox01.WB_WhiteBox01",
+        input={"item_ids": [
+            "/Game/Maps/WB_WhiteBox01.WB_WhiteBox01:PersistentLevel.Actor_1"
+        ]},
     )
     asset = client.reference.asset_read(
         "/Game/UAI/Reference/BP_Reference.BP_Reference",
@@ -78,8 +78,22 @@ Inspect completeness and state semantics before extending a conclusion beyond
 the returned scope. The generated methods add no UE business logic, alias
 mapping, retry loop, transport fallback, or result reinterpretation.
 
-The former 21 public query identities assigned to T06 are not aliases. Their
-frozen contracts and exact current successors are recorded in
+`world.actors`, `world.actor_components`, and `world.property` are dormant.
+Use `content_graph.structure`, filtered `content_graph.items`, and filtered
+`content_graph.properties`; when discovery starts at `query.content.search`,
+forward its returned detail command, detail target, and detail input unchanged.
+
+Normal `query.command.search` results and generated named SDK methods do not
+expose dormant commands. Development-only compatibility inspection uses
+`client.query.command_search(intent, mode="compatibility")`. If an active HJSON
+successor cannot satisfy the authorized task, explain that gap and obtain the
+user's explicit agreement before calling
+`client.execute_dormant(..., user_confirmed=True)` or the CLI's
+`--allow-dormant` form. Dormancy preserves the original contract and server
+implementation; it is not an alias or a physically removed route.
+
+The separate 21 historical query identities assigned to the T06 migration are
+not aliases. Their frozen contracts and exact current successors are recorded in
 `Plugins/UeAgentInterface/docs/active/successors/t06_non_hjson_query_migration.json`.
 Use only the current generated methods named there; the old IDs are absent from
 the manifest, SDK catalog, CLI, and compatibility routing.

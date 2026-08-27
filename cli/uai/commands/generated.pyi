@@ -2159,6 +2159,7 @@ class QueryCommands:
         *,
         limit: int = ...,
         cursor: int = ...,
+        mode: str = ...,
     ) -> Any: ...
 
     def content_search(
@@ -2281,6 +2282,15 @@ class RigCommands:
         *,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
+    ) -> Any: ...
+
+class RuntimeCommands:
+
+    def scenario_execute(
+        self,
+        subject_ref: str,
+        policy_id: str,
+        parameters: dict[str, Any],
     ) -> Any: ...
 
 class SkeletalMeshCommands:
@@ -2578,15 +2588,6 @@ class WorldCommands:
         tags: list[Any] = ...,
     ) -> Any: ...
 
-    def actor_components(
-        self,
-        target: str,
-        *,
-        input: dict[str, Any] = ...,
-        context: dict[str, Any] = ...,
-        projection: dict[str, Any] = ...,
-    ) -> Any: ...
-
     def actor_hlod_layer_update(
         self,
         *,
@@ -2599,14 +2600,6 @@ class WorldCommands:
         self,
         changes: dict[str, Any],
         target_refs: list[Any],
-    ) -> Any: ...
-
-    def actors(
-        self,
-        *,
-        input: dict[str, Any] = ...,
-        context: dict[str, Any] = ...,
-        projection: dict[str, Any] = ...,
     ) -> Any: ...
 
     def capsule_path(
@@ -2776,24 +2769,6 @@ class WorldCommands:
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
-    def object_transform_read(
-        self,
-        target: str,
-        input: dict[str, Any],
-        context: dict[str, Any],
-        *,
-        projection: dict[str, Any] = ...,
-    ) -> Any: ...
-
-    def object_transform_update(
-        self,
-        target: str,
-        input: dict[str, Any],
-        context: dict[str, Any],
-        *,
-        projection: dict[str, Any] = ...,
-    ) -> Any: ...
-
     def overlap(
         self,
         *,
@@ -2836,15 +2811,6 @@ class WorldCommands:
     ) -> Any: ...
 
     def physics_constraint(
-        self,
-        target: str,
-        *,
-        input: dict[str, Any] = ...,
-        context: dict[str, Any] = ...,
-        projection: dict[str, Any] = ...,
-    ) -> Any: ...
-
-    def property(
         self,
         target: str,
         *,
@@ -2945,6 +2911,7 @@ class GeneratedCommandNamespaces:
     query: QueryCommands
     reference: ReferenceCommands
     rig: RigCommands
+    runtime: RuntimeCommands
     skeletal_mesh: SkeletalMeshCommands
     sound_cue: SoundCueCommands
     texture_graph: TextureGraphCommands
@@ -3051,6 +3018,9 @@ class GeneratedClientBindingsMixin:
 
     @property
     def rig(self) -> RigCommands: ...
+
+    @property
+    def runtime(self) -> RuntimeCommands: ...
 
     @property
     def skeletal_mesh(self) -> SkeletalMeshCommands: ...
