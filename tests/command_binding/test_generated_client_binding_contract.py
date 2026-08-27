@@ -196,6 +196,27 @@ class GeneratedClientBindingContractTests(unittest.TestCase):
             ],
         )
 
+    def test_asset_registry_relations_requires_and_forwards_nested_input(self) -> None:
+        namespaces, client = self._namespaces()
+        signature = inspect.signature(namespaces.asset.registry_relations)
+        self.assertIs(
+            signature.parameters["input"].default,
+            inspect.Parameter.empty,
+            "registry_relations_input_must_not_be_optional",
+        )
+        target = "/Game/Test.Test"
+        query_input = {"direction": "dependencies"}
+        namespaces.asset.registry_relations(target, query_input)
+        self.assertEqual(
+            client.calls,
+            [
+                (
+                    "asset.registry_relations",
+                    {"target": target, "input": query_input},
+                )
+            ],
+        )
+
     def test_voxel_grid_bindings_forward_only_explicit_session_data(self) -> None:
         namespaces, client = self._namespaces()
         namespaces.mesh.voxel_grid_session(

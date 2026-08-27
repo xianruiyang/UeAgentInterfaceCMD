@@ -443,8 +443,8 @@ class AssetCommands:
     def collection(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
@@ -641,8 +641,8 @@ class AssetCommands:
     def registry_relations(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
@@ -682,8 +682,8 @@ class AssetCommands:
     def relations(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
@@ -715,8 +715,8 @@ class AssetCommands:
     def sample(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
@@ -1002,16 +1002,16 @@ class ConfigCommands:
 
     def resolved_value(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
     def section(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
@@ -1343,8 +1343,8 @@ class LandscapeCommands:
     def height_read(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
@@ -2112,8 +2112,8 @@ class ProjectCommands:
 
     def settings(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
@@ -2196,8 +2196,8 @@ class ReferenceCommands:
 
     def origin_resolve(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
@@ -2604,16 +2604,16 @@ class WorldCommands:
 
     def capsule_path(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
     def capsule_sweep(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
@@ -2704,8 +2704,8 @@ class WorldCommands:
     def mesh_closest_vertex(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
@@ -2713,40 +2713,40 @@ class WorldCommands:
     def mesh_vertex_position(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
     def nav_connectivity(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
     def nav_find_path(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
     def nav_project_point(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
     def nearby_shapes(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
@@ -2771,8 +2771,8 @@ class WorldCommands:
 
     def overlap(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...
@@ -2821,8 +2821,8 @@ class WorldCommands:
 
     def ray_trace(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] = ...,
         context: dict[str, Any] = ...,
         projection: dict[str, Any] = ...,
     ) -> Any: ...

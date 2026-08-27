@@ -12,8 +12,8 @@ from ._runtime import (
     OMITTED,
 )
 
-GENERATED_MANIFEST_HASH = "sha256:8944af5bda2851272eda9183977ac4949dd4332ef74ffd46d9c215668674d61d"
-GENERATED_REGISTRY_HASH = "sha256:adaef6b43c4dc302279b2872c8e42ec97c52f205915df412b1d11f9c92545bb7"
+GENERATED_MANIFEST_HASH = "sha256:2cf202f104ff7080a2e490a38a8c2fe7c54bf921e2e146843e37be7ed0eeac8c"
+GENERATED_REGISTRY_HASH = "sha256:c5b8c2d48aa9b54a310191a5b37cc861eaf40b330b728a83431587c2b619458c"
 
 class AiCommands:
     __slots__ = ("_client",)
@@ -977,15 +977,14 @@ class AssetCommands:
     def collection(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["target"] = target
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -1410,15 +1409,14 @@ class AssetCommands:
     def registry_relations(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["target"] = target
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -1499,15 +1497,14 @@ class AssetCommands:
     def relations(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["target"] = target
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -1572,15 +1569,14 @@ class AssetCommands:
     def sample(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["target"] = target
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -2239,14 +2235,13 @@ class ConfigCommands:
 
     def resolved_value(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -2258,14 +2253,13 @@ class ConfigCommands:
 
     def section(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -3024,15 +3018,14 @@ class LandscapeCommands:
     def height_read(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["target"] = target
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -4738,14 +4731,13 @@ class ProjectCommands:
 
     def settings(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -4944,14 +4936,13 @@ class ReferenceCommands:
 
     def origin_resolve(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -5883,14 +5874,13 @@ class WorldCommands:
 
     def capsule_path(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -5902,14 +5892,13 @@ class WorldCommands:
 
     def capsule_sweep(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -6110,15 +6099,14 @@ class WorldCommands:
     def mesh_closest_vertex(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["target"] = target
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -6131,15 +6119,14 @@ class WorldCommands:
     def mesh_vertex_position(
         self,
         target: str,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["target"] = target
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -6151,14 +6138,13 @@ class WorldCommands:
 
     def nav_connectivity(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -6170,14 +6156,13 @@ class WorldCommands:
 
     def nav_find_path(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -6189,14 +6174,13 @@ class WorldCommands:
 
     def nav_project_point(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -6208,14 +6192,13 @@ class WorldCommands:
 
     def nearby_shapes(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -6265,14 +6248,13 @@ class WorldCommands:
 
     def overlap(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -6381,14 +6363,13 @@ class WorldCommands:
 
     def ray_trace(
         self,
+        input: dict[str, Any],
         *,
-        input: dict[str, Any] | object = OMITTED,
         context: dict[str, Any] | object = OMITTED,
         projection: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
-        if input is not OMITTED:
-            params["input"] = input
+        params["input"] = input
         if context is not OMITTED:
             params["context"] = context
         if projection is not OMITTED:
@@ -8207,7 +8188,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.collection",
-            binding_hash="sha256:3157b05ee9eb5c41cd62a8607717d8db649d0dabfd5d77534aba88e0730dea20",
+            binding_hash="sha256:26d4dc48f98ef060a0941fac46a50103b884ffcd2f1eac83e445099b37d151a2",
             namespace="asset",
             method="collection",
             parameters=(
@@ -8220,7 +8201,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -8900,7 +8881,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.properties",
-            binding_hash="sha256:30f10d97a4e7637b355f668761eb037101285f7cfa863bc4caf64e255bf38fbd",
+            binding_hash="sha256:4a712dc079deebbfe5dc0a08a999a590ea3171b15282dc02901e00d68227548f",
             namespace="asset",
             method="properties",
             parameters=(
@@ -8935,7 +8916,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.registry_record",
-            binding_hash="sha256:657a069073f0886d9075e0c71f9cf719da9e721ad7ae956efe169a0d61e8667e",
+            binding_hash="sha256:b76f1b60cb1ed7ef6006eeb38c6ba815979d57cf5e10c740c9319aaba9c48231",
             namespace="asset",
             method="registry_record",
             parameters=(
@@ -8970,7 +8951,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.registry_relations",
-            binding_hash="sha256:a193b8fc3a9541910eebacd0289e51bf106e49847399d58c95f192b59f870075",
+            binding_hash="sha256:e493571d952d850d4750a1668bbc1429cd5c5ed4066b06dca1157fa8008cb2f5",
             namespace="asset",
             method="registry_relations",
             parameters=(
@@ -8983,7 +8964,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -9121,7 +9102,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.relations",
-            binding_hash="sha256:555b9829c31fad5b642c8fb64bdac68a0abeec4161d9d8dae5ec1553962ae043",
+            binding_hash="sha256:704b2233fdf88e360c7b56a7f42a88513dc76410981fc9f41a84c640a4f48d91",
             namespace="asset",
             method="relations",
             parameters=(
@@ -9134,7 +9115,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -9248,7 +9229,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sample",
-            binding_hash="sha256:94b4a6485f63b0e0e6c5ffa2ab8946a0cad56c7d214f8db67927eb602e6b3a10",
+            binding_hash="sha256:b33ce0740be31a4cfcdff3daed1ce96ee362a25c43d65002867b0dbdd051a1da",
             namespace="asset",
             method="sample",
             parameters=(
@@ -9261,7 +9242,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -9652,7 +9633,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.summary",
-            binding_hash="sha256:5b1b53ac8accbc593d1df51f57815ae7111c7eeffc2ed10aaff30c46dd160be3",
+            binding_hash="sha256:8aa3335290d93fe0b1c15a4fc50677ca6ebad25109cb64bb86fcecfb90f73ea4",
             namespace="asset",
             method="summary",
             parameters=(
@@ -9871,7 +9852,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.validation",
-            binding_hash="sha256:845c80cba1a4966aa53287e652f9ba6f25d1a61d0aa6163a885f9810c116c21d",
+            binding_hash="sha256:6200ea08d627c65c4b3c38c704af43c805c12435f0cb39ad83d862df12db34a7",
             namespace="asset",
             method="validation",
             parameters=(
@@ -10355,14 +10336,14 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="config.resolved_value",
-            binding_hash="sha256:78079f50cfbd9b67c0538daae337a4e92cbef60c34777350750cd18e265c61c9",
+            binding_hash="sha256:ae475703d7a91b8e55dab531dda2b1ba4ef06f119cad68aba001627715f022f2",
             namespace="config",
             method="resolved_value",
             parameters=(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -10384,14 +10365,14 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="config.section",
-            binding_hash="sha256:90841c87e995e6a3a01e333a00ae6c7606802837c300bc582976c8bb40e9cd62",
+            binding_hash="sha256:4b6da5e74e5f03d423879add811dc3d988ad6d68efc0f3de5e954e940a72d382",
             namespace="config",
             method="section",
             parameters=(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -10850,7 +10831,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor.dirty_resources",
-            binding_hash="sha256:c58253d6cc742d78e53c878b15cd6f887328e4b5a87708ef7569b226024c7cbb",
+            binding_hash="sha256:76d10dff958813ccde145cacef88c6e9f710184c4cfbbea22e42ccf3abb42547",
             namespace="editor",
             method="dirty_resources",
             parameters=(
@@ -10879,7 +10860,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor.open_assets",
-            binding_hash="sha256:bf45a9cf9cc001291fd4d6aba1028e3124b617e934a50d745db0cf7503a93aa7",
+            binding_hash="sha256:28067a272ba5f8404f8c543aace70590460649ee3e7e939da28bd791e5617666",
             namespace="editor",
             method="open_assets",
             parameters=(
@@ -11623,7 +11604,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="landscape.height.read",
-            binding_hash="sha256:5d95851a03fbf05c75ca699076faf35b28a0f1d391f0103d3501781afa365965",
+            binding_hash="sha256:aebd20a52cdc1d1583438ee8c6c2cd6d59c8f0a0b18aad7392ba42a6ce1ea5ea",
             namespace="landscape",
             method="height_read",
             parameters=(
@@ -11636,7 +11617,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -14845,7 +14826,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="project.platform",
-            binding_hash="sha256:f50916c2fce9ad2a38421cd614feee0c37f2f0244781d1be14ef415fa46eebaa",
+            binding_hash="sha256:25f4202a23560935627140baf5b31b14f5a14009ea6cbd7058ca3f792a7ecc7b",
             namespace="project",
             method="platform",
             parameters=(
@@ -14874,14 +14855,14 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="project.settings",
-            binding_hash="sha256:60268291aaf4bb3ca12afac08ef7422d386e365140b4bea6cf01adada4b2e059",
+            binding_hash="sha256:fe9c3f2a20d1389773e42f89e4f4d9e8dfa74990aa0e02676259d294ffae5170",
             namespace="project",
             method="settings",
             parameters=(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -14903,7 +14884,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="project.summary",
-            binding_hash="sha256:cd9691d7a0d220f780906e7333b140ae37b9e3985463cbf81af25e9458b34da1",
+            binding_hash="sha256:c56469e538ea9048a1bbcd865a29cfbfd695fb52bd23e3d78036fe88617f46c4",
             namespace="project",
             method="summary",
             parameters=(
@@ -14932,7 +14913,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="project.validation",
-            binding_hash="sha256:f084c970a9484a2cc88830d398f212c11664d4070bcca25b8d2387fe3faea7a9",
+            binding_hash="sha256:4e58a901331fb64746a65dc5a616b02f2c89b7214d4d984a9469f71bb3b787ea",
             namespace="project",
             method="validation",
             parameters=(
@@ -15183,14 +15164,14 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="reference.origin.resolve",
-            binding_hash="sha256:fe618646a9e1a406e3a9a78ff8e72f32bccb1eaf905f96716614c44674b6414e",
+            binding_hash="sha256:d6a559f9c189e7a1aa9f515fb1f4ab4ac3edfcee96559675698de8bd6acad7af",
             namespace="reference",
             method="origin_resolve",
             parameters=(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -16643,7 +16624,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.actor_components",
-            binding_hash="sha256:3208fc2d3807b0360261135f65dcc8d145736d8525265611a38b189bbed54868",
+            binding_hash="sha256:9a73e4fed755d4f19fcfd9b88a55c8d1060e47d732ba9c2e77663db99c3b416d",
             namespace="world",
             method="actor_components",
             parameters=(
@@ -16730,7 +16711,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.actors",
-            binding_hash="sha256:f2960e360c7e673cde0251e866f0426b5affbf03e34a7da04ae2a5c177bd74eb",
+            binding_hash="sha256:56c4aa0709c231b89dedef5a9160b2d35a46e36c755e3fe6ad87104cfd27e06d",
             namespace="world",
             method="actors",
             parameters=(
@@ -16759,14 +16740,14 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.capsule_path",
-            binding_hash="sha256:6844dc21072fbedb32fa4e35ce9b0c50c77263c549f74b22460f1785e51e4420",
+            binding_hash="sha256:380a36ba8b4a1c7b22697fc6e297a88b07b07bb3a10a1365e3af859c8a54c087",
             namespace="world",
             method="capsule_path",
             parameters=(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -16788,14 +16769,14 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.capsule_sweep",
-            binding_hash="sha256:2060a664d6c6cd8493b329fe90ba29664731f928f6cad7f2e7a22904da74a057",
+            binding_hash="sha256:24e5dfd8aab8165134ad2e5365498c9967a92df1a8990969f13facb829bde396",
             namespace="world",
             method="capsule_sweep",
             parameters=(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -16817,7 +16798,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.content",
-            binding_hash="sha256:fd455e8417fe3e58c21d5e7442bf3cd7806de33ca0c45238e05e841c1ccd1bba",
+            binding_hash="sha256:ee8f0aa44d1b4f2f08a3dedd81aeabb0e5245e3d12b01a1a679aa52366430813",
             namespace="world",
             method="content",
             parameters=(
@@ -16968,7 +16949,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.data_layers",
-            binding_hash="sha256:1f101499c8ed7644464e4e022582d606689109a2b5db9b69f89f10258362c5d7",
+            binding_hash="sha256:c2c9321af697cdb4d488dcee7e71aa512a1dff942b8afb4ab26791ee63591fc5",
             namespace="world",
             method="data_layers",
             parameters=(
@@ -16997,7 +16978,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.hlod_assignments",
-            binding_hash="sha256:ee1ec9f7dbe87a8b837a3960d09d1b043bf30e9dbc384b2fafe0b9fb1449bdff",
+            binding_hash="sha256:6609d85df3a9cbf3fd31e2189f1bbb9c14678b86a516b8c5ed167f7bf9fb99e7",
             namespace="world",
             method="hlod_assignments",
             parameters=(
@@ -17124,7 +17105,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.mesh_closest_vertex",
-            binding_hash="sha256:7c96da94c8df8d25dedc45be739749f481df0a8d3a16ae8e3e69a883dd8df9d4",
+            binding_hash="sha256:97902bc28f8890ca68a3058bdd9928aa6e0a0a3852ff186fbbb77e464990ec52",
             namespace="world",
             method="mesh_closest_vertex",
             parameters=(
@@ -17137,7 +17118,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -17159,7 +17140,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.mesh_vertex_position",
-            binding_hash="sha256:d7a2dd40fde4b356739ed6f1235040432d6f642bd9908e207b89b6d4c90d062b",
+            binding_hash="sha256:84796c05b81872ce274b0ba6acfeac6d852b216b5e1b6e762638b3fc3aa3de70",
             namespace="world",
             method="mesh_vertex_position",
             parameters=(
@@ -17172,7 +17153,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -17194,14 +17175,14 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.nav_connectivity",
-            binding_hash="sha256:457498347409f7f5d941c5ed0d436c4bdc3aca1c5af7f25474f3d6a5bacbb6a2",
+            binding_hash="sha256:57ce49e44cd4b3df427744daa6a90bc3cb6eb289b7cf3c085a9599a077a1c668",
             namespace="world",
             method="nav_connectivity",
             parameters=(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -17223,14 +17204,14 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.nav_find_path",
-            binding_hash="sha256:dd93e3cafc7930098cf42998340e333514bcf06f324c55706dc15349a86d556b",
+            binding_hash="sha256:f71136ee23df4a221d0de99cbd4d128928db149693626640e3e4fed84de0e358",
             namespace="world",
             method="nav_find_path",
             parameters=(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -17252,14 +17233,14 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.nav_project_point",
-            binding_hash="sha256:0ff435a73f1239ac579565a121b700e643169fcf98fa9dbc61b5f3cbac1a707d",
+            binding_hash="sha256:b68974fb8f46da435e00885444dde0b120521dd1f21424f5eb9d05a31db9c662",
             namespace="world",
             method="nav_project_point",
             parameters=(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -17281,14 +17262,14 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.nearby_shapes",
-            binding_hash="sha256:1de6ede784d63f097882f5471101aa321cf4e9624d777c8398d3d94fdd30e8f5",
+            binding_hash="sha256:09a47f0ebfa129df3326f8bf2ba3a8f97738586f4b9d69c3df1cfa2f1fd76952",
             namespace="world",
             method="nearby_shapes",
             parameters=(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -17450,14 +17431,14 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.overlap",
-            binding_hash="sha256:31d60ba471b3f5f421e889c04b0569a96801ac6ef13f9ec37033f970849208b8",
+            binding_hash="sha256:3527bf1c9d7c7cb39dbd1744687470b42064ff71a0c99477e1da7a5d02bddd3b",
             namespace="world",
             method="overlap",
             parameters=(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -17479,7 +17460,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.partition",
-            binding_hash="sha256:e9533384f6f08e90bea5d3983dc35a96fd2721bb7d736c50031d4604c68965ee",
+            binding_hash="sha256:55b256c6cf4c56e31d64dcff58f98bfaf458f1bf7117a11f98c736dbbed2616c",
             namespace="world",
             method="partition",
             parameters=(
@@ -17508,7 +17489,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.partition_health",
-            binding_hash="sha256:dcb330b872e23a402a8e5a19e6eb8023d4edd8a8f383d61c024d57fa978f20b7",
+            binding_hash="sha256:3990197e31a763224abf4fe5dd4273eb8d29e76bbd923817e8219f87a8868ed7",
             namespace="world",
             method="partition_health",
             parameters=(
@@ -17566,7 +17547,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.physics_component",
-            binding_hash="sha256:71ae9d5b85377172baae5aa2135fdd95c72f1730768af2ad71600a5b21cc4fb6",
+            binding_hash="sha256:7ff265234bce8b94fc084aa0ff4be4e9ce0e6daca60bd5d250f74a98f0ae0c66",
             namespace="world",
             method="physics_component",
             parameters=(
@@ -17601,7 +17582,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.physics_constraint",
-            binding_hash="sha256:c8512f540e680c6e6bfc867ea148dceac2f2208009a8a1ec0f054120536ab882",
+            binding_hash="sha256:f991293e62b108d722faf1d50795e121a211b91cfd9dbd2609303614688da025",
             namespace="world",
             method="physics_constraint",
             parameters=(
@@ -17636,7 +17617,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.property",
-            binding_hash="sha256:e801f8bdf4d410fbf2258fabd6057d2b2cb00429449dcf36ab52eccf24b59c28",
+            binding_hash="sha256:039767a5e7ebaa042b76c5392bb2fb54860a26ea5b59cf40ffd52c9975b82eb7",
             namespace="world",
             method="property",
             parameters=(
@@ -17649,7 +17630,7 @@ BINDING_CATALOG = CommandBindingCatalog(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -17671,14 +17652,14 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.ray_trace",
-            binding_hash="sha256:f2cfe2dd7dad8427e25c64a82a98c56711bb0ada4506841c3269f05bd5ac71a9",
+            binding_hash="sha256:58034e948e0f1ae355d7dd6a66f45f7a85a412daec573a28c9cad83c9e7318e1",
             namespace="world",
             method="ray_trace",
             parameters=(
                 CommandParameterBinding(
                     name="input",
                     wire_type="object",
-                    required=False,
+                    required=True,
                     nullable=False,
                 ),
                 CommandParameterBinding(
@@ -17700,7 +17681,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.selection",
-            binding_hash="sha256:2e54d576de8d914e37cbbb48cf0fa09db7476a6e9315991ea08af85dbce3a18a",
+            binding_hash="sha256:60de52186c001952248e2ab08d4c706416c2369adad5b949b76a3ac875b7b75e",
             namespace="world",
             method="selection",
             parameters=(
@@ -17729,7 +17710,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.streaming_levels",
-            binding_hash="sha256:f5069955d2bf2184f476bca23ce6f4788a4e06c18b8240f38f0bc9a3a1d3a759",
+            binding_hash="sha256:d33b74257a9d9c94d882d15ce58e1ff8f3ea9e9de93a277aa1038fad5c1387a7",
             namespace="world",
             method="streaming_levels",
             parameters=(
@@ -17810,7 +17791,7 @@ BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.summary",
-            binding_hash="sha256:df4d22766e65dd903830e5a67d3b31d9eb7ecd8bd6e9c0db6889895bce791cc6",
+            binding_hash="sha256:99183e07f45c2c857b67348e9b653fa7e2e315ddb300c0ada7d20183c39174a9",
             namespace="world",
             method="summary",
             parameters=(
