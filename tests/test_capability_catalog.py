@@ -103,6 +103,50 @@ def test_catalog_schema_identity_and_manifest_partition_are_current() -> None:
         assert unit["evidence"]["not_proven"]
 
 
+def test_post_t94_identities_have_one_current_unit_without_waking_dormant_commands() -> None:
+    catalog = load(CATALOG_PATH)
+    manifest = load(MANIFEST_PATH)
+    units = units_by_id(catalog)
+
+    expected_units = {
+        "animation.state_machine.candidates": (
+            "CU-ANIMATION-BLUEPRINT-COMMANDS"
+        ),
+        "umg.widget.candidates": "CU-UMG-COMMANDS",
+        "runtime.scenario.execute": "CU-OPERATION-LIFECYCLE",
+    }
+    assigned_units = {
+        command_id: unit["id"]
+        for unit in catalog["units"]
+        for command_id in unit["current_command_ids"]
+    }
+    assert {
+        command_id: assigned_units[command_id]
+        for command_id in expected_units
+    } == expected_units
+    assert all(
+        units[unit_id]["evidence"]["not_proven"]
+        for unit_id in set(expected_units.values())
+    )
+
+    dormant_ids = {
+        item["command_id"]
+        for item in manifest["commands"]
+        if item["status"] == "dormant"
+    }
+    assert dormant_ids == {
+        "world.actor_components",
+        "world.actors",
+        "world.object_transform.read",
+        "world.object_transform.update",
+        "world.property",
+    }
+    assert Counter(item["status"] for item in manifest["commands"]) == {
+        "active": 351,
+        "dormant": 5,
+    }
+
+
 def test_historical_decisions_are_final_but_do_not_promote_old_successors() -> None:
     catalog = load(CATALOG_PATH)
     history = load(HISTORY_PATH)
