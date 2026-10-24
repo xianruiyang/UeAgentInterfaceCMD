@@ -100,12 +100,14 @@ class PublicConnectionLifecycleTests(unittest.TestCase):
                             str(path),
                             "connection",
                             "show",
+                            "--format",
+                            "json",
                         ]
                     )
             self.assertEqual(exit_code, 0)
             connect.assert_called_once_with(str(path))
             self.assertTrue(client.closed)
-            self.assertIn('"connection_state": "open"', output.getvalue())
+            self.assertEqual(output.getvalue().strip(), '{"connection_state":"open"}')
 
 
 if __name__ == "__main__":

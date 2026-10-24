@@ -6,6 +6,8 @@ from pathlib import Path
 import unittest
 
 import uai
+from uai.operation import OperationHandle, OperationNamespace
+from uai.result import Result
 
 try:
     from uai.commands.generated import GeneratedCommandNamespaces
@@ -89,6 +91,16 @@ EXPECTED_METHODS: dict[str, tuple[str, str]] = {
     "operation.release": ("operation", "release"),
 }
 
+INTERNAL_LIFECYCLE_COMMANDS = {
+    "runtime.scenario.execute",
+    "operation.status",
+    "operation.resume",
+    "operation.cancel",
+    "operation.receipt",
+    "operation.reconcile",
+    "operation.release",
+}
+
 
 class _Client:
     def __init__(self) -> None:
@@ -104,6 +116,157 @@ class _Client:
 
 
 class LongRunningSessionPublicBindingContractTests(unittest.TestCase):
+    def test_long_running_projection_and_typed_handle_custody(self) -> None:
+        operation_ref = {
+            "operation_id": "op",
+            "owner_lease_id": "lease",
+            "server_session_id": "session",
+        }
+
+        class _HandleClient:
+            def __init__(self) -> None:
+                self.calls: list[tuple[str, dict[str, object]]] = []
+                self.reject_release = True
+
+            def execute(self, command_id, params):
+                self.calls.append((command_id, dict(params)))
+                if command_id == "operation.release" and self.reject_release:
+                    return Result({
+                        "ok": False,
+                        "correlation_id": "correlation",
+                        "payload": {},
+                        "error": {"code": "operation_not_terminal"},
+                    })
+                generation = 1 if command_id == "operation.resume" else 0
+                return Result(
+                    {
+                        "ok": True,
+                        "correlation_id": "correlation",
+                        "payload": {
+                            "schema": "uai.long_running.snapshot.v1",
+                            "operation_ref": operation_ref,
+                            "descriptor_id": "descriptor",
+                            "binding_hash": "binding",
+                            "generation": generation,
+                            "phase": "terminal" if command_id == "operation.release" else "running",
+                            "lifecycle_status": "released" if command_id == "operation.release" else "running",
+                            "stop_requested": False,
+                            "retry_safe": False,
+                            "terminal": command_id == "operation.release",
+                            "latest_signal": {"type_id": "fixture.signal", "revision": 1, "payload": {"value": "ok", "content_hash": "business"}},
+                        },
+                        "error": None,
+                    }
+                )
+
+            def _execute_operation_lifecycle(self, command_id, params):
+                return self.execute(command_id, params)
+
+        client = _HandleClient()
+        handle = OperationHandle(client, operation_ref, 0)
+        projected = Result(
+            {
+                "ok": True,
+                "correlation_id": "correlation",
+                "payload": {
+                    "operation_ref": operation_ref,
+                    "descriptor_id": "descriptor",
+                    "binding_hash": "binding",
+                    "generation": 0,
+                    "phase": "running",
+                    "lifecycle_status": "running",
+                    "stop_requested": False,
+                    "retry_safe": False,
+                    "terminal": False,
+                    "latest_signal": {"type_id": "fixture.signal", "revision": 1, "payload": {"value": "ok", "content_hash": "business"}},
+                },
+                "error": None,
+            },
+            long_running=True,
+            operation=handle,
+        )
+        self.assertEqual(
+            projected.payload,
+            {
+                "phase": "running",
+                "lifecycle_status": "running",
+                "stop_requested": False,
+                "retry_safe": False,
+                "terminal": False,
+                "latest_signal": {"type_id": "fixture.signal", "payload": {"value": "ok"}},
+            },
+        )
+        self.assertEqual(projected.operation, handle)
+        with self.assertRaises(AttributeError):
+            handle.generation
+
+        failed_projected = Result(
+            {
+                "ok": False,
+                "correlation_id": "correlation",
+                "payload": {"operation_ref": operation_ref, "generation": 0},
+                "error": {
+                    "code": "failed",
+                    "operation_ref": operation_ref,
+                    "content_hash": "machine-value",
+                    "fingerprint": "machine-value",
+                },
+            },
+            long_running=True,
+        )
+        self.assertEqual(failed_projected.payload, {})
+        self.assertEqual(
+            failed_projected.error,
+            {"code": "failed"},
+        )
+
+        ordinary = Result(
+            {
+                "ok": True,
+                "correlation_id": "correlation",
+                "payload": {"operation_ref": operation_ref, "generation": 0},
+                "error": None,
+            }
+        )
+        self.assertEqual(ordinary.payload, {"generation": 0})
+        self.assertIn("operation_ref", ordinary._machine_payload)
+        self.assertIn("generation", ordinary._machine_payload)
+        with self.assertRaises(AttributeError):
+            ordinary.correlation_id
+
+        resumed = handle.resume()
+        self.assertEqual(client.calls[0][0], "operation.resume")
+        self.assertEqual(client.calls[0][1]["expected_generation"], 0)
+        self.assertIs(resumed.operation, None)
+        reconciled = handle.reconcile()
+        self.assertEqual(client.calls[1][0], "operation.reconcile")
+        self.assertEqual(client.calls[1][1]["expected_generation"], 1)
+        self.assertIs(reconciled.operation, None)
+        rejected = handle.release()
+        self.assertFalse(rejected.ok)
+        self.assertEqual(rejected.error["code"], "operation_not_terminal")
+        self.assertFalse(handle.released)
+        self.assertTrue(handle.resume().ok)
+        self.assertEqual(client.calls[-1][0], "operation.resume")
+        client.reject_release = False
+        released = handle.release()
+        self.assertTrue(handle.released)
+        self.assertEqual(client.calls[-1][0], "operation.release")
+        self.assertTrue(released.ok)
+        with self.assertRaises(uai.UsageError):
+            handle.status()
+
+        namespace = OperationNamespace(
+            client,
+            type("Generated", (), {"plan_execute": lambda *_args: "planned"})(),
+        )
+        self.assertEqual(namespace.plan_execute([], "stop", "serial"), "planned")
+        for name in ("status", "resume", "cancel", "receipt", "reconcile", "release"):
+            self.assertFalse(
+                hasattr(namespace, name),
+                f"operation_namespace_must_not_expose_low_level_{name}",
+            )
+
     def test_cpp_manifest_contains_exact_long_running_bindings(
         self,
     ) -> None:
@@ -126,7 +289,12 @@ class LongRunningSessionPublicBindingContractTests(unittest.TestCase):
                     (command["namespace"], command["method"]),
                     EXPECTED_METHODS[command_id],
                 )
-                self.assertEqual(command["status"], "active")
+                self.assertEqual(
+                    command["status"],
+                    "dormant"
+                    if command_id in INTERNAL_LIFECYCLE_COMMANDS
+                    else "active",
+                )
                 self.assertEqual(
                     tuple(
                         parameter["name"]
@@ -151,7 +319,6 @@ class LongRunningSessionPublicBindingContractTests(unittest.TestCase):
         expected_namespaces = (
             "job",
             "editor",
-            "runtime",
             "capture",
             "operation",
         )
@@ -177,11 +344,6 @@ class LongRunningSessionPublicBindingContractTests(unittest.TestCase):
             "client_namespaces_missing:" + ",".join(missing_client),
         )
 
-        operation_ref = {
-            "operation_id": "op-fixture",
-            "owner_lease_id": "lease-fixture",
-            "server_session_id": "session-fixture",
-        }
         namespaces.job.compile_build(
             "asset_compile",
             "/Game/UAI/Fixture.Asset",
@@ -194,19 +356,9 @@ class LongRunningSessionPublicBindingContractTests(unittest.TestCase):
             "policy:asset-editor/open/v1",
             {},
         )
-        namespaces.runtime.scenario_execute(
-            "runtime-session:pie-debug:0:fixture",
-            "policy:runtime-scenario:bounded/v1",
-            {
-                "expected_pause_epoch": 1,
-                "expected_workspace_revision": 1,
-                "limits": {
-                    "wall_seconds": 1,
-                    "game_seconds": 1,
-                    "frame_count": 1,
-                },
-                "steps": [],
-            },
+        self.assertFalse(
+            hasattr(namespaces, "runtime"),
+            "runtime scenario continuation must stay behind RuntimeSessionHandle",
         )
         namespaces.capture.image_execute(
             "viewport:owned-fixture",
@@ -236,16 +388,19 @@ class LongRunningSessionPublicBindingContractTests(unittest.TestCase):
                 "nonce": "3" * 64,
             },
         )
-        namespaces.operation.status(operation_ref)
-        namespaces.operation.resume(operation_ref, 1)
-        namespaces.operation.cancel(operation_ref, "fixture-cancel")
-        namespaces.operation.receipt(operation_ref)
-        namespaces.operation.reconcile(operation_ref, 1)
-        namespaces.operation.release(operation_ref)
+        for method in ("status", "resume", "cancel", "receipt", "reconcile", "release"):
+            self.assertFalse(
+                hasattr(namespaces.operation, method),
+                f"generated_operation_namespace_must_hide_{method}",
+            )
 
         self.assertEqual(
             [command_id for command_id, _ in client.calls],
-            list(EXPECTED_PARAMETERS),
+            [
+                command_id
+                for command_id in EXPECTED_PARAMETERS
+                if command_id not in INTERNAL_LIFECYCLE_COMMANDS
+            ],
             "generated_methods_must_forward_each_actual_command_once",
         )
         for command_id, params in client.calls:

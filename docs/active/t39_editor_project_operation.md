@@ -1,94 +1,79 @@
-# T39 Editor Project SDK and CLI
+# T39 EditorProject Operation Authority
 
-Import only `uai` and connect from one complete Connection TOML. The final
-manifest generates all seven methods in the default `editor_project` namespace:
+The `editor-project-operation` contribution owns seven
+`editor_project.*.update` identities. Five remain active: config-section,
+device-profile, platform-config, project-settings and scalability-group updates.
+Localization-target and StringTable updates are centrally dormant; their
+registered HJSON profiles are the normal authoring surface. Every
+frozen contract reports `editor-project-operation-owner`; no namespace or
+catch-all fallback adds commands.
+
+The exact handlers require `uai:operate`, add only the private
+`uai:editor-project:write` mechanics scope and forward one request to the common
+OperationService. The EditorProject simple-effect adapter remains the sole owner
+of the native config, settings, localization and StringTable mechanics. It is an
+internal dependency, not a second public route, registry, handler, contract,
+test or documentation authority.
+
+The common lifecycle performs schema validation, exact target and field
+resolution, server-owned current-revision binding, native execution, settle,
+persistence, reload, independent readback
+and rollback or `state_unknown` handling. A stale revision or invalid typed
+change fails before mutation; `state_unknown` is not safe for automatic replay.
+
+## Public SDK and CLI
+
+The generated catalog retains the compatibility identities; only active
+commands belong in the named `editor_project` namespace. Callers import only
+`uai`, use `uai.connect_project()` for the local project and call methods such as
+`client.editor_project.config_section_update(...)`. For Localization and
+StringTable editing, obtain `workspace = client.content_graph.export_workspace(...)`,
+edit its ordinary HJSON files and call `workspace.import_changes()`.
+Generic `client.execute(...)`,
+exact `client.execute_exact(...)`, and `ueagentinterfacecmd exec` reuse the same generated
+catalog, Client, Protocol and Transport. No T39-specific Python module remains
+authoritative.
+
+The five active update methods accept only the readable `target_ref` and typed
+`changes`. The EditorProject target resolver reads the current revision and
+freezes it inside the same Operation before planning; later prestate and
+prewrite checks still reject an internally changed target. The revision is not
+a Python/HJSON/CLI parameter. `reference.catalog_search` is retired and must
+not be restored as a second target directory.
+
+For example, a config-section target is read through `config.section`:
 
 ```python
-import uai
-
-with uai.connect("connection.toml") as client:
-    result = client.editor_project.config_section_update(
-        changes=[
-            {
-                "field_id": "entries",
-                "presence": "set",
-                "value": {
-                    "type_id": "uai.editor_project.config_entry_map.v1",
-                    "canonical_value": {
-                        "UAI_StrictV2_T39": "public-write",
-                    },
-                },
-            }
-        ],
-        expected_revision=current_target_revision,
-        target_ref=(
-            "uai://editor-project/v1/config-section/game/"
-            "%2FScript%2FEngineSettings.GeneralProjectSettings"
-        ),
-    )
-```
-
-The same namespace exposes the other typed profiles, including
-`client.editor_project.string_table_update(...)`. `expected_revision` must come
-from `target.read` on the matching active Query command immediately before the
-write; it is not a literal from this tutorial and must not be guessed or
-replayed after a stale-revision failure. The retired
-`reference.catalog_search` identity is not a fallback.
-
-```python
-import json
-
-read = client.config.section(
+query_result = client.config.section(
     input={
-        "config_scope": "game",
-        "section_id": "/Script/EngineSettings.GeneralProjectSettings",
         "editor_project_capability": "target.read",
         "parameters": {"target_ref": target_ref},
     },
-    projection={"max_items": 2},
 )
-entry = read.payload["query_result"]["projection"]["payload"]["snapshot"][
-    "entries"
-][0]
-target = json.loads(entry["value"]["text"])
-current_target_revision = target["target_revision"]
+# Use query_result.payload["observation"]["entries"] to choose the typed change.
 ```
 
-`target.read` is accepted only by the five Editor Project Query providers:
-`config.section`, `config.resolved_value`, `project.settings`,
-`project.platform`, and `project.validation`. Config-backed observations expose
-independently loaded `entries`; project-settings observations expose exact
-`fields[]` metadata and current values. Repeat the same read after the write to
-verify durable product state independently.
-
-The generic form uses the same generated binding:
-
-```python
-result = client.execute(
-    "editor_project.config_section.update",
-    {
-        "changes": changes,
-        "expected_revision": current_target_revision,
-        "target_ref": target_ref,
-    },
-)
-```
-
-The CLI forwards one identical request:
+The same `target.read` action is closed over `config.section`,
+`config.resolved_value`, `project.settings`, `project.platform`, and
+`project.validation`. Project-settings observations additionally return
+`fields[]` with exact field ref, type and current canonical value. Target and
+field revisions remain hidden inside the same server-owned operation. Explicit
+capability requests return `observation`; ordinary queries retain their compact
+sections/settings/values results. After
+the update, repeat `target.read` for independent product readback.
 
 ```text
-uai-cli --connection connection.toml exec editor_project.config_section.update --params-json {"changes":[{"field_id":"entries","presence":"set","value":{"type_id":"uai.editor_project.config_entry_map.v1","canonical_value":{"UAI_StrictV2_T39":"public-write"}}}],"expected_revision":"<current-target-revision>","target_ref":"uai://editor-project/v1/config-section/game/%2FScript%2FEngineSettings.GeneralProjectSettings"}
+ueagentinterfacecmd exec editor_project.config_section.update --params-json '{"changes":[{"field_id":"entries","presence":"set","value":{"type_id":"uai.editor_project.config_entry_map.v1","canonical_value":{"UAI_StrictV2_T39":"public-write"}}}],"target_ref":"uai://editor-project/v1/config-section/game/%2FScript%2FEngineSettings.GeneralProjectSettings"}'
 ```
 
-Use `client.query.command_search("update project config section", limit=5)` and
-then `client.query.command_detail(command_id, contract_hash)` to obtain the exact
-request schema, named SDK/CLI forms, owner, failures and tutorial references.
-Search is the only fuzzy command-selection step; execute the selected ID and
-hash unchanged.
+For unknown command names or parameter shapes, follow [public command discovery](../PYTHON_SDK_AND_CLI.md#command-discovery).
+Search matches only positive tokens from command IDs, registered keywords and
+registered synonyms; call the selected generated method by name.
 
-The fifteen historical read/diff/validate behaviors are supporting actions,
-not public command aliases. Pass one of the closed action names in
-`input.editor_project_capability` and its parameters in `input.parameters`:
+## Historical read capabilities
+
+The fifteen retained historical read/diff/validate behaviors are closed
+capability actions on the five Query commands, not public aliases:
 
 - `config.section`: `device_profile.export`, `device_profile.query`,
   `scalability.export`;
@@ -100,10 +85,15 @@ not public command aliases. Pass one of the closed action names in
   `project_settings.diff`, `project_settings.validate`,
   `scalability.validate`.
 
-These Query calls never write server-side export files; requested output paths
-are returned only as provenance.
+Put the exact action in `input.editor_project_capability` and its historical
+parameters in `input.parameters`. File-output parameters are provenance only:
+the Query route forces `write_file=false` and `write_files=false` and never
+writes a server-side export file.
 
-The client contains no HTTP implementation, retry, alias, config parser,
-persistence, rollback or Unreal Engine business behavior. Inspect `Result.ok`
-and the verified terminal projection; `state_unknown` is never safe for
-automatic replay.
+Canonical reads and capability reads are separate input shapes: canonical
+fields such as `section_id`/`config_scope` belong at the input root only when no
+capability is selected. A capability request supplies its action parameters
+once, inside `parameters`; do not duplicate canonical fields at the root.
+For example, `project.settings` accepts
+`{"editor_project_capability":"project_settings.page","parameters":{"section_id":"<id returned by project_settings.index>"}}`
+as its `input` object.

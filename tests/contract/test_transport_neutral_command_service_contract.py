@@ -19,13 +19,15 @@ class TransportNeutralCommandServiceContractTest(unittest.TestCase):
     def test_command_service_owns_no_http_surface(self) -> None:
         header = (
             PLUGIN_PRIVATE
-            / "Composition"
-            / "UeAgentCommandServiceComposition.h"
+            / "ServiceComposition"
+            / "CommandService"
+            / "UeAgentCommandService.h"
         ).read_text(encoding="utf-8-sig")
         source = (
             PLUGIN_PRIVATE
-            / "Composition"
-            / "UeAgentCommandServiceComposition.cpp"
+            / "ServiceComposition"
+            / "CommandService"
+            / "UeAgentCommandService.cpp"
         ).read_text(encoding="utf-8-sig")
 
         self.assertIn("NetworkTransport/UeAgentNetworkTransport.h", header)

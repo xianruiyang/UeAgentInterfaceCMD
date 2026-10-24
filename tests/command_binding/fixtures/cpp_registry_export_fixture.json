@@ -40,6 +40,16 @@
           "nullable": false
         }
       ],
+      "model_result_fields": [
+        {
+          "name": "target",
+          "source_path": ["projection", "payload", "target_ref"]
+        },
+        {
+          "name": "outcome",
+          "source_path": ["projection", "payload", "outcome"]
+        }
+      ],
       "min_wire_version": 1,
       "max_wire_version": 1,
       "status": "active",

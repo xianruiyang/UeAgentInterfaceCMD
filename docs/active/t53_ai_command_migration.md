@@ -1,34 +1,31 @@
 # AI commands through the default SDK
 
-Discover current contracts through client.query.command_search(...) and
-client.query.command_detail(...), then use:
+For unknown command names or parameter shapes, follow [public command discovery](../PYTHON_SDK_AND_CLI.md#command-discovery).
+The normal SDK methods are:
 
 ```python
 client.ai.behavior_tree_asset_create(...)
-client.ai.behavior_tree_graph_apply(...)
 client.ai.blackboard_asset_create(...)
-client.ai.blackboard_schema_apply(...)
 client.ai.eqs_asset_create(...)
-client.ai.eqs_graph_apply(...)
-client.ai.smart_object_definition_apply(...)
 client.ai.smart_object_definition_asset_create(...)
 client.ai.state_tree_asset_create(...)
-client.ai.state_tree_hierarchy_apply(...)
 ```
 
-The exact CLI uses uai-cli with the current command ID, contract hash, and one
+The exact CLI uses ueagentinterfacecmd with the current command name and one
 JSON parameter object. No task-specific generated projection remains active.
 
-All creation/schema/graph/hierarchy/definition calls use the common durable
-operation lifecycle and native AI mechanics. Asset class, parent/schema
-identity, nodes, links, keys, hierarchy, definition fields, expected revision,
-compile/settle policy, and target path come only from command_detail. The SDK
-does not infer or duplicate Behavior Tree, Blackboard, EQS, Smart Object, or
-State Tree business.
+Asset creation uses the public command contract above. Structure mutation uses
+`workspace = client.content_graph.export_workspace(...)` followed by sparse HJSON editing
+and `workspace.import_changes()`; the former typed apply IDs
+are internal HJSON operation kinds, not duplicate public SDK methods. Asset
+class, parent/schema identity, nodes, links, keys, hierarchy, definition fields,
+compile/settle policy and target path come from the current
+export, generated SDK and focused domain documentation; revision and identity
+are hidden service state. The SDK does not infer or duplicate Behavior Tree,
+Blackboard, EQS, Smart Object, or State Tree business.
 
 Success requires native compile/settle where declared, terminal projection,
 and independent persisted readback after reload. Invalid class, schema, graph,
 key, hierarchy, definition, or stale revision fails before mutation. Unknown
 state requires reconciliation. Cleanup removes only owned AI fixtures and
 verifies absence independently.
-

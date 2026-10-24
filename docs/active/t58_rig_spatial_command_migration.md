@@ -1,7 +1,7 @@
 # Rig/spatial commands through the default SDK
 
-Discover current contracts through client.query.command_search(...) and
-client.query.command_detail(...), then use:
+For unknown command names or parameter shapes, follow [public command discovery](../PYTHON_SDK_AND_CLI.md#command-discovery).
+The normal SDK methods are:
 
 ```python
 client.animation.ik_probe_candidate_apply(...)
@@ -18,7 +18,7 @@ client.rig.skeleton_preview_mesh_bind(...)
 client.rig.skeleton_socket_update(...)
 ```
 
-The exact CLI uses uai-cli with the current command ID, hash, and one JSON
+The exact CLI uses ueagentinterfacecmd with the current command name and one JSON
 parameter object. No task-specific generated projection remains active.
 
 Every public request carries explicit target/input/context. The server
@@ -32,12 +32,11 @@ handler is not a valid fallback.
 Rig/control/IK/retarget/pose/socket transforms explicitly state
 semantic_frame_id, write_frame_id, read_frame_id, verify_frame_id, unit,
 basis_evidence, and conversion_chain. Target, skeleton, mesh, chain, control,
-pose, time/frame, expected revision, and generation/bake policy come only from
-command_detail.
+pose, time/frame, revision custody, and generation/bake policy come only from
+the generated SDK signature for that command.
 
 Success requires native mechanics, applicable settle, terminal projection, and
 independent readback in the declared state/frame after reload when persisted.
 Invalid/unresolvable bindings or frames fail before mutation; unknown state
 requires reconciliation. Cleanup restores transient subject state and removes
 only owned durable fixtures, with independent verification.
-

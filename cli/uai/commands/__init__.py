@@ -8,8 +8,7 @@ from ._runtime import (
     OMITTED,
 )
 from .generated import (
-    BINDING_CATALOG,
-    GENERATED_REGISTRY_HASH,
+    _BINDING_CATALOG,
     GeneratedClientBindingsMixin,
     GeneratedCommandNamespaces,
     bind_generated_commands,
@@ -17,15 +16,5 @@ from .generated import (
 
 
 __all__ = [
-    "BINDING_CATALOG",
-    "CommandBinding",
-    "CommandBindingCatalog",
-    "CommandExecutor",
-    "CommandParameterBinding",
-    "GENERATED_REGISTRY_HASH",
-    "GeneratedClientBindingsMixin",
-    "GeneratedCommandNamespaces",
     "OMITTED",
-    "bind_generated_commands",
 ]
-

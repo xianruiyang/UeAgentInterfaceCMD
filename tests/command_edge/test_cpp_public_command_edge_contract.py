@@ -38,7 +38,10 @@ class CppPublicCommandEdgeContractTests(unittest.TestCase):
         )
         for command in commands:
             with self.subTest(command=command.get("command_id")):
-                self.assertEqual(command.get("status"), "active")
+                self.assertIn(
+                    command.get("status"),
+                    {"active", "dormant", "disabled"},
+                )
                 self.assertRegex(
                     str(command.get("binding_hash", "")),
                     SHA256_IDENTITY,
@@ -57,14 +60,11 @@ class CppPublicCommandEdgeContractTests(unittest.TestCase):
         self.assertTrue(
             {
                 "query.command.search",
-                "query.command.detail",
-                "reference.asset_read",
-                "reference.asset_apply",
+                "query.command.usage",
                 "content_graph.export_workspace",
                 "content_graph.import_workspace",
             }.issubset(by_id)
         )
-        self.assertNotIn("reference.catalog_search", by_id)
         self.assertEqual(
             [
                 parameter["name"]
@@ -75,32 +75,6 @@ class CppPublicCommandEdgeContractTests(unittest.TestCase):
             [
                 "target",
                 "source",
-                "expected_revision",
-                "authorization_id",
-                "limits",
-            ],
-        )
-        self.assertEqual(
-            by_id["reference.asset_read"]["parameters"],
-            [
-                {
-                    "name": "object_path",
-                    "nullable": False,
-                    "required": True,
-                    "wire_type": "string",
-                },
-                {
-                    "name": "context",
-                    "nullable": False,
-                    "required": False,
-                    "wire_type": "object",
-                },
-                {
-                    "name": "projection",
-                    "nullable": False,
-                    "required": False,
-                    "wire_type": "object",
-                },
             ],
         )
 

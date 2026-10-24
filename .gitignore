@@ -19,6 +19,7 @@ dist/logs/*.log
 dist/tmp/
 
 # Python 缓存
+.venv-sdk/
 __pycache__/
 *.egg-info/
 *.pyc

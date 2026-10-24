@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import keyword
 from pathlib import Path
@@ -26,6 +25,19 @@ _WIRE_TYPES = frozenset(
 _HASH_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
 _TUTORIAL_REFERENCE_PATTERN = re.compile(
     r"^(?:uai-docs|uai-skill):[^#\s]+#[^#\s]+$"
+)
+
+# These routes remain in the machine binding catalog because typed SDK owners
+# call them internally.  They must not appear in the model-readable signature
+# stub, where their opaque continuation/path parameters would look public.
+_PUBLIC_SDK_PRIVATE_COMMAND_IDS = frozenset(
+    {
+        "asset_durable.journal.read",
+        "asset_durable.journal.reconcile",
+        "content_graph.export_workspace",
+        "content_graph.import_workspace",
+        "runtime.scenario.execute",
+    }
 )
 
 
@@ -56,10 +68,6 @@ def _identifier(
             f"{field_name} must be a Python identifier"
         )
     return text
-
-
-def _sha256_file(path: Path) -> str:
-    return f"sha256:{hashlib.sha256(path.read_bytes()).hexdigest()}"
 
 
 def _load_manifest(path: Path) -> dict[str, Any]:
@@ -221,6 +229,62 @@ def _load_manifest(path: Path) -> dict[str, Any]:
                 raise BindingGenerationError(
                     f"{parameter_label}.nullable is invalid"
                 )
+            if "schema" in parameter and not isinstance(parameter["schema"], dict):
+                raise BindingGenerationError(f"{parameter_label}.schema must be an object")
+        if type(command.get("supports_operation_recovery", False)) is not bool:
+            raise BindingGenerationError(f"{command_label}.supports_operation_recovery must be a boolean")
+        variants = command.get("variants", [])
+        if not isinstance(variants, list):
+            raise BindingGenerationError(f"{command_label}.variants must be a list")
+        variant_ids: set[str] = set()
+        for variant_index, variant in enumerate(variants):
+            variant_label = f"{command_label}.variants[{variant_index}]"
+            if not isinstance(variant, dict):
+                raise BindingGenerationError(f"{variant_label} must be an object")
+            variant_id = _required_text(variant.get("variant_id"), field_name=f"{variant_label}.variant_id")
+            if variant_id in variant_ids:
+                raise BindingGenerationError(f"duplicate variant: {command_id}.{variant_id}")
+            variant_ids.add(variant_id)
+            if not isinstance(variant.get("request_schema"), dict):
+                raise BindingGenerationError(f"{variant_label}.request_schema must be an object")
+            for name in ("summary", "parameter_guidance", "result_guidance", "minimum_example"):
+                if not isinstance(variant.get(name, ""), str):
+                    raise BindingGenerationError(f"{variant_label}.{name} must be a string")
+        model_result_fields = command.get("model_result_fields", [])
+        if not isinstance(model_result_fields, list):
+            raise BindingGenerationError(
+                f"{command_label}.model_result_fields must be a list"
+            )
+        model_result_names: set[str] = set()
+        for field_index, field in enumerate(model_result_fields):
+            field_label = (
+                f"{command_label}.model_result_fields[{field_index}]"
+            )
+            if not isinstance(field, dict):
+                raise BindingGenerationError(
+                    f"{field_label} must be an object"
+                )
+            name = _identifier(
+                field.get("name"),
+                field_name=f"{field_label}.name",
+            )
+            if name in model_result_names:
+                raise BindingGenerationError(
+                    f"duplicate model result field: {command_id}.{name}"
+                )
+            source_path = field.get("source_path")
+            if not isinstance(source_path, list) or not source_path:
+                raise BindingGenerationError(
+                    f"{field_label}.source_path must be a non-empty list"
+                )
+            for segment_index, segment in enumerate(source_path):
+                _required_text(
+                    segment,
+                    field_name=(
+                        f"{field_label}.source_path[{segment_index}]"
+                    ),
+                )
+            model_result_names.add(name)
     return payload
 
 
@@ -319,11 +383,7 @@ def _stub_method_lines(command: Mapping[str, Any]) -> list[str]:
     ]
 
 
-def _render_python(
-    manifest: Mapping[str, Any],
-    *,
-    manifest_hash: str,
-) -> str:
+def _render_python(manifest: Mapping[str, Any]) -> str:
     commands = sorted(
         manifest["commands"],
         key=lambda item: item["command_id"],
@@ -346,11 +406,10 @@ def _render_python(
         "    CommandBindingCatalog,",
         "    CommandExecutor,",
         "    CommandParameterBinding,",
+        "    CommandVariantBinding,",
+        "    ModelResultFieldBinding,",
         "    OMITTED,",
         ")",
-        "",
-        f'GENERATED_MANIFEST_HASH = "{manifest_hash}"',
-        f'GENERATED_REGISTRY_HASH = "{manifest["registry_hash"]}"',
         "",
     ]
     for namespace, namespace_commands in sorted(namespaces.items()):
@@ -373,7 +432,7 @@ def _render_python(
 
     lines.extend(
         [
-            "BINDING_CATALOG = CommandBindingCatalog(",
+            "_BINDING_CATALOG = CommandBindingCatalog(",
             "    (",
         ]
     )
@@ -399,6 +458,43 @@ def _render_python(
                     "                ),",
                 ]
             )
+            if "schema" in parameter:
+                schema_json = json.dumps(parameter["schema"], ensure_ascii=False, separators=(",", ":"))
+                parameter_lines.insert(len(parameter_lines) - 1, f"                    schema_json={schema_json!r},")
+        variant_lines = []
+        for variant in command.get("variants", []):
+            schema_json = json.dumps(variant["request_schema"], ensure_ascii=False, separators=(",", ":"))
+            variant_lines.extend([
+                "                CommandVariantBinding(",
+                f"                    variant_id={variant['variant_id']!r},",
+                f"                    request_schema_json={schema_json!r},",
+                *[f"                    {name}={variant[name]!r},"
+                  for name in ("summary", "parameter_guidance", "result_guidance", "minimum_example")
+                  if variant.get(name)],
+                "                ),",
+            ])
+        model_result_field_lines = []
+        for field in command.get("model_result_fields", []):
+            source_path = ", ".join(
+                repr(segment) for segment in field["source_path"]
+            )
+            if len(field["source_path"]) == 1:
+                source_path += ","
+            model_result_field_lines.extend(
+                [
+                    "                ModelResultFieldBinding(",
+                    f'                    name="{field["name"]}",',
+                    f"                    source_path=({source_path}),",
+                    "                ),",
+                ]
+            )
+        model_result_argument_lines = []
+        if model_result_field_lines:
+            model_result_argument_lines = [
+                "            model_result_fields=(",
+                *model_result_field_lines,
+                "            ),",
+            ]
         lines.extend(
             [
                 "        CommandBinding(",
@@ -409,6 +505,10 @@ def _render_python(
                 "            parameters=(",
                 *parameter_lines,
                 "            ),",
+                *model_result_argument_lines,
+                *(["            variants=(", *variant_lines, "            ),"] if variant_lines else []),
+                *(['            supports_operation_recovery=True,']
+                  if command.get("supports_operation_recovery", False) else []),
                 (
                     "            min_wire_version="
                     f'{command["min_wire_version"]},'
@@ -491,6 +591,7 @@ def _render_stub(
             command
             for command in manifest["commands"]
             if command["status"] == "active"
+            and command["command_id"] not in _PUBLIC_SDK_PRIVATE_COMMAND_IDS
         ),
         key=lambda item: item["command_id"],
     )
@@ -503,13 +604,8 @@ def _render_stub(
         "from typing import Any",
         "",
         "from ._runtime import (",
-        "    CommandBindingCatalog,",
         "    CommandExecutor,",
         ")",
-        "",
-        "GENERATED_MANIFEST_HASH: str",
-        "GENERATED_REGISTRY_HASH: str",
-        "BINDING_CATALOG: CommandBindingCatalog",
         "",
     ]
     for namespace, namespace_commands in sorted(namespaces.items()):
@@ -552,25 +648,8 @@ def _render_stub(
     return "\n".join(lines)
 
 
-def _write_or_check(
-    path: Path,
-    content: str,
-    *,
-    check: bool,
-) -> None:
+def _write(path: Path, content: str) -> None:
     normalized = content.rstrip() + "\n"
-    if check:
-        try:
-            actual = path.read_text(encoding="utf-8-sig")
-        except OSError as exc:
-            raise BindingGenerationError(
-                f"generated file is missing: {path}"
-            ) from exc
-        if actual != normalized:
-            raise BindingGenerationError(
-                f"generated file is stale: {path}"
-            )
-        return
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(normalized, encoding="utf-8", newline="\n")
 
@@ -579,21 +658,17 @@ def generate(
     *,
     manifest_path: Path,
     output_root: Path,
-    check: bool,
 ) -> None:
     manifest_path = manifest_path.resolve()
     manifest = _load_manifest(manifest_path)
-    manifest_hash = _sha256_file(manifest_path)
     commands_root = output_root.resolve() / "commands"
-    _write_or_check(
+    _write(
         commands_root / "generated.py",
-        _render_python(manifest, manifest_hash=manifest_hash),
-        check=check,
+        _render_python(manifest),
     )
-    _write_or_check(
+    _write(
         commands_root / "generated.pyi",
         _render_stub(manifest),
-        check=check,
     )
 
 
@@ -606,7 +681,6 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
-    parser.add_argument("--check", action="store_true")
     return parser
 
 
@@ -616,7 +690,6 @@ def main(argv: Sequence[str] | None = None) -> int:
         generate(
             manifest_path=args.manifest,
             output_root=args.output_root,
-            check=args.check,
         )
     except BindingGenerationError as exc:
         print(str(exc))

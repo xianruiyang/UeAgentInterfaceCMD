@@ -57,9 +57,6 @@ class _Client:
     def __init__(self, result: uai.Result) -> None:
         self.result = result
         self.calls: list[tuple[str, dict[str, object]]] = []
-        self.dormant_calls: list[
-            tuple[str, dict[str, object], str, bool]
-        ] = []
         self.closed = False
 
     def execute(
@@ -70,29 +67,6 @@ class _Client:
         self.calls.append((command_id, params))
         return self.result
 
-    def execute_exact(
-        self,
-        command_id: str,
-        params: dict[str, object],
-        *,
-        contract_hash: str,
-    ) -> uai.Result:
-        self.calls.append((command_id, params))
-        return self.result
-
-    def execute_dormant(
-        self,
-        command_id: str,
-        params: dict[str, object],
-        *,
-        contract_hash: str,
-        user_confirmed: bool,
-    ) -> uai.Result:
-        self.dormant_calls.append(
-            (command_id, params, contract_hash, user_confirmed)
-        )
-        return self.result
-
     def __enter__(self):
         return self
 
@@ -101,6 +75,46 @@ class _Client:
 
 
 class CliExecForwardingContractTests(unittest.TestCase):
+    def test_local_failures_keep_message_format_report_and_exit_without_retry(self) -> None:
+        for error_type, code in ((uai.UsageError, 2), (uai.TransportError, 3),
+                                 (uai.SerializationError, 4), (uai.ProtocolError, 4)):
+            for output_format in ("compact", "json"):
+                with self.subTest(error=error_type.__name__, format=output_format), tempfile.TemporaryDirectory() as directory:
+                    report = Path(directory) / "failure.json"
+                    diagnostic = {"code": "fixture_failed", "message": "Specific reason at 字段 /commands/2",
+                                  "stage": "command_protocol", "json_pointer": "/commands/2",
+                                  "cause": {"message": "nested cause", "actual_value": {"identity": "business", "hash": "value"}},
+                                  "unchecked": [{"reason": "request rejected"}]}
+                    failure = error_type(code="fixture_failed", message=diagnostic["message"], diagnostic=diagnostic)
+                    output, errors = io.StringIO(), io.StringIO()
+                    with mock.patch.object(cli_main.uai, "connect_project", side_effect=failure) as connect:
+                        with redirect_stdout(output), redirect_stderr(errors):
+                            actual = cli_main.main(["exec", "fixture.echo_exact", "--format", output_format,
+                                                    "--report", str(report)])
+                    self.assertEqual(actual, code)
+                    connect.assert_called_once()
+                    self.assertEqual(output.getvalue(), "")
+                    self.assertIn(failure.message, errors.getvalue())
+                    saved = json.loads(report.read_text(encoding="utf-8"))
+                    self.assertEqual(saved["error"]["diagnostic"]["message"], failure.message)
+                    self.assertEqual(saved["error"]["diagnostic"], diagnostic)
+                    self.assertFalse(saved["ok"])
+                    self.assertNotIn("mutation_started", saved["error"])
+                    if output_format == "json":
+                        self.assertEqual(json.loads(errors.getvalue()), saved)
+
+    def test_report_failure_keeps_completed_command_stdout_and_never_replays(self) -> None:
+        client = _Client(_result(True))
+        output, errors = io.StringIO(), io.StringIO()
+        with tempfile.TemporaryDirectory() as directory:
+            with mock.patch.object(cli_main.uai, "connect_project", return_value=client):
+                with redirect_stdout(output), redirect_stderr(errors):
+                    code = cli_main.main(["exec", "fixture.echo_exact", "--format", "json", "--report", directory])
+        self.assertEqual(code, 2)
+        self.assertTrue(json.loads(output.getvalue())["ok"])
+        self.assertEqual(json.loads(errors.getvalue())["error"]["code"], "cli_report_write_failed")
+        self.assertEqual(len(client.calls), 1)
+
     def _run_main(self, argv: list[str]) -> int:
         try:
             with redirect_stderr(io.StringIO()):
@@ -131,6 +145,7 @@ class CliExecForwardingContractTests(unittest.TestCase):
                         "--connection",
                         "fixture.toml",
                         "exec",
+                        "--format", "json",
                         "fixture.echo_exact",
                         "--params-json",
                         json.dumps(params, ensure_ascii=False),
@@ -145,10 +160,14 @@ class CliExecForwardingContractTests(unittest.TestCase):
         self.assertTrue(client.closed)
         self.assertEqual(
             json.loads(output.getvalue()),
-            dict(client.result.raw_response),
+            {
+                "ok": True,
+                "payload": dict(client.result.payload),
+                "error": None,
+            },
         )
 
-    def test_server_failure_keeps_raw_stdout_and_stable_exit(
+    def test_server_failure_keeps_model_stdout_and_stable_exit(
         self,
     ) -> None:
         client = _Client(_result(False))
@@ -164,6 +183,7 @@ class CliExecForwardingContractTests(unittest.TestCase):
                         "--connection",
                         "fixture.toml",
                         "exec",
+                        "--format", "json",
                         "fixture.echo_exact",
                         "--params-json",
                         "{}",
@@ -177,35 +197,11 @@ class CliExecForwardingContractTests(unittest.TestCase):
         self.assertEqual(len(client.calls), 1)
         self.assertEqual(
             json.loads(output.getvalue()),
-            dict(client.result.raw_response),
-        )
-
-    def test_allow_dormant_uses_the_confirmation_entry_once(self) -> None:
-        client = _Client(_result(True))
-        with mock.patch.object(
-            cli_main.uai,
-            "connect",
-            return_value=client,
-        ):
-            with redirect_stdout(io.StringIO()):
-                exit_code = self._run_main(
-                    [
-                        "--connection",
-                        "fixture.toml",
-                        "exec",
-                        "fixture.echo_exact",
-                        "--contract-hash",
-                        BINDING_HASH,
-                        "--allow-dormant",
-                        "--params-json",
-                        "{}",
-                    ]
-                )
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(client.calls, [])
-        self.assertEqual(
-            client.dormant_calls,
-            [("fixture.echo_exact", {}, BINDING_HASH, True)],
+            {
+                "ok": False,
+                "payload": dict(client.result.payload),
+                "error": dict(client.result.error),
+            },
         )
 
     def test_params_file_and_report_preserve_the_result(self) -> None:
@@ -235,6 +231,7 @@ class CliExecForwardingContractTests(unittest.TestCase):
                             "--connection",
                             "fixture.toml",
                             "exec",
+                            "--format", "json",
                             "fixture.echo_exact",
                             "--params-file",
                             str(params_path),
@@ -249,12 +246,36 @@ class CliExecForwardingContractTests(unittest.TestCase):
             )
             self.assertEqual(
                 json.loads(report_path.read_text(encoding="utf-8")),
-                dict(client.result.raw_response),
+                {
+                    "ok": True,
+                    "payload": dict(client.result.payload),
+                    "error": None,
+                },
             )
             self.assertEqual(
                 json.loads(output.getvalue()),
-                dict(client.result.raw_response),
+                {
+                    "ok": True,
+                    "payload": dict(client.result.payload),
+                    "error": None,
+                },
             )
+
+    def test_default_display_keeps_json_report_and_failure_exit(self) -> None:
+        client = _Client(_result(False))
+        output = io.StringIO()
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "result.json"
+            with mock.patch.object(cli_main.uai, "connect_project", return_value=client):
+                with redirect_stdout(output):
+                    code = self._run_main(["exec", "fixture.echo_exact", "--report", str(report)])
+            self.assertEqual(code, 5)
+            self.assertIn("ok: false", output.getvalue())
+            self.assertIn("large_integer: 9007199254740993", output.getvalue())
+            self.assertIn("code: fixture_failed", output.getvalue())
+            saved = json.loads(report.read_text(encoding="utf-8"))
+            self.assertEqual(saved, {"ok": False, "payload": dict(client.result.payload), "error": dict(client.result.error)})
+        self.assertEqual(client.calls, [("fixture.echo_exact", {})])
 
     def test_cli_has_no_direct_transport_or_orchestration_path(
         self,

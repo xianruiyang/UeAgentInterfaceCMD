@@ -1,15 +1,28 @@
 # T28 Factory Import SDK and CLI
 
-Import only `uai` and connect from one complete Connection TOML. The final
+Import only `uai` and use `uai.connect_project()` for the local project. The final
 manifest generates the default `external` methods for create imports and
 `asset` methods for reimports:
+
+For a fresh import, the destination supplies the asset name independently of the
+source filename (for example, `Mask.png` and `/Game/Textures/WallMask`). The
+destination must not already exist. Use
+`replace_existing=False` or omit it for a create import; `True` belongs to a
+reimport route. The same rules apply when preparing a Factory HJSON workspace.
+Generic texture, sound and light-profile formats follow the class-compatible
+native UE import factories; specialized routes retain their native formats.
+Reimports use the native automated mode and an unattended script scope, including
+the Factory workspace path. They do not wait for import-option or painted-texture
+confirmation dialogs. Supply the intended source and options in the request;
+native failures are returned through the existing result and rollback paths.
 
 ```python
 import uai
 
-with uai.connect("connection.toml") as client:
+with uai.connect_project() as client:
+    walk = client.external_source.from_project("fixtures/Walk.fbx")
     animation = client.external.fbx_animation_import(
-        "D:/fixtures/Walk.fbx",
+        walk,
         "/Game/StrictV2/T28/Walk",
         "/Game/Characters/SK_Mannequin_Skeleton.SK_Mannequin_Skeleton",
         options={
@@ -19,17 +32,17 @@ with uai.connect("connection.toml") as client:
         },
     )
     sound = client.external.sound_wave_import(
-        "D:/fixtures/OwnedSound.wav",
+        "fixtures/OwnedSound.wav",
         "/Game/StrictV2/T28/OwnedSound",
         options={"replace_existing": False},
     )
     texture = client.asset.reimport_texture(
-        "D:/fixtures/OwnedTexture.png",
+        "fixtures/OwnedTexture.png",
         "/Game/StrictV2/T28/OwnedTexture.OwnedTexture",
         options={"replace_existing": True},
     )
     configured_texture = client.external.texture_import(
-        "D:/fixtures/Mask.png",
+        "fixtures/Mask.png",
         "/Game/StrictV2/T28/Mask",
         options={
             "srgb": False,
@@ -46,29 +59,29 @@ The generic and exact forms use the same generated catalog:
 result = client.execute(
     "external.sound_wave.import",
     {
-        "source_ref": "D:/fixtures/OwnedSound.wav",
+        "source_ref": "fixtures/OwnedSound.wav",
         "destination_ref": "/Game/StrictV2/T28/OwnedSound",
         "options": {"replace_existing": False},
     },
 )
 ```
 
-The CLI forwards one identical request:
+The normal SDK resolves short project-relative sources to absolute wire paths
+privately. Raw CLI absolute-path forms are machine integration surfaces and are
+not model guidance.
 
-```text
-uai-cli --connection connection.toml exec external.texture.import --params-json {"source_ref":"D:/fixtures/T_Grid.png","destination_ref":"/Game/StrictV2/T28/T_Grid","options":{"replace_existing":false}}
-uai-cli --connection connection.toml exec asset.reimport_texture --contract-hash sha256:<exact> --params-json {"source_ref":"D:/fixtures/T_Grid.png","target_ref":"/Game/StrictV2/T28/T_Grid.T_Grid","options":{"replace_existing":true}}
-```
-
-Use `client.query.command_search(intent, limit=...)` and then
-`client.query.command_detail(command_id, contract_hash)` to obtain the exact
-parameter schema, named SDK form, CLI form, owner, and tutorial references.
-Search is the only fuzzy step; execute the selected identity and hash unchanged.
+For unknown command names or parameter shapes, follow [public command discovery](../PYTHON_SDK_AND_CLI.md#command-discovery).
+Search matches only positive tokens from registered command names, registered keywords and
+registered synonyms; execute the selected generated SDK method unchanged.
 
 The client does not select a UE factory, rewrite identities or options, call
 transport directly, retry a write, persist generated assets, or synthesize
-readback. Inspect `Result.ok`; success requires the returned terminal receipt,
-persistence receipt, and independent class/import-data/business-state readback.
-Texture configuration and skeletal FBX Morph/LOD/material validation stay inside
-the same `options` object and the same generated command binding; there are no
-legacy `asset_import_*` methods or client-side compatibility mappings.
+readback. Inspect `Result.ok`; a successful response contains a short
+`command_id`/`terminal_status` pair and readable business `readback` (target,
+asset class, state summary, relevant options, dependencies, and bounded counts).
+Source paths and hashes, option fingerprints, plan/receipt identifiers, lifecycle phase
+history, reload evidence, and full independent readback are internal machine
+evidence and are not returned. Texture configuration and skeletal FBX
+Morph/LOD/material validation stay inside the same `options` object and the same
+generated command binding; there are no legacy `asset_import_*` methods or
+client-side compatibility mappings.

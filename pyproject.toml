@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ueagentinterfacecmd"
-version = "0.2.0"
+version = "0.3.0"
 description = "Transport-neutral Python SDK and CLI for UeAgentInterface"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -13,7 +13,11 @@ dependencies = [
     "tomli>=2.0; python_version < '3.11'",
 ]
 
+[project.optional-dependencies]
+authoring = ["hjson>=3.1,<4"]
+
 [project.scripts]
+ueagentinterfacecmd = "uai_cli.main:main"
 uai-cli = "uai_cli.main:main"
 
 [tool.setuptools]
@@ -26,7 +30,6 @@ where = ["cli"]
 "uai.commands" = ["*.pyi"]
 
 [tool.pytest.ini_options]
-addopts = "-m 'not historical_evidence'"
+norecursedirs = ["retired"]
 markers = [
-    "historical_evidence: preserved oracle that consumes pre-root-plan task receipts and is excluded from the current product suite",
 ]

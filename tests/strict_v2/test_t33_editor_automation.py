@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 from pathlib import Path
 
 
 PROJECT = Path(r"D:\program\UE\GptProjectTest")
-POWERSHELL = Path(r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe")
+POWERSHELL = shutil.which("pwsh.exe") or shutil.which("pwsh") or "pwsh.exe"
 MODULE = PROJECT / "scripts/ue/automation/UeEditorBuildLifecycle.psm1"
 SCRIPT = PROJECT / "scripts/ue/automation/Invoke-UePluginBuildLifecycle.ps1"
 LIFECYCLE_MODULE = PROJECT / "scripts/ue/UeLifecycleHost.psm1"
@@ -78,16 +79,22 @@ def test_smoke_runner_owns_worker_isolation_without_global_throttle_overrides() 
     assert all(item not in source for item in forbidden)
 
 
-def test_rhi_fps_gate_receipt_captures_the_terminal_observed_fps() -> None:
-    payload = _powershell_json(
-        f"Import-Module -Force '{LIFECYCLE_MODULE}'; "
-        "$sample = 'Starting wait for framerate of >= 10 FPS`nHit 34.64 FPS for 5 seconds after 5 seconds of waiting'; "
-        "$result = Get-UeLifecycleFpsGateObservation -LogText $sample -WorkerMode 'headless_rhi'; "
-        "$result | ConvertTo-Json -Depth 8 -Compress"
-    )
-    assert payload["required_fps"] == 10.0
-    assert payload["current_fps"] == 34.64
-    assert payload["mismatch"] is False
+def test_smoke_runner_plugin_override_is_opt_in_and_rejects_argument_injection() -> None:
+    runner = PROJECT / "scripts/ue/RunSmokeTests.ps1"
+    source = runner.read_text(encoding="utf-8-sig")
+    assert "[string[]]$EnablePlugins = @()" in source
+    assert "$EnablePlugins.Count -gt 0 -and $batches.Count -ne 1" in source
+    assert 'if ($EnablePlugins.Count -gt 0) { $args += "-EnablePlugins=$($EnablePlugins -join \',\')" }' in source
+    for invalid in ("ModelViewViewModel -ExecCmds=Quit", "ModelViewViewModel,Other"):
+        completed = subprocess.run(
+            [str(POWERSHELL), "-NoProfile", "-File", str(runner),
+             "-UERoot", "unused", "-ProjectPath", "unused", "-PlanPath", "unused",
+             "-EnablePlugins", invalid],
+            cwd=PROJECT, text=True, capture_output=True, encoding="utf-8",
+        )
+        assert completed.returncode != 0
+        assert "EnablePlugins" in completed.stderr
+        assert "Pattern" in completed.stderr or "pattern" in completed.stderr
 
 
 def test_owned_process_tree_rejects_reused_pid_ancestry() -> None:
@@ -134,4 +141,6 @@ def test_plan_only_entry_never_changes_editor_or_build_state() -> None:
     )
     payload = json.loads(completed.stdout.strip())
     assert payload["plan_only"] is True
-    assert payload["actions"][-1] == "restore_main_editor_minimized"
+    assert payload["actions"][-1] == (
+        "restore_main_editor_uai_ready_minimized"
+    )

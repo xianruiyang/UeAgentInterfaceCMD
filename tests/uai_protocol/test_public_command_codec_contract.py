@@ -122,7 +122,7 @@ class PublicCommandCodecContractTests(unittest.TestCase):
             current = current["child"]
         self.assertEqual(current, {"leaf": "保留"})
 
-    def test_success_result_is_lossless(self) -> None:
+    def test_success_result_exposes_public_fields(self) -> None:
         codec = self._codec()
         model = self.fixture["success"]["model"]
         result = codec.decode_result(
@@ -131,12 +131,10 @@ class PublicCommandCodecContractTests(unittest.TestCase):
         )
         self.assertIsInstance(result, uai.Result)
         self.assertTrue(result.ok)
-        self.assertEqual(
-            dict(result.raw_response),
-            model,
-        )
+        self.assertEqual(result.payload, model["payload"])
+        self.assertIsNone(result.error)
 
-    def test_server_failure_remains_a_lossless_result(self) -> None:
+    def test_server_failure_remains_a_public_result(self) -> None:
         codec = self._codec()
         model = self.fixture["failure"]["model"]
         result = codec.decode_result(
@@ -145,7 +143,8 @@ class PublicCommandCodecContractTests(unittest.TestCase):
         )
         self.assertIsInstance(result, uai.Result)
         self.assertFalse(result.ok)
-        self.assertEqual(dict(result.raw_response), model)
+        self.assertEqual(result.payload, model["payload"])
+        self.assertEqual(result.error, {"code": model["error"]["code"]})
         with self.assertRaises(uai.ServerCommandError) as raised:
             result.raise_for_error()
         self.assertIs(raised.exception.result, result)

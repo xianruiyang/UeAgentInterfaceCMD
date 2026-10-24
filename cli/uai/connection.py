@@ -8,8 +8,8 @@ from .connection_config import (
     ConnectionSnapshot,
     load_connection_toml,
 )
-from .errors import TransportError, UsageError
-from .network_transport import ITransportClient
+from .errors import Error, TransportError, UsageError
+from .network_transport import ITransportClient, TransportExchangeError
 from .transport_catalog import default_transport_factories
 from .uai_client import Client
 
@@ -28,7 +28,11 @@ class ConnectionAssembler:
         client_factory: ClientFactory,
     ) -> None:
         if not transport_factories:
-            raise ValueError("connection_transport_factories_missing")
+            raise UsageError.at_source(
+                code="connection_transport_factories_missing",
+                message="At least one transport factory is required to assemble a connection.",
+                facts={"property_path": "transport_factories", "expected_value": "non-empty mapping", "actual_value": {}},
+            )
         self._transport_factories = MappingProxyType(
             dict(transport_factories)
         )
@@ -45,26 +49,35 @@ class ConnectionAssembler:
     def connect(self, snapshot: ConnectionSnapshot) -> Any:
         factory = self._transport_factories.get(snapshot.transport)
         if factory is None:
-            raise UsageError(
+            raise UsageError.at_source(
                 code="connection_transport_unsupported",
                 message=(
                     "connection transport is unsupported: "
                     f"{snapshot.transport}"
                 ),
+                facts={"property_path": "connection.transport", "actual_value": snapshot.transport,
+                       "expected_value": list(self.transport_names)},
             )
         transport = factory(snapshot)
         try:
             return self._client_factory(snapshot, transport)
-        except BaseException:
+        except BaseException as construction_exc:
             try:
                 transport.close()
             except BaseException as cleanup_exc:
-                raise TransportError(
+                construction = (construction_exc.diagnostic if isinstance(construction_exc, Error)
+                                else TransportExchangeError.from_exception(
+                                    construction_exc, phase="client_construction").diagnostic.as_dict())
+                cleanup = (cleanup_exc.diagnostic if isinstance(cleanup_exc, Error)
+                           else TransportExchangeError.from_exception(
+                               cleanup_exc, phase="connection_cleanup").diagnostic.as_dict())
+                raise TransportError.at_source(
                     code="connection_cleanup_failed",
                     message=(
                         "client construction failed and the transport "
                         "could not be closed"
                     ),
+                    facts={"phase": "connection_cleanup", "cause": construction, "diagnostics": [cleanup]},
                 ) from cleanup_exc
             raise
 

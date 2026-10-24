@@ -28,13 +28,10 @@ def test_read_export_commands_are_cpp_manifest_owned_and_generated() -> None:
 
     required_ids = {
         "query.command.search",
-        "query.command.detail",
-        "reference.asset_read",
+        "query.command.usage",
         "content_graph.export_workspace",
     }
     assert required_ids.issubset(by_id)
-    assert "reference.catalog_search" not in by_id
-    assert "/api/uai/export" not in by_id
     assert (
         manifest["source"]["kind"]
         == "cpp_immutable_command_registry_export"
@@ -61,8 +58,7 @@ def test_public_read_shape_does_not_expose_internal_dispatch() -> None:
     by_id = {str(command["command_id"]): command for command in commands}
     for command_id in (
         "query.command.search",
-        "query.command.detail",
-        "reference.asset_read",
+        "query.command.usage",
         "content_graph.export_workspace",
     ):
         command = by_id[command_id]

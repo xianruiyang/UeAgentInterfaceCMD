@@ -81,6 +81,16 @@ class HttpAdapterContractTests(unittest.TestCase):
     def setUp(self) -> None:
         self.fixture = load_fixture()
 
+    def test_large_request_is_delivered_without_an_imposed_frame_ceiling(self) -> None:
+        _, _, adapter, exchange, (frame, requirements) = self._build(
+            status_code=200, body=b"reply"
+        )
+        payload = b"x" * (16 * 1024 * 1024 + 1)
+        frame = dataclasses.replace(frame, payload=payload)
+        requirements = dataclasses.replace(requirements, max_frame_bytes=0)
+        adapter.send(frame, requirements)
+        self.assertEqual(len(exchange.requests), 1)
+
     def _build(
         self,
         *,
@@ -192,33 +202,27 @@ class HttpAdapterContractTests(unittest.TestCase):
     def test_http_adapter_preserves_stable_transport_diagnostic_header(
         self,
     ) -> None:
-        api, _, adapter, _, inputs = self._build(
-            status_code=401,
-            body=b"transport credential was rejected",
-            headers=(
-                ("content-type", "text/plain; charset=utf-8"),
-                (
-                    "x-transport-diagnostic",
-                    "transport_authentication_failed",
-                ),
-            ),
-        )
-        frame, requirements = inputs
-
-        delivery = adapter.send(frame, requirements)
-
-        self.assertEqual(
-            delivery.state,
-            api.TransportDeliveryState.FAILED,
-        )
-        self.assertEqual(
-            delivery.diagnostic.code,
-            "transport_authentication_failed",
-        )
-        self.assertEqual(
-            delivery.reply.frame.payload,
-            b"transport credential was rejected",
-        )
+        for status, code, message, state in (
+            (401, "transport_authentication_failed", "transport credential was rejected", "FAILED"),
+            (503, "transport_backpressured", "The request queue is full; this request was not executed.", "BACKPRESSURED"),
+        ):
+            with self.subTest(code=code):
+                api, _, adapter, exchange, inputs = self._build(
+                    status_code=status,
+                    body=b"opaque error body",
+                    headers=(
+                        ("x-transport-diagnostic", code),
+                        ("x-transport-diagnostic-message", message),
+                    ),
+                )
+                frame, requirements = inputs
+                delivery = adapter.send(frame, requirements)
+                self.assertEqual(delivery.state, getattr(api.TransportDeliveryState, state))
+                self.assertEqual(delivery.diagnostic.code, code)
+                self.assertEqual(delivery.diagnostic.message, message)
+                self.assertEqual(delivery.reply.frame.payload, b"opaque error body")
+                self.assertEqual(delivery.attempts, 1)
+                self.assertEqual(len(exchange.requests), 1)
 
     def test_http_adapter_closes_only_its_owned_exchange(self) -> None:
         _, _, adapter, exchange, _ = self._build(

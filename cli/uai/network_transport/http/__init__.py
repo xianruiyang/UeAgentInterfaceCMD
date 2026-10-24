@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 import http.client
-import socket
+import math
 import ssl
 from types import MappingProxyType
 from typing import Any
@@ -17,7 +17,9 @@ from .. import (
     TransportDelivery,
     TransportDeliveryState,
     TransportDiagnostic,
+    TransportExchangeError,
     TransportFrame,
+    TransportOptionsError,
     TransportReply,
     bind_capabilities,
 )
@@ -25,24 +27,39 @@ from .. import (
 
 @dataclass(frozen=True, slots=True)
 class HttpRequest:
-    base_url: str
+    base_url: str = field(repr=False)
     method: str
-    route_path: str
-    headers: tuple[tuple[str, str], ...]
-    body: bytes
+    route_path: str = field(repr=False)
+    headers: tuple[tuple[str, str], ...] = field(repr=False)
+    body: bytes = field(repr=False)
 
 
 @dataclass(frozen=True, slots=True)
 class HttpResponse:
     status_code: int
-    headers: tuple[tuple[str, str], ...]
-    body: bytes
+    headers: tuple[tuple[str, str], ...] = field(repr=False)
+    body: bytes = field(repr=False)
 
 
 class IHttpExchange(Protocol):
     def exchange(self, request: HttpRequest) -> HttpResponse: ...
 
     def close(self) -> None: ...
+
+
+def _exchange_error(exc: Exception, phase: str, request: HttpRequest) -> TransportExchangeError:
+    # Never copy connection identity, credentials, or request content into a
+    # public diagnostic, including when an exchange includes them in its text.
+    parsed = urlsplit(request.base_url)
+    redacted_values = (
+        request.base_url, parsed.netloc, parsed.hostname or "",
+        request.route_path if len(request.route_path) > 1 else "",
+        request.body.decode("utf-8", errors="ignore"),
+        *(value for _, value in request.headers),
+    )
+    return TransportExchangeError.from_exception(
+        exc, phase=phase, redacted_values=redacted_values,
+    )
 
 
 def _default_capabilities() -> TransportCapabilities:
@@ -61,8 +78,10 @@ def _validate_http_endpoint(endpoint: str) -> str:
     try:
         parsed = urlsplit(normalized)
         parsed.port
-    except ValueError as exc:
-        raise ValueError("http_endpoint_invalid") from exc
+    except ValueError:
+        raise TransportOptionsError("The HTTP endpoint has an invalid host or port.",
+                                    property_path="connection.endpoint",
+                                    expected_value="HTTP(S) URL with a valid host and port") from None
     if (
         parsed.scheme not in {"http", "https"}
         or not parsed.hostname
@@ -71,7 +90,9 @@ def _validate_http_endpoint(endpoint: str) -> str:
         or parsed.query
         or parsed.fragment
     ):
-        raise ValueError("http_endpoint_invalid")
+        raise TransportOptionsError("The HTTP endpoint requires an HTTP(S) scheme and host, without credentials, query or fragment.",
+                                    property_path="connection.endpoint",
+                                    expected_value="HTTP(S) URL without credentials, query or fragment")
     return normalized.rstrip("/")
 
 
@@ -89,14 +110,14 @@ def _find_header(
 
 @dataclass(frozen=True, slots=True)
 class HttpAdapterConfig:
-    base_url: str
+    base_url: str = field(repr=False)
     method: str
     route_path: str
     probe_path: str
     connect_timeout_seconds: float
     io_timeout_seconds: float
-    auth_header: str | None = None
-    auth_token: str | None = None
+    auth_header: str | None = field(default=None, repr=False)
+    auth_token: str | None = field(default=None, repr=False)
     tls_verify: bool = True
     capabilities: TransportCapabilities = field(
         default_factory=_default_capabilities
@@ -104,32 +125,54 @@ class HttpAdapterConfig:
 
     def __post_init__(self) -> None:
         if not isinstance(self.base_url, str) or not self.base_url.strip():
-            raise ValueError("http_base_url_missing")
+            raise TransportOptionsError("The HTTP endpoint must be a non-empty URL string.",
+                                        property_path="connection.endpoint", expected_value="non-empty HTTP(S) URL")
         object.__setattr__(
             self,
             "base_url",
             _validate_http_endpoint(self.base_url),
         )
+        if not isinstance(self.method, str):
+            raise TransportOptionsError("The HTTP method must be a string.", property_path="transport.method",
+                                        expected_value="string", actual_value=type(self.method).__name__)
         method = self.method.strip().upper()
         if not method:
-            raise ValueError("http_method_missing")
+            raise TransportOptionsError("The HTTP method must not be empty.", property_path="transport.method",
+                                        expected_value="non-empty string", actual_value=method)
         object.__setattr__(self, "method", method)
+        if not isinstance(self.route_path, str):
+            raise TransportOptionsError("The HTTP route path must be a string beginning with a slash.",
+                                        property_path="transport_options.http.route_path", expected_value="absolute route path",
+                                        actual_value=type(self.route_path).__name__)
         route_path = self.route_path.strip()
         if not route_path.startswith("/"):
-            raise ValueError("http_route_path_invalid")
+            raise TransportOptionsError("The HTTP route path must begin with a slash.",
+                                        property_path="transport_options.http.route_path", expected_value="absolute route path")
         object.__setattr__(self, "route_path", route_path)
+        if not isinstance(self.probe_path, str):
+            raise TransportOptionsError("The HTTP probe path must be a string beginning with a slash.",
+                                        property_path="transport_options.http.probe_path", expected_value="absolute route path",
+                                        actual_value=type(self.probe_path).__name__)
         probe_path = self.probe_path.strip()
         if not probe_path.startswith("/"):
-            raise ValueError("http_probe_path_invalid")
+            raise TransportOptionsError("The HTTP probe path must begin with a slash.",
+                                        property_path="transport_options.http.probe_path", expected_value="absolute route path")
         object.__setattr__(self, "probe_path", probe_path)
         if (self.auth_header is None) != (self.auth_token is None):
-            raise ValueError("http_auth_incomplete")
+            raise TransportOptionsError("The authentication header and token must be supplied together.",
+                                        property_path="transport_options.http.auth", expected_value="both header and token, or neither")
         if self.auth_header is not None:
+            if not isinstance(self.auth_header, str):
+                raise TransportOptionsError("The authentication header name must be a string.",
+                                            property_path="transport_options.http.auth_header", expected_value="non-empty string",
+                                            actual_value=type(self.auth_header).__name__)
             auth_header = self.auth_header.strip()
             if not auth_header:
-                raise ValueError("http_auth_header_missing")
-            if not self.auth_token:
-                raise ValueError("http_auth_token_missing")
+                raise TransportOptionsError("The authentication header name must not be empty.",
+                                            property_path="transport_options.http.auth_header", expected_value="non-empty string")
+            if not isinstance(self.auth_token, str) or not self.auth_token:
+                raise TransportOptionsError("The authentication token must be a non-empty string.",
+                                            property_path="transport_options.http.auth_token", expected_value="non-empty string")
             object.__setattr__(self, "auth_header", auth_header)
         for field_name, value in (
             (
@@ -145,10 +188,16 @@ class HttpAdapterConfig:
                 isinstance(value, bool)
                 or not isinstance(value, (int, float))
                 or value <= 0
+                or not math.isfinite(value)
             ):
-                raise ValueError(f"http_{field_name}_invalid")
+                path = "timeouts.connect_seconds" if field_name == "connect_timeout_seconds" else "timeouts.io_seconds"
+                actual = value if type(value) in (int, float) and math.isfinite(value) else type(value).__name__
+                raise TransportOptionsError("The transport timeout must be a finite number greater than zero.",
+                                            property_path=path, expected_value="finite number > 0", actual_value=actual)
         if type(self.tls_verify) is not bool:
-            raise TypeError("http_tls_verify_invalid")
+            raise TransportOptionsError("TLS verification must be a boolean.",
+                                        property_path="transport_options.http.tls_verify",
+                                        expected_value="boolean", actual_value=type(self.tls_verify).__name__)
 
 
 class StdlibHttpExchange:
@@ -200,22 +249,29 @@ class StdlibHttpExchange:
         target = parsed.path or "/"
         if parsed.query:
             target += f"?{parsed.query}"
+        phase = "connect"
         try:
             connection.connect()
+            phase = "configure_socket"
             if connection.sock is not None:
                 connection.sock.settimeout(self._io_timeout_seconds)
+            phase = "send_request"
             connection.request(
                 request.method,
                 target,
                 body=request.body if request.body else None,
                 headers=dict(request.headers),
             )
+            phase = "receive_headers"
             response = connection.getresponse()
+            phase = "read_body"
             return HttpResponse(
                 status_code=int(response.status),
                 headers=tuple(response.getheaders()),
                 body=response.read(),
             )
+        except Exception as exc:
+            raise _exchange_error(exc, phase, request) from exc
         finally:
             connection.close()
 
@@ -244,17 +300,6 @@ class HttpTransportAdapter(ITransportClient):
         requirements: DeliveryRequirements,
     ) -> TransportDelivery:
         bind_capabilities(self._config.capabilities, requirements)
-        limit = min(
-            self._config.capabilities.max_frame_bytes,
-            requirements.max_frame_bytes,
-        )
-        if len(frame.payload) > limit:
-            return self._failure(
-                frame,
-                TransportDeliveryState.UNSUPPORTED,
-                "frame_too_large",
-                "frame exceeds bound transport capacity",
-            )
         if self._closed:
             return self._failure(
                 frame,
@@ -271,27 +316,12 @@ class HttpTransportAdapter(ITransportClient):
             body=frame.payload,
         )
         try:
-            response = self._exchange.exchange(request)
-        except (TimeoutError, socket.timeout) as exc:
-            return self._failure(
-                frame,
-                TransportDeliveryState.TIMED_OUT,
-                "transport_timed_out",
-                str(exc) or "transport exchange timed out",
-            )
-        except OSError as exc:
-            return self._failure(
-                frame,
-                TransportDeliveryState.DISCONNECTED,
-                "transport_disconnected",
-                str(exc) or "transport exchange disconnected",
-            )
-        except Exception as exc:
-            return self._failure(
-                frame,
-                TransportDeliveryState.FAILED,
-                "transport_failed",
-                str(exc) or "transport exchange failed",
+            response = self._exchange_request(request)
+        except TransportExchangeError as exc:
+            return TransportDelivery(
+                correlation_id=frame.correlation_id,
+                state=exc.state, reply=None,
+                diagnostic=exc.diagnostic, attempts=1,
             )
 
         reply_frame = TransportFrame(
@@ -313,13 +343,19 @@ class HttpTransportAdapter(ITransportClient):
             response.headers,
             "X-Transport-Diagnostic",
         )
+        diagnostic_message = _find_header(
+            response.headers,
+            "X-Transport-Diagnostic-Message",
+        )
         return TransportDelivery(
             correlation_id=frame.correlation_id,
-            state=TransportDeliveryState.FAILED,
+            state=(TransportDeliveryState.BACKPRESSURED
+                   if diagnostic_code == "transport_backpressured"
+                   else TransportDeliveryState.FAILED),
             reply=reply,
             diagnostic=TransportDiagnostic(
                 code=diagnostic_code or "remote_rejected",
-                message="remote transport endpoint rejected the frame",
+                message=diagnostic_message or "remote transport endpoint rejected the frame",
             ),
             attempts=1,
         )
@@ -333,7 +369,7 @@ class HttpTransportAdapter(ITransportClient):
     def probe(self) -> bool:
         if self._closed:
             return False
-        response = self._exchange.exchange(
+        response = self._exchange_request(
             HttpRequest(
                 base_url=self._config.base_url,
                 method="GET",
@@ -343,6 +379,15 @@ class HttpTransportAdapter(ITransportClient):
             )
         )
         return 200 <= response.status_code < 300
+
+    def _exchange_request(self, request: HttpRequest) -> HttpResponse:
+        try:
+            return self._exchange.exchange(request)
+        except TransportExchangeError:
+            raise
+        except Exception as exc:
+            # Custom exchanges may not identify a more specific phase.
+            raise _exchange_error(exc, "exchange", request) from exc
 
     def _headers(
         self,
@@ -389,8 +434,9 @@ def load_http_transport_options(
 ) -> Mapping[str, Any]:
     _validate_http_endpoint(endpoint)
     if not isinstance(raw, Mapping):
-        raise TypeError(
-            "transport_options.http must be a table"
+        raise TransportOptionsError(
+            "transport_options.http must be a table", property_path="transport_options.http",
+            expected_value="table", actual_type=type(raw).__name__,
         )
     expected = {
         "auth_header",
@@ -400,20 +446,23 @@ def load_http_transport_options(
     }
     unknown = sorted(set(raw) - expected)
     if unknown:
-        raise ValueError(
+        raise TransportOptionsError(
             "transport_options.http contains unknown fields: "
-            + ",".join(unknown)
+            + ",".join(unknown), property_path="transport_options.http",
+            actual_value=unknown, expected_value=sorted(expected),
         )
     missing = sorted(expected - set(raw))
     if missing:
-        raise ValueError(
+        raise TransportOptionsError(
             "transport_options.http is missing fields: "
-            + ",".join(missing)
+            + ",".join(missing), property_path="transport_options.http",
+            missing_fields=missing,
         )
     tls_verify = raw.get("tls_verify")
     if type(tls_verify) is not bool:
-        raise TypeError(
-            "transport_options.http.tls_verify must be a boolean"
+        raise TransportOptionsError(
+            "transport_options.http.tls_verify must be a boolean", property_path="transport_options.http.tls_verify",
+            expected_value="boolean", actual_type=type(tls_verify).__name__,
         )
     normalized: dict[str, Any] = {
         "tls_verify": tls_verify,
@@ -421,15 +470,17 @@ def load_http_transport_options(
     for name in ("auth_header", "probe_path", "route_path"):
         value = raw.get(name)
         if not isinstance(value, str) or not value.strip():
-            raise TypeError(
+            raise TransportOptionsError(
                 f"transport_options.http.{name} "
-                "must be a non-empty string"
+                "must be a non-empty string", property_path=f"transport_options.http.{name}",
+                expected_value="non-empty string", actual_type=type(value).__name__,
             )
         normalized[name] = value.strip()
     for name in ("probe_path", "route_path"):
         if not normalized[name].startswith("/"):
-            raise ValueError(
-                f"transport_options.http.{name} must start with /"
+            raise TransportOptionsError(
+                f"transport_options.http.{name} must start with /", property_path=f"transport_options.http.{name}",
+                expected_value="path starting with /",
             )
     return MappingProxyType(normalized)
 

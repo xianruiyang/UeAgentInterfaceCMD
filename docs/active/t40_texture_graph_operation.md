@@ -1,64 +1,140 @@
-# T40 TextureGraph SDK and CLI
+# T40 TextureGraph Operation Authority
 
-Import only `uai` and connect from one complete Connection TOML. The final
-manifest generates all seven methods in the default `texture_graph` namespace:
+The active `texture-graph-operation` contribution owns the current TextureGraph
+command identities. Every current contract reports
+`texture-graph-operation-owner`; no namespace or catch-all fallback adds
+commands.
 
-```python
-import uai
+The three typed node/link/parameter mutation identities are dormant compatibility
+commands. Normal graph editing uses the public HJSON workspace flow below;
+their compatibility registration does not make them generated named SDK methods.
 
-with uai.connect("connection.toml") as client:
-    capture = client.texture_graph.artifact_capture(
-        expected_settled_revision=current_settled_revision,
-        outputs=[{
-            "element_id": "builtin_output",
-            "output_name": "Output",
-        }],
-        target_ref="/Game/TextureGraphs/TG_Example",
-    )
+The four typed mutation/settle commands and `texture_graph.artifact.bake` enter the common
+Operation lifecycle through five request-scoped factories. The public handler
+and typed capability contribution consume the same factory object for each
+identity. Read-only `texture_graph.artifact.capture` and
+`texture_graph.runtime.probe` enter the common Query lifecycle. These lanes
+reuse the single native GraphCompound TextureGraph mechanics boundary. The
+former AudioMediaGraph registry stage is an internal mechanics dependency only,
+not a second public route, registry, handler, contract, test or documentation
+authority.
+
+Mutation and bake success require exact schema and target binding, native
+application, settle, required persistence and independent readback. Bake
+renders every selected output, creates the requested Texture2D targets as one
+authorized impact set, and compensates the full batch on failure. Artifact
+capture resolves the current settled asset on the server and returns the
+selected output observations without publishing a second artifact authority.
+Runtime probe performs a real render,
+returns pixel statistics and expected-stat comparisons, and never persists.
+Prewrite failures leave no residue;
+unknown state requires reconciliation rather than replay.
+
+## Public SDK and CLI
+
+For an existing TextureGraph, obtain
+`workspace = client.content_graph.export_workspace(...)`, edit its ordinary
+HJSON files and call `workspace.import_changes()`. Discover current command
+arguments through command usage. Edit the ordinary HJSON
+graph files. Native scalar, integer, Boolean, string, color and vector inputs expose
+their compact value, including inputs that are not graph parameters. Input parameters
+also expose aliases when no compact native value is available. Connections refer to
+the exported readable node and pin names. Import the same directory and
+read its refreshed HJSON before the next edit. The shared importer resolves the workspace machine mapping;
+callers do not read or rewrite it.
+If an older export reports `semantic_workspace_graph_pin_capture_reexport_required`,
+export to a new directory and transfer the intended ordinary HJSON edits. That
+old machine baseline lost the original pin selectors; do not reconstruct them from aliases
+or overwrite the directory containing unapplied edits.
+
+Add a known expression with a keyed entry such as
+`AddedGain: {name: "Scalar"}` in the graph's `nodes` object. Optional input values
+and connections can be included in the same import. Unknown or ambiguous names
+fail before mutation. Complete native-menu candidate search and semantic
+`select` are not provided by this path. The old `uai.texture_graph.edit/1`
+operation wrapper is retired; export a current workspace to edit it.
+
+Editable expression fields use the shared reflected property surface in each
+node's `properties.hjson`, except values already represented by compact inputs.
+This includes `TG_Setting`, input references such as Texture `Source`, and
+reflected input structures such as `OutputSettings.Settings`. Edit the exported `categories`
+`type`/`value` rows; enum names and legal choices come from the workspace's
+shared definitions. For example, an IfThenElse node exposes
+`NoCategory.Operator: {type: "EIfThenElseOperator", value: "LT"}`. Import follows
+the captured node identity through the same current binding used by nodes and
+connections. If the graph edit replaces the expression, settings are prepared
+against the replacement after native creation. ObjectApply validates and applies
+the original descriptors and sends the native property notification so the
+setting Pin stays synchronized.
+A value has one writable projection. Compact native inputs retain their
+alias/value surface; other reflected fields use the same recursive codec and
+property application as settings. An input containing only `alias` edits that
+alias and preserves its value. Native outputs/private data are not editable
+inputs, and live GPU values are not converted into invented asset references.
+Integer inputs preserve their native width through export, import and readback;
+fractional or out-of-range numbers are diagnosed at the input instead of truncated.
+
+Setting edits join the same transaction and complete expected readback as graph
+edits. Invalid enum values fail before source mutation. A final-readback
+rejection restores original dirty memory, package bytes, settings and graph.
+Direct coverage includes IfThenElse settings and identity, Source references,
+OutputSettings structure edits, alias-only changes, and exact ArrayGrid integer
+inputs through public import and persistent reload. Other expressions and
+interface-changing settings have not been exhaustively validated.
+
+Workspace update success includes persistent reload and final HJSON readback
+before the atomic transaction commits. If that final readback fails, the shared
+transaction restores the pre-import graph, dirty state and original package
+on disk. Typed compatibility operations retain their own lifecycle contract.
+
+
+For a missing target, the same public import accepts an inline HJSON source
+with the shared schema and a readable root factory candidate:
+
+```hjson
+{
+  schema: uai.authoring.workspace/2
+  root: {
+    candidate: { name: "Texture Graph" }
+    graph: {
+      nodes: {
+        Gain: {
+          candidate: { name: "Scalar" }
+          inputs: { Scalar: { alias: "Gain", value: 0.25 } }
+        }
+      }
+      connections: []
+    }
+  }
+}
 ```
 
-The mutation lane uses the same namespace, including
-`client.texture_graph.graph_node_mutate(...)`,
-`client.texture_graph.graph_link_mutate(...)`, and
-`client.texture_graph.graph_parameter_mutate(...)`. The
-`client.texture_graph.graph_validate_evaluate_settle(...)` call completes the
-same public Operation lifecycle. Use
-`client.texture_graph.artifact_bake(...)` for persistent Texture2D outputs and
-`client.texture_graph.runtime_probe(...)` for a non-persistent real render with
-pixel statistics. Feed the `package-md5:*` revision returned by the successful
-settle operation directly into artifact capture or bake; do not replace it with
-a content-graph revision, guess it, or reuse an older revision. Bake fails closed
-when the source is unsaved/dirty. Runtime probe reads the current target and does
-not accept a revision parameter.
+Pass this text through `source: {kind: "inline", document: text}` and supply
+the asset path as `target`. The server resolves the existing factory catalog
+and initialization contract; no factory/class path or revision is required.
+Native factory defaults, including the Output node, are preserved. The root
+and requested graph content are created in one atomic transaction, saved and
+reloaded before final readback. Invalid candidates or unsupported fields fail
+before creating the target. A final-readback rejection restores the original
+absence in memory, the asset registry and on disk. Export the new asset to a
+fresh workspace for subsequent edits. This limited initialization uses the
+existing expression-name resolver; it does not claim complete native menus.
 
-The generic form uses the same generated binding:
-
-```python
-capture = client.execute(
-    "texture_graph.artifact.capture",
-    {
-        "expected_settled_revision": current_settled_revision,
-        "outputs": [{
-            "element_id": "builtin_output",
-            "output_name": "Output",
-        }],
-        "target_ref": "/Game/TextureGraphs/TG_Example",
-    },
-)
-```
-
-The CLI forwards one identical request:
+The final manifest projects the active identities into the default
+`texture_graph` namespace. Callers import only `uai`, use `uai.connect_project()` for the local project and call methods such as
+`client.texture_graph.artifact_capture(...)`,
+`client.texture_graph.artifact_bake(...)`,
+`client.texture_graph.graph_validate_evaluate_settle(...)`, and
+`client.texture_graph.runtime_probe(...)`. Named SDK calls and the thin CLI
+consume the same generated catalog, Client, Protocol and Transport. No
+T40-specific Python module remains authoritative.
 
 ```text
-uai-cli --connection connection.toml exec texture_graph.artifact.capture --params-json {"expected_settled_revision":"package-md5:<current-settled-revision>","outputs":[{"element_id":"builtin_output","output_name":"Output"}],"target_ref":"/Game/TextureGraphs/TG_Example"}
+ueagentinterfacecmd exec texture_graph.artifact.capture --params-json '{"outputs":[{"element_id":"OutputNode","output_name":"Output"}],"target_ref":"/Game/TextureGraphs/TG_Example"}'
 ```
 
-Use `client.query.command_search("capture texture graph artifact", limit=5)` and
-then `client.query.command_detail(command_id, contract_hash)` to obtain the exact
-request schema, named SDK/CLI forms, owner, failures and tutorial references.
-Search is the only fuzzy command-selection step; execute the selected ID and
-hash unchanged.
-
-The client contains no HTTP implementation, retry, alias, TextureGraph parsing,
-evaluation, persistence, rollback or Unreal Engine business behavior. Inspect
-`Result.ok` and the returned revision/output identities.
+Use `client.query.command_search("capture texture graph artifact")` and
+then `client.query.command_usage(...)` to obtain the minimal named SDK call.
+Inspect available nested parameter schemas with `ueagentinterfacecmd describe <command-id> --parameter <name>` when needed; domain semantics remain in this contract. Target
+revisions and other concurrency evidence are resolved, frozen, and rechecked by
+the server during the operation; callers neither read nor write them.

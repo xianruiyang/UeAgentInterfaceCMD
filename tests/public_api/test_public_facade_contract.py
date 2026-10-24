@@ -14,6 +14,8 @@ EXPECTED_PUBLIC_NAMES = frozenset(
     {
         "__version__",
         "connect",
+        "connect_project",
+        "describe_command",
         "Client",
         "Result",
         "Error",
@@ -22,11 +24,61 @@ EXPECTED_PUBLIC_NAMES = frozenset(
         "TransportError",
         "ProtocolError",
         "ServerCommandError",
+        "OperationHandle",
+        "RuntimeSessionHandle",
+        "PieSession",
+        "DurableJournalHandle",
+        "ArtifactHandle",
+        "ExternalSourceNamespace",
+        "ProjectFileHandle",
+        "HjsonWorkspaceHandle",
+        "VoxelGridHandle",
     }
 )
 
 
 class PublicFacadeContractTests(unittest.TestCase):
+    def test_artifact_roles_do_not_depend_on_traversal_order(self) -> None:
+        from uai.artifact import _from_payload
+        from uai import Result
+
+        primary = {"locator": str(REPO_ROOT / "tests" / "primary.png"), "byte_count": 300}
+        frames = [{"locator": str(REPO_ROOT / "tests" / f"frame-{index}.png"), "byte_count": index + 1}
+                  for index in range(2)]
+        # The wire object may sort additional refs before the primary ref.
+        owner = {"additional_artifact_refs": frames, "artifact_ref": primary}
+        for payload in (owner, {"schema": "uai.long_running.receipt.v1", "latest_signal": {"payload": owner}}):
+            with self.subTest(payload=payload):
+                artifacts = _from_payload(object(), payload)
+                result = Result({"ok": True, "correlation_id": "artifact-role-test", "payload": payload},
+                                artifacts=artifacts)
+                self.assertIs(result.primary_artifact, artifacts[2])
+                self.assertEqual(result.additional_artifacts, artifacts[:2])
+                self.assertEqual(result.artifacts, artifacts)
+                self.assertNotIn("locator", str(result.payload))
+
+    def test_artifact_roles_preserve_shared_and_repeated_references(self) -> None:
+        from uai.artifact import _from_payload
+        from uai import Result
+
+        reference = {"locator": str(REPO_ROOT / "tests" / "shared.png"), "byte_count": 10}
+        payload = {"artifact_ref": reference, "additional_artifact_refs": [reference, reference]}
+        artifacts = _from_payload(object(), payload)
+        result = Result({"ok": True, "correlation_id": "artifact-role-test", "payload": payload}, artifacts=artifacts)
+        self.assertEqual(len(result.artifacts), 1)
+        self.assertEqual(result.additional_artifacts, (result.primary_artifact, result.primary_artifact))
+
+    def test_artifact_roles_leave_scalar_identifiers_and_unassigned_outputs_compatible(self) -> None:
+        from uai.artifact import _from_payload
+        from uai import Result
+
+        payload = {"artifact_ref": "descriptor-id", "locator": str(REPO_ROOT / "tests" / "output.png"), "byte_count": 10}
+        result = Result({"ok": True, "correlation_id": "artifact-role-test", "payload": payload},
+                        artifacts=_from_payload(object(), payload))
+        self.assertEqual(len(result.artifacts), 1)
+        self.assertIsNone(result.primary_artifact)
+        self.assertEqual(result.additional_artifacts, ())
+
     def test_root_facade_is_small_and_complete(self) -> None:
         uai = importlib.import_module("uai")
         actual = frozenset(getattr(uai, "__all__", ()))

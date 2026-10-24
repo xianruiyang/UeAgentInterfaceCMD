@@ -1,10 +1,10 @@
 # Capture and media commands through the default SDK
 
-Discover the current contract and a policy before calling it:
+When the command is unknown, discover it and request usage for its exact command ID:
 
 ```python
 matches = client.query.command_search("capture image viewport niagara")
-contract = client.query.command_detail(command_id="capture.image.execute")
+usage = client.query.command_usage(["capture.image.execute"])
 
 started = client.capture.image_execute(
     subject_ref="capture-subject:viewport:active",
@@ -15,12 +15,10 @@ started = client.capture.image_execute(
 
 The other exact default bindings are `client.capture.media_execute(...)` and
 `client.capture.render_execute(...)`. Each named method forwards one exact
-request; it does not poll, retry, render, clean up, or choose a policy. The CLI
-form uses the same contract hash:
-
-```text
-uai-cli --connection connection.toml exec capture.image.execute --contract-hash <hash-from-command_detail> --params-json <json-object>
-```
+request; it does not poll, retry, render, clean up, or choose a policy. Use the SDK
+handle for the capture lifecycle below. A CLI `exec` invocation of the same command
+only starts it; it does not wait for the final image. Connection and machine
+metadata remain SDK-owned.
 
 Use `subject_ref` for the exact target, `policy_id` for the explicit behavior,
 and `parameters` for only that policy's documented fields. Asset subjects use
@@ -29,16 +27,40 @@ and `parameters` for only that policy's documented fields. Asset subjects use
 `capture-subject:viewport:active`. If a policy accepts `output_file`, it names
 the final owned artifact; native work still uses operation-owned staging.
 
-`command_detail(command_id="capture.image.execute")` dynamically projects the
-current image-policy catalog into the `policy_id` input schema and places any
-policy-specific parameter schemas under `parameters.schema` at
-`x-uai-policy-contracts`. This projection comes from the same policy registry
-that executes the request, so the SDK tutorial does not maintain a second list.
+Actor references accept an exact object path, a unique native name or label,
+or a name qualified by its discovery scope. If `parameters` repeats the target
+as `actor`, `actor_name`, `actor_label`, `id`, or `asset_path`, every supplied
+reference must identify the same subject. Ambiguous or conflicting targets
+return a diagnostic before capture moves the camera or opens an asset editor.
+
+Use `ueagentinterfacecmd describe capture.image.execute --parameter policy_id`
+for available policy IDs. The base description also lists registered `variants`.
+Select one with `--variant <variant_id>` for its exact request contract and guidance;
+add `--parameter parameters` for the policy's parameter schema. These contracts are
+generated from the plugin registry, including UMG canvas/crop fields. Policy behavior and documented
+fields belong to the [plugin capture contract](../../../Plugins/UeAgentInterface/docs/active/t44_capture_media_operation.md),
+not to a second catalog in this SDK guide.
+
+Level viewport capture prepares its existing native window and layout when
+needed, including restoring a minimized window. No separate SDK preparation
+call is required; see the plugin capture contract for policy scope and
+asset-editor window permissions.
+
+Read policy-specific sampling facts from the terminal
+`latest_signal.payload.capture_receipt`. Level Sequence image capture is an independent
+scene-camera render, including when it falls back to viewport camera geometry; it does
+not reproduce the viewport backbuffer or its exposure history at a larger resolution.
+Its frame receipts associate individual outputs using `uses_primary_artifact` or
+`raw_artifact_index` into `additional_artifact_refs`. The SDK exposes those declared roles as
+`result.primary_artifact` and `result.additional_artifacts`, so a frame's
+`raw_artifact_index` indexes `result.additional_artifacts` directly. The existing
+`result.artifacts` tuple still lists all handles; its traversal order does not identify the
+primary output. See the plugin contract for details.
 
 ## Transform-candidate visual preview
 
 `policy:image-capture:transform-candidates/v1` is a current policy, not a
-historical alias. Pass one exact Actor object path and 1-15 candidates:
+historical alias. Pass one exact Actor object path and one or more candidates:
 
 ```python
 started = client.capture.image_execute(
@@ -58,54 +80,37 @@ started = client.capture.image_execute(
 ```
 
 The policy captures the original frame plus each temporary candidate from the
-current Level viewport and publishes one operation-owned frame sheet. The 15
-candidate limit keeps the complete sheet at no more than 16 frames. It does not
+current Level viewport and publishes one operation-owned frame sheet. It does not
 focus the Editor, score candidates, choose one, or persist a candidate. Every
 terminal mechanics path restores the Actor transform, package dirty state,
 Actor selection, and temporary viewport realtime override; success fails closed
-unless those restorations are observed. After comparison, read the exact Actor
-with `content_graph.items`, update its transform in the World
-`uai.world.edit/1` document, and persist the chosen value through
-`content_graph.import_workspace` using the exported revision.
+unless those restorations are observed. After comparison, edit the Actor's declared
+transform fields in its Level workspace and persist with `workspace.import_changes()`; the managed workspace
+owns revision and identity. See [T26](t26_level_world_domain.md).
 
-## Image policy migration table
+## Asset preview workspace capture
 
-| Retired historical identity | Current `capture.image.execute` policy | `parameters` responsibility |
-| --- | --- | --- |
-| `anim_blueprint_screenshot` | `policy:image-capture:anim-blueprint/v1` | graph/window/viewport fields |
-| `anim_sequence_screenshot` | `policy:image-capture:anim-sequence/v1` | time, frame and sequence-sheet fields |
-| `behavior_tree_screenshot` | `policy:image-capture:behavior-tree/v1` | offscreen widget fields |
-| `blueprint_screenshot` | `policy:image-capture:blueprint/v1` | graph/window/viewport and restore fields |
-| `control_rig_screenshot` | `policy:image-capture:control-rig/v1` | capture target fields |
-| `metasound_screenshot` | `policy:image-capture:metasound/v1` | graph image fields |
-| `niagara_screenshot` | `policy:image-capture:niagara/v1` | preview camera, tick, frames and sheet fields |
-| `pcg_screenshot` | `policy:image-capture:pcg-viewport/v1` | actor framing and viewport image fields |
-| `screenshot_viewport` | `policy:image-capture:viewport/v1` | view mode, visualization, warmup, tick, restore, format and output fields |
-| `screenshot_viewport_buffer` | `policy:image-capture:viewport-buffer/v1` | buffer, depth, invert, format and output fields |
-| `sequence_screenshot` | `policy:image-capture:level-sequence/v1` | time, frame and sequence-sheet fields |
-| `sound_cue_screenshot` | `policy:image-capture:sound-cue/v1` | graph image fields |
-| `state_tree_screenshot` | `policy:image-capture:state-tree/v1` | offscreen widget fields |
-| `texture_screenshot` | `policy:image-capture:texture/v1` | mip, slice, format and statistics fields |
-| `umg_screenshot` | `policy:image-capture:umg/v1` | offscreen size, crop and region fields |
+`policy:image-capture:asset-preview/v1` captures the selected asset's actual preview.
+Use `capture-subject:asset:<object-path>` and `parameters={"mode":"single"}` or
+`{"mode":"sequence"}`; `target` optionally selects a named target from the exported
+`preview/index.hjson`. Camera, environment and capture settings are edited in the
+asset workspace and applied with its ordinary import operation. Capture does not
+implicitly import pending local edits or accept another copy of those settings.
 
-The historical names in the first column are documentation identities only.
-Do not call them and do not construct an alias from them.
+Sampling, render extent, output dimensions, realtime state and receipt semantics
+are defined in the plugin contract's
+[Asset preview workspace capture](../../../Plugins/UeAgentInterface/docs/active/t44_capture_media_operation.md#asset-preview-workspace-capture)
+section. Consume the exported preview fields and actual receipt; do not infer a
+second configuration from an unrelated screenshot policy.
 
-Every image policy requires a rendering-capable Editor process. In a process
-where `FApp::CanEverRender()` is false, including `-NullRHI`, the returned
-operation reaches terminal failure with
-`capture_image_rhi_unavailable:<policy_id>` before screenshot mechanics or an
-asset editor is opened, and it publishes no image artifact. The SDK and CLI do
-not provide a fallback; run image capture in a rendering-capable Editor or
-owned RHI worker.
+## Advance, inspect and release
 
-## Observe, cancel and release
-
-A successful start returns an `operation_ref`, not the final image. Use the
-public `operation.status` contract to observe or reattach until terminal. Use
-`operation.cancel` for the same operation, read the terminal receipt and
-artifact, then call `operation.release`. `state_unknown` forbids automatic
+A successful start returns a handle in `start_result.operation`, not the final image.
+Use `handle.finish()` to collect and save the receipt and release the operation,
+then inspect the result and materialize its published artifacts. Use `handle.close()`
+to cancel and drain the same operation. The SDK saves recovery custody before submission;
+follow [T32](t32_long_running.md) after a disconnect or process exit. `state_unknown` forbids automatic
 replay. Timeout, unsupported policy, invalid subject, resource refusal, missing
 artifact, failed independent readback, or incomplete cancellation must not be
-reported as success. The user's main Editor is preserved; tests use an owned
-background Editor process.
+reported as success. Reuse the current rendering-capable Editor. Use an owned
+worker only when the requested operation needs process isolation.

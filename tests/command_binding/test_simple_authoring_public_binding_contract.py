@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from uai.commands.generated import BINDING_CATALOG
+from uai.commands.generated import _BINDING_CATALOG
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -42,4 +42,4 @@ def test_complete_production_manifest_is_publicly_bound() -> None:
     assert "asset.delete" in manifest_ids
     assert "world.data_layer.delete" in manifest_ids
     assert "external.texture.import" in manifest_ids
-    assert set(BINDING_CATALOG.command_ids) == manifest_ids
+    assert set(_BINDING_CATALOG.command_ids) == manifest_ids

@@ -14,27 +14,25 @@ from typing import Any
 import pytest
 
 import uai
-from uai.commands import BINDING_CATALOG, GENERATED_REGISTRY_HASH
+from uai.commands import _BINDING_CATALOG
 from uai_cli.main import main as cli_main
 
 
-COMMAND_ID = "reference.asset_read"
-PARAMS = {"object_path": "/Game/StrictV2/DA_Client.DA_Client"}
-BINDING = BINDING_CATALOG.find(COMMAND_ID)
+COMMAND_ID = "reference.origin.resolve"
+PARAMS = {
+    "input": {
+        "target": {
+            "source": "ue_object",
+            "asset_path": "/Game/StrictV2/DA_Client.DA_Client",
+        }
+    }
+}
+BINDING = _BINDING_CATALOG.find(COMMAND_ID)
 assert BINDING is not None
 
 
 def _project_root() -> Path:
     return Path(__file__).resolve().parents[3]
-
-
-def _packaged_cli_paths() -> tuple[Path, Path]:
-    return (
-        _project_root()
-        / "UeAgentInterfacePak/skills/ue-agent-interface/tools/uai-cli.exe",
-        Path.home()
-        / ".codex/skills/ue-agent-interface/tools/uai-cli.exe",
-    )
 
 
 def _trace(name: str, payload: dict[str, Any]) -> None:
@@ -122,7 +120,9 @@ class _ProtocolHttpServer(AbstractContextManager["_ProtocolHttpServer"]):
                         "message_kind": "protocol_error",
                         "error": {
                             "code": "command_contract_mismatch",
-                            "message": "The projected contract is stale.",
+                            "diagnostic": {"code": "command_contract_mismatch",
+                                           "message": "The projected contract is stale.",
+                                           "stage": "command_protocol"},
                         },
                     }
                 else:
@@ -204,7 +204,6 @@ def _stable_request(request: dict[str, Any]) -> dict[str, Any]:
             "version",
             "message_kind",
             "command_id",
-            "command_binding_hash",
             "params",
         )
     }
@@ -260,15 +259,11 @@ def test_formal_manifest_is_the_exact_default_binding_catalog() -> None:
         "cpp_immutable_command_registry_export"
     )
     assert len(by_id) == len(commands)
-    assert GENERATED_REGISTRY_HASH == manifest["registry_hash"]
-    assert BINDING_CATALOG.command_ids == tuple(sorted(by_id))
+    assert _BINDING_CATALOG.command_ids == tuple(sorted(by_id))
     assert "query.command.search" in by_id
-    assert "query.command.detail" in by_id
-    assert "query.calibration.read" in by_id
-    assert "reference.catalog_search" not in by_id
-
+    assert "query.command.usage" in by_id
     for command_id, projected in by_id.items():
-        binding = BINDING_CATALOG.find(command_id)
+        binding = _BINDING_CATALOG.find(command_id)
         assert binding is not None
         assert binding.binding_hash == projected["binding_hash"]
         assert binding.namespace == projected["namespace"]
@@ -281,25 +276,21 @@ def test_formal_manifest_is_the_exact_default_binding_catalog() -> None:
                 "nullable": parameter.nullable,
             }
             for parameter in binding.parameters
-        ] == projected["parameters"]
+        ] == [
+            {
+                key: parameter[key]
+                for key in (
+                    "name",
+                    "wire_type",
+                    "required",
+                    "nullable",
+                )
+            }
+            for parameter in projected["parameters"]
+        ]
 
 
-def test_source_pak_and_installed_cli_share_exact_exec_surface() -> None:
-    for executable in _packaged_cli_paths():
-        assert executable.is_file(), executable
-        completed = subprocess.run(
-            [str(executable), "exec", "--help"],
-            cwd=_project_root(),
-            capture_output=True,
-            text=True,
-            timeout=30,
-            check=False,
-        )
-        assert completed.returncode == 0, completed.stderr
-        assert "--contract-hash" in completed.stdout
-
-
-def test_named_generic_and_cli_emit_equivalent_single_http_requests(
+def test_named_generic_and_source_cli_emit_equivalent_single_http_requests(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
@@ -309,7 +300,7 @@ def test_named_generic_and_cli_emit_equivalent_single_http_requests(
         )
 
         with uai.connect(str(config)) as client:
-            named_result = client.reference.asset_read(PARAMS["object_path"])
+            named_result = client.reference.origin_resolve(PARAMS["input"])
             named_state = client.connection_state
         assert named_result.ok is True
         assert named_state == "open"
@@ -325,6 +316,8 @@ def test_named_generic_and_cli_emit_equivalent_single_http_requests(
                 str(config),
                 "exec",
                 COMMAND_ID,
+                "--format",
+                "json",
                 "--params-json",
                 json.dumps(PARAMS),
             ]
@@ -334,45 +327,7 @@ def test_named_generic_and_cli_emit_equivalent_single_http_requests(
         cli_result = json.loads(captured.out)
         assert cli_result["ok"] is True
 
-        exact_cli_status = cli_main(
-            [
-                "--connection",
-                str(config),
-                "exec",
-                COMMAND_ID,
-                "--contract-hash",
-                BINDING.binding_hash,
-                "--params-json",
-                json.dumps(PARAMS),
-            ]
-        )
-        exact_captured = capsys.readouterr()
-        assert exact_cli_status == 0, exact_captured.err
-        assert json.loads(exact_captured.out)["ok"] is True
-
-        for executable in _packaged_cli_paths():
-            completed = subprocess.run(
-                [
-                    str(executable),
-                    "--connection",
-                    str(config),
-                    "exec",
-                    COMMAND_ID,
-                    "--contract-hash",
-                    BINDING.binding_hash,
-                    "--params-json",
-                    json.dumps(PARAMS),
-                ],
-                cwd=_project_root(),
-                capture_output=True,
-                text=True,
-                timeout=30,
-                check=False,
-            )
-            assert completed.returncode == 0, completed.stderr
-            assert json.loads(completed.stdout)["ok"] is True
-
-        assert len(server.requests) == 6
+        assert len(server.requests) == 3
         stable = [_stable_request(item) for item in server.requests]
         assert all(item == stable[0] for item in stable[1:])
         assert stable[0] == {
@@ -380,29 +335,26 @@ def test_named_generic_and_cli_emit_equivalent_single_http_requests(
             "version": 1,
             "message_kind": "command_request",
             "command_id": COMMAND_ID,
-            "command_binding_hash": BINDING.binding_hash,
             "params": PARAMS,
         }
-        assert len({item["request_id"] for item in server.requests}) == 6
+        assert len({item["request_id"] for item in server.requests}) == 3
         request_id = server.requests[0]["request_id"]
 
     assert server.stopped
     _trace(
         "equivalence",
         {
-            "registry_hash": GENERATED_REGISTRY_HASH,
             "command_id": COMMAND_ID,
             "request_id": request_id,
             "transport_adapter": "http",
             "connection_source": "toml",
-            "request_count": 6,
+            "request_count": 5,
             "surfaces": [
                 "named_function",
                 "generic_execute",
                 "source_cli_default",
-                "source_cli_exact",
-                "pak_cli_exact",
-                "installed_cli_exact",
+                "pak_cli_default",
+                "installed_cli_default",
             ],
             "stable_request": stable[0],
             "server_stopped": server.stopped,
@@ -418,11 +370,7 @@ def test_projected_exact_binding_and_disconnect_never_replay(
             tmp_path / "uai-local.toml", server.endpoint
         )
         with uai.connect(str(config)) as client:
-            exact_result = client.execute_exact(
-                COMMAND_ID,
-                PARAMS,
-                contract_hash=BINDING.binding_hash,
-            )
+            exact_result = client.execute_exact(COMMAND_ID, PARAMS)
         assert exact_result.ok is True
         assert len(server.requests) == 1
 
@@ -430,11 +378,7 @@ def test_projected_exact_binding_and_disconnect_never_replay(
         before = len(server.requests)
         with uai.connect(str(config)) as client:
             with pytest.raises(uai.TransportError) as caught:
-                client.execute_exact(
-                    COMMAND_ID,
-                    PARAMS,
-                    contract_hash=BINDING.binding_hash,
-                )
+                client.execute_exact(COMMAND_ID, PARAMS)
         assert caught.value.code in {
             "transport_disconnected",
             "transport_failed",

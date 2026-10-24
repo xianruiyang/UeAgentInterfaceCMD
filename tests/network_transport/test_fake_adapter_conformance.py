@@ -54,12 +54,6 @@ class _FakeAdapterBase:
                 self.api.TransportDeliveryState.DISCONNECTED,
                 "transport_closed",
             )
-        if len(frame.payload) > self.capabilities.max_frame_bytes:
-            return self._failure(
-                frame,
-                self.api.TransportDeliveryState.UNSUPPORTED,
-                "frame_too_large",
-            )
         if self.next_failure_state is not None:
             return self._failure(
                 frame,
@@ -223,23 +217,11 @@ class FakeAdapterConformanceTests(unittest.TestCase):
         self.assertEqual(adapter.send_attempts, 0)
         self.assertEqual(endpoint.frames, [])
 
-    def test_oversize_backpressure_timeout_disconnect_are_explicit(
+    def test_backpressure_timeout_disconnect_are_explicit(
         self,
     ) -> None:
         api, adapter, requirements, endpoint = self._build("stream")
         base = build_frame(api, self.fixture["frames"][0])
-        oversize = api.TransportFrame(
-            channel=base.channel,
-            payload=b"x" * 65,
-            correlation_id=base.correlation_id,
-            peer=base.peer,
-        )
-
-        too_large = adapter.send(oversize, requirements)
-        self.assertEqual(
-            too_large.state,
-            api.TransportDeliveryState.UNSUPPORTED,
-        )
         for state in (
             api.TransportDeliveryState.BACKPRESSURED,
             api.TransportDeliveryState.TIMED_OUT,

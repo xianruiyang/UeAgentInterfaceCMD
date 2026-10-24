@@ -28,7 +28,7 @@ if (-not $hasPyInstaller) {
 Write-Host "[3/3] Build one-file executable ..."
 python -m PyInstaller `
   --onefile `
-  --name uai-cli `
+  --name ueagentinterfacecmd `
   --paths "$Root\cli" `
   --distpath "$Root\dist" `
   --workpath "$Root\build_tmp" `
@@ -37,4 +37,4 @@ python -m PyInstaller `
 if ($LASTEXITCODE -ne 0) {
     throw "PyInstaller build failed."
 }
-Write-Host "Build done: $Root\dist\uai-cli.exe"
+Write-Host "Build done: $Root\dist\ueagentinterfacecmd.exe"

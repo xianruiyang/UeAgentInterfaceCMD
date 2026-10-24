@@ -101,20 +101,6 @@ class _Handler(BaseHTTPRequestHandler):
             return {"map_name": "MockMap", "package_name": "/Game/Maps/MockMap", "dirty": False}
         if command == "list_actors":
             return {"actors": [], "count": 0}
-        if command == "material_apply_folder":
-            return {
-                "asset_path": str(params.get("asset_path") or ""),
-                "saved": True,
-                "status": "applied",
-            }
-        if command == "material_export_folder":
-            return {
-                "asset_path": str(params.get("asset_path") or ""),
-                "folder_path": ".",
-                "file_count": 1,
-                "written_files": ["index.hjson"],
-                "status": "written",
-            }
         if command == "material_get_info":
             return {"asset_path": str(params.get("asset_path") or ""), "expression_count": 1}
         return {"command": command}

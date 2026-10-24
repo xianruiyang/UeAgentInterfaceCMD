@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 import os
+import math
 from pathlib import Path
 from typing import Any
 
@@ -31,8 +32,11 @@ _TOP_LEVEL_FIELDS = frozenset(
 )
 
 
-def _usage(code: str, message: str) -> UsageError:
-    return UsageError(code=code, message=message)
+def _usage(code: str, message: str, *, field_name: str = "", **facts: object) -> UsageError:
+    diagnostic = {"stage": "connection_config", **facts}
+    if field_name:
+        diagnostic["property_path"] = field_name
+    return UsageError.at_source(code=code, message=message, facts=diagnostic)
 
 
 def _mapping(
@@ -44,6 +48,7 @@ def _mapping(
         raise _usage(
             "connection_config_invalid",
             f"{field_name} must be a table",
+            field_name=field_name, expected_value="table", actual_type=type(value).__name__,
         )
     return value
 
@@ -59,6 +64,7 @@ def _reject_unknown(
         raise _usage(
             "connection_config_invalid",
             f"{field_name} contains unknown fields: {','.join(unknown)}",
+            field_name=field_name, actual_value=unknown, expected_value=sorted(allowed),
         )
 
 
@@ -71,6 +77,7 @@ def _required_text(
         raise _usage(
             "connection_config_invalid",
             f"{field_name} must be a non-empty string",
+            field_name=field_name, expected_value="non-empty string", actual_type=type(value).__name__,
         )
     return value.strip()
 
@@ -84,10 +91,14 @@ def _positive_seconds(
         isinstance(value, bool)
         or not isinstance(value, (int, float))
         or value <= 0
+        or not math.isfinite(value)
     ):
         raise _usage(
             "connection_config_invalid",
-            f"{field_name} must be a positive number",
+            f"{field_name} must be a finite positive number",
+            field_name=field_name, expected_value="finite number > 0",
+            actual_value=value if isinstance(value, (int, float)) and math.isfinite(value) else None,
+            actual_type=type(value).__name__,
         )
     return float(value)
 
@@ -95,7 +106,7 @@ def _positive_seconds(
 @dataclass(frozen=True, slots=True)
 class AuthenticationSnapshot:
     mode: str
-    secret_source: Path | str | None = None
+    secret_source: Path | str | None = field(default=None, repr=False)
     _secret_value: str | None = field(default=None, repr=False)
 
     def get_secret_value(self) -> str | None:
@@ -104,15 +115,15 @@ class AuthenticationSnapshot:
 
 @dataclass(frozen=True, slots=True)
 class ConnectionSnapshot:
-    source_path: Path
+    source_path: Path = field(repr=False)
     format_version: int
     transport: str
-    endpoint: str
+    endpoint: str = field(repr=False)
     protocol_version: str
     connect_timeout_seconds: float
     io_timeout_seconds: float
-    authentication: AuthenticationSnapshot
-    transport_options: Mapping[str, Mapping[str, Any]]
+    authentication: AuthenticationSnapshot = field(repr=False)
+    transport_options: Mapping[str, Mapping[str, Any]] = field(repr=False)
 
 
 def _load_authentication(
@@ -148,7 +159,8 @@ def _load_authentication(
         if not isinstance(secret, str) or not secret.strip():
             raise _usage(
                 "connection_secret_missing",
-                f"connection secret environment variable is missing: {variable}",
+                "connection secret environment variable is missing",
+                field_name="authentication.bearer_env", actual_value_present=False,
             )
         return AuthenticationSnapshot(
             mode=mode,
@@ -175,20 +187,23 @@ def _load_authentication(
         if not secret_path.is_file():
             raise _usage(
                 "connection_secret_missing",
-                f"connection secret file is missing: {secret_path}",
+                "connection secret file is missing",
+                field_name="authentication.bearer_file", actual_value_present=False,
             )
         try:
             secret = secret_path.read_text(encoding="utf-8-sig")
-        except OSError as exc:
+        except OSError:
             raise _usage(
                 "connection_secret_missing",
-                f"connection secret file cannot be read: {secret_path}",
-            ) from exc
+                "connection secret file cannot be read",
+                field_name="authentication.bearer_file",
+            ) from None
         secret = secret.rstrip("\r\n")
         if not secret.strip():
             raise _usage(
                 "connection_secret_invalid",
-                f"connection secret file is empty: {secret_path}",
+                "connection secret file is empty",
+                field_name="authentication.bearer_file",
             )
         return AuthenticationSnapshot(
             mode=mode,
@@ -199,6 +214,7 @@ def _load_authentication(
     raise _usage(
         "connection_config_invalid",
         f"authentication mode is unsupported: {mode}",
+        field_name="authentication.mode", actual_value=mode, expected_value=["none", "bearer_env", "bearer_file"],
     )
 
 
@@ -208,19 +224,41 @@ def load_connection_toml(
     environ: Mapping[str, str] | None = None,
 ) -> ConnectionSnapshot:
     source_path = Path(path).expanduser().resolve()
+    try:
+        return _load_connection_toml(source_path, environ=environ)
+    except UsageError as error:
+        error.diagnostic.setdefault("source_file", str(source_path))
+        raise
+
+
+def _load_connection_toml(source_path: Path, *, environ: Mapping[str, str] | None) -> ConnectionSnapshot:
     if not source_path.is_file():
         raise _usage(
             "connection_file_missing",
-            f"connection file is missing: {source_path}",
+            "connection file is missing",
         )
     try:
         text = source_path.read_text(encoding="utf-8-sig")
         raw = _toml.loads(text)
-    except (OSError, UnicodeError, _toml.TOMLDecodeError) as exc:
+    except _toml.TOMLDecodeError as error:
+        location = {}
+        for attribute, field_name in (("lineno", "line"), ("colno", "column"), ("pos", "character")):
+            value = getattr(error, attribute, None)
+            if isinstance(value, int):
+                location[field_name] = value
         raise _usage(
             "connection_toml_invalid",
-            f"connection TOML cannot be parsed: {source_path}",
-        ) from exc
+            f"connection TOML cannot be parsed: {error}",
+            **location,
+        ) from None
+    except (OSError, UnicodeError) as error:
+        facts = {"exception_type": type(error).__name__}
+        if isinstance(error, OSError):
+            facts["errno"] = error.errno
+        if isinstance(error, UnicodeDecodeError):
+            facts["byte_offset"] = error.start
+            facts["expected_value"] = error.encoding
+        raise _usage("connection_toml_invalid", "connection TOML could not be read as UTF-8", **facts) from None
 
     root = _mapping(raw, field_name="root")
     _reject_unknown(
@@ -237,11 +275,13 @@ def load_connection_toml(
         raise _usage(
             "connection_config_invalid",
             "format_version must be an integer",
+            field_name="format_version", actual_value=format_version, expected_value="integer",
         )
     if format_version != 1:
         raise _usage(
             "connection_format_unsupported",
             f"connection format is unsupported: {format_version}",
+            field_name="format_version", actual_value=format_version, expected_value=1,
         )
 
     connection = _mapping(
@@ -267,16 +307,14 @@ def load_connection_toml(
             root.get("transport_options"),
             endpoint=endpoint,
         )
-    except UnsupportedTransportError as exc:
+    except UnsupportedTransportError:
         raise _usage(
             "connection_transport_unsupported",
             f"connection transport is unsupported: {transport}",
-        ) from exc
+            field_name="connection.transport", actual_value=transport,
+        ) from None
     except TransportOptionsError as exc:
-        raise _usage(
-            "connection_config_invalid",
-            str(exc),
-        ) from exc
+        raise UsageError(code=exc.code, message=exc.message, diagnostic=exc.diagnostic) from None
 
     protocol = _mapping(
         root.get("protocol"),

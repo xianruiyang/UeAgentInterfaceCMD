@@ -23,7 +23,7 @@ class CliEntrypointContractTests(unittest.TestCase):
         )
         self.assertEqual(
             payload["project"]["scripts"],
-            {"uai-cli": "uai_cli.main:main"},
+            {"ueagentinterfacecmd": "uai_cli.main:main", "uai-cli": "uai_cli.main:main"},
         )
 
     def test_source_module_entry_is_available_without_installation(self) -> None:

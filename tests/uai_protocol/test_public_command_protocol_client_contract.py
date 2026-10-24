@@ -122,6 +122,13 @@ class PublicCommandProtocolClientContractTests(unittest.TestCase):
 
     def test_protocol_error_reply_remains_protocol_error(self) -> None:
         request = self.fixture["request"]["model"]
+        diagnostic = {
+            "code": "command_binding_mismatch", "message": "binding mismatch", "stage": "command_protocol",
+            "name": "fixture.echo_exact", "json_pointer": "/command_id",
+            "cause": {"code": "fixture_cause", "message": "Specific cause", "line": 7,
+                      "actual_value": {"identity": "business identity", "hash": "business hash"}},
+            "unchecked": [{"stage": "dispatch", "reason": "request rejected"}],
+        }
         response = json.dumps(
             {
                 "schema": "uai.command.v1",
@@ -135,8 +142,7 @@ class PublicCommandProtocolClientContractTests(unittest.TestCase):
                 ],
                 "error": {
                     "code": "command_binding_mismatch",
-                    "message": "binding mismatch",
-                    "details": {"preserved": True},
+                    "diagnostic": diagnostic,
                 },
             },
             ensure_ascii=False,
@@ -171,6 +177,10 @@ class PublicCommandProtocolClientContractTests(unittest.TestCase):
             "command_binding_mismatch",
         )
         self.assertEqual(len(transport.calls), 1)
+
+        self.assertEqual(raised.exception.diagnostic, diagnostic)
+        self.assertNotIn("request_id", raised.exception.diagnostic)
+        self.assertNotIn("command_binding_hash", raised.exception.diagnostic)
 
     def test_failed_delivery_with_non_protocol_reply_remains_transport_error(
         self,

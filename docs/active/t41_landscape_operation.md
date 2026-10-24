@@ -5,20 +5,12 @@ ordinary entries in the default generated binding catalog. Do not import a
 task-specific generated projection module. Discover them before authoring:
 
 ```python
-matches = client.query.command_search("landscape terrain height", limit=8)
-create_contract = client.query.command_detail(
-    "landscape.create", create_hash_from_matches
-)
-read_contract = client.query.command_detail(
-    "landscape.height.read", read_hash_from_matches
-)
-delta_contract = client.query.command_detail(
-    "landscape.height_delta", delta_hash_from_matches
-)
+matches = client.query.command_search("landscape terrain height")
+usage = client.query.command_usage(["landscape.create", "landscape.height_read", "landscape.height_delta"])
+# Call the generated SDK methods; internal contract metadata is supplied by the SDK.
 ```
 
-Copy only fields returned by the current `command_detail`. Named calls use the
-same contract hash and send one exact request:
+Use only fields accepted by the generated SDK signatures. Named calls send one exact request:
 
 ```python
 result = client.landscape.create(
@@ -29,7 +21,7 @@ result = client.landscape.create(
     topology=topology,
 )
 
-height_state = client.landscape.height_read(
+height_result = client.landscape.height_read(
     target_ref,
     input={
         "region": {
@@ -69,8 +61,12 @@ label, use a partial path, or rewrite either identity into an alias.
 `height_read.input.region` uses inclusive local sample-grid coordinates.
 `height_read.input.space_contract` must declare the same frame, `unit=sample`,
 and non-empty basis evidence. A request is bounded to 16,384 samples. The
-projected state reports extent, region, scale, managed evidence and local
-heights in `row_major_x_fastest` order. The command is strictly read-only and
+direct `height_grids` result reports the full sample-grid extent,
+`scale_cm_per_local_unit`, local-height encoding, `row_major_x_fastest` order
+and the requested height values. It does not repeat the requested target or
+region and does not expose Actor or managed ownership identity. Combine the
+returned scale with the caller-held basis evidence before comparing or
+converting local heights in world space. The command is strictly read-only and
 does not dirty the Landscape package.
 
 ### Replacing `landscape_raise_circle`
@@ -78,7 +74,7 @@ does not dirty the Landscape package.
 The retired single-purpose command has one current successor:
 `landscape.height_delta`. First read the exact target transform, extent and
 scale through the current public world/Landscape read flow advertised by
-`command_detail`. Convert the world-space circle to a bounded delta grid; the
+`the generated SDK signature for that command`. Convert the world-space circle to a bounded delta grid; the
 following is caller-side parameter preparation, not another UE command path:
 
 ```python
@@ -130,8 +126,8 @@ world-space height.
 The equivalent exact CLI forms are shown by discovery:
 
 ```text
-uai-cli --connection connection.toml exec landscape.height.read --contract-hash <hash-from-command_detail> --params-json <json-object>
-uai-cli --connection connection.toml exec landscape.height_delta --contract-hash <hash-from-command_detail> --params-json <json-object>
+ueagentinterfacecmd exec landscape.height.read  --params-json <json-object>
+ueagentinterfacecmd exec landscape.height_delta  --params-json <json-object>
 ```
 
 Success is terminal only when the common operation lifecycle reports a

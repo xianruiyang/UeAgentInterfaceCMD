@@ -145,6 +145,38 @@ class StaticBindingGeneratorContractTests(unittest.TestCase):
                 "invalid_tutorial_reference_was_accepted",
             )
 
+    def test_generator_rejects_empty_model_result_source_path(self) -> None:
+        payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
+        payload["commands"][0]["model_result_fields"][0][
+            "source_path"
+        ] = []
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            invalid_manifest = root / "invalid_manifest.json"
+            invalid_manifest.write_text(
+                json.dumps(payload, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    str(GENERATOR),
+                    "--manifest",
+                    str(invalid_manifest),
+                    "--output-root",
+                    str(root / "output"),
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(
+                completed.returncode,
+                0,
+                "empty_model_result_source_path_was_accepted",
+            )
+
     def test_generator_emits_static_python_and_pyi(self) -> None:
         self.assertTrue(
             GENERATOR.is_file(),
@@ -267,6 +299,35 @@ class StaticBindingGeneratorContractTests(unittest.TestCase):
             self.assertEqual(
                 ast.literal_eval(execute_calls[0].args[0]),
                 "fixture.echo_exact",
+            )
+            model_fields = [
+                node
+                for node in ast.walk(tree)
+                if isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id == "ModelResultFieldBinding"
+            ]
+            self.assertEqual(len(model_fields), 2)
+            projected = {
+                ast.literal_eval(call.keywords[0].value): ast.literal_eval(
+                    call.keywords[1].value
+                )
+                for call in model_fields
+            }
+            self.assertEqual(
+                projected,
+                {
+                    "target": (
+                        "projection",
+                        "payload",
+                        "target_ref",
+                    ),
+                    "outcome": (
+                        "projection",
+                        "payload",
+                        "outcome",
+                    ),
+                },
             )
             self.assertIn(
                 "def echo_exact",

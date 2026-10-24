@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Any
+from .network_transport import TransportOptionsError
 
 from .network_transport.http import (
     build_http_transport,
@@ -11,10 +12,6 @@ from .network_transport.http import (
 
 
 class UnsupportedTransportError(ValueError):
-    pass
-
-
-class TransportOptionsError(ValueError):
     pass
 
 
@@ -42,24 +39,24 @@ def load_transport_options(
         raise UnsupportedTransportError(transport)
     if not isinstance(raw, Mapping):
         raise TransportOptionsError(
-            "transport_options must be a table"
+            "transport_options must be a table", property_path="transport_options",
+            expected_value="table", actual_type=type(raw).__name__,
         )
     unknown = sorted(set(raw) - {transport})
     if unknown:
         raise TransportOptionsError(
             "transport_options contains unknown adapters: "
-            + ",".join(unknown)
+            + ",".join(unknown), property_path="transport_options",
+            actual_value=unknown, expected_value=[transport],
         )
     try:
         selected = raw[transport]
-    except KeyError as exc:
+    except KeyError:
         raise TransportOptionsError(
-            f"transport_options.{transport} is required"
-        ) from exc
-    try:
-        options = loader(selected, endpoint=endpoint)
-    except (TypeError, ValueError) as exc:
-        raise TransportOptionsError(str(exc)) from exc
+            f"transport_options.{transport} is required", property_path=f"transport_options.{transport}",
+            actual_present=False, expected_value="table",
+        ) from None
+    options = loader(selected, endpoint=endpoint)
     return MappingProxyType({transport: options})
 
 

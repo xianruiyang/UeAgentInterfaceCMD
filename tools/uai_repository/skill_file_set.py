@@ -28,8 +28,6 @@ EXCLUDED_FILE_NAMES = frozenset(
         "thumbs.db",
     }
 )
-DEFAULT_MAX_FILES = 250_000
-DEFAULT_MAX_DIRECTORIES = 100_000
 _READ_CHUNK_SIZE = 1024 * 1024
 
 
@@ -67,23 +65,15 @@ def is_excluded(path: Path) -> bool:
     )
 
 
-def walk_relative_files(
-    root: Path,
-    *,
-    max_files: int = DEFAULT_MAX_FILES,
-    max_directories: int = DEFAULT_MAX_DIRECTORIES,
-) -> tuple[Path, ...]:
-    """Return a bounded, deterministic inventory relative to ``root``."""
+def walk_relative_files(root: Path) -> tuple[Path, ...]:
+    """Return a complete, deterministic inventory relative to ``root``."""
 
-    if max_files < 0 or max_directories < 0:
-        raise ValueError("file-set limits must be non-negative")
     if not root.exists():
         return ()
     if not root.is_dir():
         raise FileSetScanError(f"not_a_directory:{root}")
 
     files: list[Path] = []
-    directory_count = 0
 
     def raise_walk_error(error: OSError) -> None:
         raise FileSetScanError(
@@ -97,12 +87,6 @@ def walk_relative_files(
             onerror=raise_walk_error,
             followlinks=False,
         ):
-            directory_count += 1
-            if directory_count > max_directories:
-                raise FileSetScanError(
-                    "directory_limit_exceeded:"
-                    f"{root}:limit={max_directories}"
-                )
             current = Path(dirpath)
             dirnames[:] = sorted(
                 (
@@ -120,11 +104,6 @@ def walk_relative_files(
                 if is_excluded(path):
                     continue
                 files.append(path.relative_to(root))
-                if len(files) > max_files:
-                    raise FileSetScanError(
-                        "file_limit_exceeded:"
-                        f"{root}:limit={max_files}"
-                    )
     except FileSetScanError:
         raise
     except OSError as exc:
@@ -217,22 +196,11 @@ def files_equal(source: Path, target: Path) -> bool:
 def compare_file_sets(
     source_root: Path,
     target_root: Path,
-    *,
-    max_files: int = DEFAULT_MAX_FILES,
-    max_directories: int = DEFAULT_MAX_DIRECTORIES,
 ) -> FileSetComparison:
     """Compare complete source/target file sets without mutating either root."""
 
-    source_files = walk_relative_files(
-        source_root,
-        max_files=max_files,
-        max_directories=max_directories,
-    )
-    target_files = walk_relative_files(
-        target_root,
-        max_files=max_files,
-        max_directories=max_directories,
-    )
+    source_files = walk_relative_files(source_root)
+    target_files = walk_relative_files(target_root)
     target_set = set(target_files)
 
     missing: list[Path] = []

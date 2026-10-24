@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import json
+import math
 from types import MappingProxyType
 from typing import Any
 
@@ -76,9 +77,11 @@ def _required_text(
     error_type=SerializationError,
 ) -> str:
     if not isinstance(value, str) or not value.strip():
-        raise error_type(
+        raise error_type.at_source(
             code=f"{field_name}_invalid",
             message=f"{field_name} must be a non-empty string",
+            facts={"stage": "command_encode", "json_pointer": f"/{field_name}",
+                   "expected_value": "non-empty string", "actual_type": type(value).__name__},
         )
     return value.strip()
 
@@ -86,10 +89,10 @@ def _required_text(
 @dataclass(frozen=True, slots=True)
 class CommandRequest:
     command_id: str
-    command_binding_hash: str
-    params: Mapping[str, Any]
-    correlation_id: str
-    request_id: str
+    command_binding_hash: str = field(repr=False)
+    params: Mapping[str, Any] = field(repr=False)
+    correlation_id: str = field(repr=False)
+    request_id: str = field(repr=False)
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -107,16 +110,20 @@ class CommandRequest:
                 ),
             )
         if not isinstance(self.params, Mapping):
-            raise SerializationError(
+            raise SerializationError.at_source(
                 code="command_params_invalid",
                 message="command params must be an object",
+                facts={"stage": "command_encode", "json_pointer": "/params", "expected_value": "object", "actual_type": type(self.params).__name__},
             )
         snapshot = deepcopy(dict(self.params))
-        if any(not isinstance(key, str) for key in snapshot):
-            raise SerializationError(
-                code="command_params_invalid",
-                message="command parameter names must be strings",
-            )
+        for index, key in enumerate(snapshot):
+            if not isinstance(key, str):
+                raise SerializationError.at_source(
+                    code="command_params_invalid",
+                    message="Command parameter names must be strings.",
+                    facts={"stage": "command_encode", "json_pointer": "/params", "key_index": index,
+                           "expected_value": "string", "actual_type": type(key).__name__},
+                )
         object.__setattr__(
             self,
             "params",
@@ -137,15 +144,27 @@ class CommandRequest:
 
 
 def _reject_json_constant(value: str) -> None:
-    raise ValueError(f"invalid JSON constant: {value}")
+    raise ProtocolError.at_source(
+        code="command_result_json_invalid", message="Command result contains a non-standard JSON numeric constant.",
+        facts={"stage": "command_decode", "actual_value": value, "expected_value": "finite JSON number"},
+    )
+
+
+def _field_error(code: str, message: str, pointer: str, value: Any, expected: Any) -> ProtocolError:
+    facts = {"stage": "command_decode", "json_pointer": pointer,
+             "actual_type": type(value).__name__, "expected_value": expected}
+    if value is None or type(value) in (str, bool, int, float):
+        facts["actual_value"] = str(value) if type(value) is float and not math.isfinite(value) else value
+    return ProtocolError.at_source(code=code, message=message, facts=facts)
 
 
 class UaiCommandCodec:
     def encode_request(self, request: CommandRequest) -> bytes:
         if not isinstance(request, CommandRequest):
-            raise SerializationError(
+            raise SerializationError.at_source(
                 code="command_request_invalid",
                 message="command request model is invalid",
+                facts={"stage": "command_encode", "expected_value": "CommandRequest", "actual_type": type(request).__name__},
             )
         try:
             text = json.dumps(
@@ -155,12 +174,18 @@ class UaiCommandCodec:
                 separators=(",", ":"),
                 allow_nan=False,
             )
+            return text.encode("utf-8")
+        except UnicodeEncodeError as exc:
+            raise SerializationError.at_source(
+                code="command_request_encode_failed", message="Command request contains text that cannot be encoded as UTF-8.",
+                facts={"stage": "command_encode", "character": exc.start, "expected_value": "UTF-8 text", "reason": exc.reason},
+            ) from None
         except (TypeError, ValueError, OverflowError) as exc:
-            raise SerializationError(
+            raise SerializationError.at_source(
                 code="command_request_encode_failed",
-                message=str(exc) or "command request cannot be encoded",
-            ) from exc
-        return text.encode("utf-8")
+                message="command request cannot be encoded",
+                facts={"stage": "command_encode", "exception_type": type(exc).__name__},
+            ) from None
 
     def decode_result(
         self,
@@ -169,44 +194,47 @@ class UaiCommandCodec:
         expected_request: CommandRequest,
     ) -> Result:
         if type(payload) is not bytes:
-            raise ProtocolError(
-                code="command_result_payload_invalid",
-                message="command result payload must be bytes",
-            )
+            raise _field_error("command_result_payload_invalid", "Command result payload must be bytes.", "", payload, "bytes")
         try:
             root = json.loads(
                 payload.decode("utf-8"),
                 parse_constant=_reject_json_constant,
             )
-        except (UnicodeError, json.JSONDecodeError, ValueError) as exc:
-            raise ProtocolError(
-                code="command_result_json_invalid",
-                message="command result is not valid UTF-8 JSON",
-            ) from exc
+        except UnicodeDecodeError as exc:
+            raise ProtocolError.at_source(
+                code="command_result_json_invalid", message="Command result is not valid UTF-8.",
+                facts={"stage": "command_decode", "byte_offset": exc.start, "expected_value": "utf-8", "reason": exc.reason},
+            ) from None
+        except json.JSONDecodeError as exc:
+            raise ProtocolError.at_source(
+                code="command_result_json_invalid", message=exc.msg,
+                facts={"stage": "command_decode", "line": exc.lineno, "column": exc.colno, "character": exc.pos},
+            ) from None
+        except ValueError as exc:
+            raise ProtocolError.at_source(
+                code="command_result_json_invalid", message="Command result cannot be decoded as JSON.",
+                facts={"stage": "command_decode", "exception_type": type(exc).__name__},
+            ) from None
         if not isinstance(root, dict):
-            raise ProtocolError(
-                code="command_result_envelope_invalid",
-                message="command result envelope must be an object",
-            )
-        if (
-            root.get("schema") != WIRE_SCHEMA
-            or type(root.get("version")) is not int
-            or root.get("version") != WIRE_VERSION
-        ):
-            raise ProtocolError(
-                code="command_result_envelope_invalid",
-                message="command result schema or version is invalid",
-            )
+            raise _field_error("command_result_envelope_invalid", "Command result envelope must be an object.", "", root, "object")
+        if root.get("schema") != WIRE_SCHEMA:
+            raise _field_error("command_result_envelope_invalid", "Command result schema is invalid.", "/schema", root.get("schema"), WIRE_SCHEMA)
+        if type(root.get("version")) is not int or root.get("version") != WIRE_VERSION:
+            raise _field_error("command_result_envelope_invalid", "Command result version is invalid.", "/version", root.get("version"), WIRE_VERSION)
         message_kind = root.get("message_kind")
         expected_fields = (
             _PROTOCOL_ERROR_FIELDS
             if message_kind == "protocol_error"
             else _RESULT_FIELDS
         )
+        if message_kind == "command_result" and "diagnostics" in root:
+            expected_fields = expected_fields | {"diagnostics"}
         if set(root) != expected_fields:
-            raise ProtocolError(
+            raise ProtocolError.at_source(
                 code="command_result_envelope_invalid",
-                message="command result fields are invalid",
+                message="command result fields do not match the protocol envelope",
+                facts={"stage": "command_decode", "json_pointer": "", "missing_fields": sorted(expected_fields - set(root)),
+                            "unexpected_fields": sorted(set(root) - expected_fields)},
             )
         for field_name in (
             "correlation_id",
@@ -218,62 +246,47 @@ class UaiCommandCodec:
                 expected_request,
                 field_name,
             ):
-                raise ProtocolError(
+                raise ProtocolError.at_source(
                     code="command_result_identity_mismatch",
                     message=(
                         "command result identity does not match "
                         f"the request: {field_name}"
                     ),
+                    facts={"stage": "command_decode", "json_pointer": f"/{field_name}"},
                 )
         if message_kind == "protocol_error":
             error = root.get("error")
             if not isinstance(error, dict):
-                raise ProtocolError(
-                    code="command_protocol_error_invalid",
-                    message="protocol error must contain an error object",
-                )
+                raise _field_error("command_protocol_error_invalid", "Protocol error must contain an error object.", "/error", error, "object")
             code = error.get("code")
-            message = error.get("message")
+            diagnostic = error.get("diagnostic")
+            if not isinstance(diagnostic, dict):
+                raise _field_error("command_protocol_error_invalid", "Protocol error must contain a structured diagnostic.", "/error/diagnostic", diagnostic, "object")
+            message = diagnostic.get("message")
             if not isinstance(code, str) or not code.strip():
-                code = "command_protocol_error"
+                raise _field_error("command_protocol_error_invalid", "Protocol error requires a non-empty code.", "/error/code", code, "non-empty string")
             if not isinstance(message, str) or not message.strip():
-                message = "server rejected the command envelope"
+                raise _field_error("command_protocol_error_invalid", "Protocol error requires a non-empty diagnostic message.", "/error/diagnostic/message", message, "non-empty string")
             protocol_error = ProtocolError(
                 code=code,
                 message=message,
+                diagnostic=diagnostic,
             )
             protocol_error.raw_response = MappingProxyType(
                 deepcopy(root)
             )
             raise protocol_error
         if message_kind != "command_result":
-            raise ProtocolError(
-                code="command_result_envelope_invalid",
-                message="command result message_kind is invalid",
-            )
+            raise _field_error("command_result_envelope_invalid", "Command result message kind is invalid.", "/message_kind", message_kind, "command_result or protocol_error")
         if type(root.get("ok")) is not bool:
-            raise ProtocolError(
-                code="command_result_ok_invalid",
-                message="command result ok must be a boolean",
-            )
+            raise _field_error("command_result_ok_invalid", "Command result ok must be a boolean.", "/ok", root.get("ok"), "boolean")
         if not isinstance(root.get("payload"), dict):
-            raise ProtocolError(
-                code="command_result_payload_invalid",
-                message="command result payload must be an object",
-            )
+            raise _field_error("command_result_payload_invalid", "Command result payload must be an object.", "/payload", root.get("payload"), "object")
         error = root.get("error")
         if root["ok"] and error is not None:
-            raise ProtocolError(
-                code="command_result_error_invalid",
-                message="successful command result error must be null",
-            )
+            raise _field_error("command_result_error_invalid", "Successful command result error must be null.", "/error", error, "null")
         if not root["ok"] and not isinstance(error, dict):
-            raise ProtocolError(
-                code="command_result_error_invalid",
-                message=(
-                    "failed command result must contain an error object"
-                ),
-            )
+            raise _field_error("command_result_error_invalid", "Failed command result must contain an error object.", "/error", error, "object")
         return Result(root)
 
 
@@ -331,9 +344,10 @@ class UaiCommandProtocolClient:
             ),
         )
         if delivery.attempts != 1:
-            raise TransportError(
+            raise TransportError.at_source(
                 code="transport_attempt_count_invalid",
                 message="command transport attempted delivery more than once",
+                facts={"stage": "command_delivery", "json_pointer": "/attempts", "actual_value": delivery.attempts, "expected_value": 1},
             )
         if delivery.reply is not None:
             reply = delivery.reply.frame
@@ -341,11 +355,13 @@ class UaiCommandProtocolClient:
                 reply.channel != COMMAND_CHANNEL
                 or reply.correlation_id != request.correlation_id
             ):
-                raise ProtocolError(
+                field = "channel" if reply.channel != COMMAND_CHANNEL else "correlation_id"
+                raise ProtocolError.at_source(
                     code="command_reply_frame_mismatch",
                     message=(
-                        "command reply channel or correlation is invalid"
+                        f"Command reply {field} does not match the request."
                     ),
+                    facts={"stage": "command_delivery", "json_pointer": f"/{field}"},
                 )
             if delivery.state == TransportDeliveryState.DELIVERED:
                 return self._codec.decode_result(
@@ -366,19 +382,16 @@ class UaiCommandProtocolClient:
                 ):
                     raise
         diagnostic = delivery.diagnostic
-        code = (
-            diagnostic.code
-            if diagnostic is not None
-            else "transport_reply_missing"
+        if diagnostic is None or delivery.state == TransportDeliveryState.DELIVERED:
+            facts = {"stage": "transport"}
+            if diagnostic is not None:
+                facts["cause"] = diagnostic.as_dict()
+            raise TransportError.at_source(
+                code="transport_reply_missing", message="transport returned no command reply", facts=facts,
+            )
+        raise TransportError(
+            code=diagnostic.code, message=diagnostic.message, diagnostic=diagnostic.as_dict(),
         )
-        message = (
-            diagnostic.message
-            if diagnostic is not None
-            else "transport returned no command reply"
-        )
-        if delivery.state == TransportDeliveryState.DELIVERED:
-            code = "transport_reply_missing"
-        raise TransportError(code=code, message=message)
 
 
 __all__ = [

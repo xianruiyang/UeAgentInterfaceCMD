@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+import keyword
 from types import MappingProxyType
 from typing import Protocol
 
@@ -28,6 +29,7 @@ class CommandParameterBinding:
     wire_type: str
     required: bool
     nullable: bool
+    schema_json: str = field(default="", repr=False)
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -47,18 +49,52 @@ class CommandParameterBinding:
             raise TypeError("command_parameter_required_invalid")
         if type(self.nullable) is not bool:
             raise TypeError("command_parameter_nullable_invalid")
+        if not isinstance(self.schema_json, str):
+            raise TypeError("command_parameter_schema_invalid")
+
+
+@dataclass(frozen=True, slots=True)
+class CommandVariantBinding:
+    variant_id: str
+    request_schema_json: str = field(repr=False)
+    summary: str = ""
+    parameter_guidance: str = ""
+    result_guidance: str = ""
+    minimum_example: str = ""
+
+
+@dataclass(frozen=True, slots=True)
+class ModelResultFieldBinding:
+    name: str
+    source_path: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        name = _required_text("model_result_field_name", self.name)
+        if not name.isidentifier() or keyword.iskeyword(name):
+            raise ValueError("model_result_field_name_invalid")
+        object.__setattr__(self, "name", name)
+        source_path = tuple(
+            _required_text("model_result_source_path_segment", segment)
+            for segment in self.source_path
+        )
+        if not source_path:
+            raise ValueError("model_result_source_path_missing")
+        object.__setattr__(self, "source_path", source_path)
 
 
 @dataclass(frozen=True, slots=True)
 class CommandBinding:
     command_id: str
-    binding_hash: str
+    binding_hash: str = field(repr=False)
     namespace: str = ""
     method: str = ""
     parameters: tuple[CommandParameterBinding, ...] = ()
+    model_result_fields: tuple[ModelResultFieldBinding, ...] = ()
     min_wire_version: int = 1
     max_wire_version: int = 1
     status: str = "active"
+    supports_operation_recovery: bool = False
+    variants: tuple[CommandVariantBinding, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -77,6 +113,20 @@ class CommandBinding:
         names = tuple(item.name for item in self.parameters)
         if len(names) != len(set(names)):
             raise ValueError("command_binding_parameter_duplicate")
+        object.__setattr__(self, "variants", tuple(self.variants))
+        variant_ids = tuple(item.variant_id for item in self.variants)
+        if len(variant_ids) != len(set(variant_ids)):
+            raise ValueError("command_binding_variant_duplicate")
+        object.__setattr__(
+            self,
+            "model_result_fields",
+            tuple(self.model_result_fields),
+        )
+        model_result_names = tuple(
+            item.name for item in self.model_result_fields
+        )
+        if len(model_result_names) != len(set(model_result_names)):
+            raise ValueError("model_result_field_duplicate")
         if (
             isinstance(self.min_wire_version, bool)
             or isinstance(self.max_wire_version, bool)
@@ -129,5 +179,6 @@ __all__ = [
     "CommandBindingCatalog",
     "CommandExecutor",
     "CommandParameterBinding",
+    "ModelResultFieldBinding",
     "OMITTED",
 ]

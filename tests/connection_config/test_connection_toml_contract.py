@@ -75,6 +75,9 @@ class ConnectionTomlContractTests(unittest.TestCase):
             expected_code,
             f"connection_error_code_mismatch:{caught.exception}",
         )
+        self.assertEqual(caught.exception.diagnostic["code"], expected_code)
+        self.assertEqual(caught.exception.diagnostic["message"], caught.exception.message)
+        self.assertEqual(caught.exception.diagnostic["stage"], "connection_config")
 
     def test_valid_file_produces_an_immutable_snapshot(self) -> None:
         _, config, loader = self._api()

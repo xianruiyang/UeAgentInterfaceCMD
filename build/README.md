@@ -4,7 +4,7 @@
 
 实际打包产物输出到：
 
-- `dist/uai-cli.exe`
+- `dist/ueagentinterfacecmd.exe`
 
-连接配置由调用方通过 `--connection <connection.toml>` 显式提供，不随可执行文件
-附带第二套默认配置。
+默认发现当前 UE 项目，也可用 `--project <目录或.uproject>` 或 `--connection <connection.toml>` 显式选择。
+连接共用公开 SDK 实现，不随可执行文件附带第二套默认配置。
