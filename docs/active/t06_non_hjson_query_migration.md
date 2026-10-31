@@ -13,6 +13,14 @@ zero-based position in ascending live vertex-ID order for the current topology,
 not an Actor, asset, or persistent vertex identity. StaticMesh uses source LOD 0;
 both paths transform local vertices through the component into world space.
 
+`client.asset.sample(mesh, input={"sample_kind":"section", "index":0})`
+reads one StaticMesh LOD 0 render section; omitted index selects 0. Its sample
+includes section/slot counts, triangle count, actual material index/path,
+`material_index_valid`, and current/original section-map indices. An invalid
+material index is observable with an empty path; an invalid section index is an
+error. This complements asset-local `bounds` and source-LOD0 `vertex` samples
+without opening an editor or changing material slots.
+
 Import only `uai` and use `uai.connect_project()` for the local project. The final
 manifest generates the normal domain namespaces for the current Query routes:
 
@@ -66,6 +74,53 @@ with uai.connect_project() as client:
         },
     )
 ```
+
+For a capsule path, choose whether the next action needs the first obstacle
+before calling. Omit `include_first_hit` (or pass false) for the original
+`{"blocked_segments": N}` summary. Request it in the same call when diagnosing:
+
+```python
+path_input = {
+    "points": [
+        {"frame_id": "ue.world", "unit": "centimeter", "components": [0, 0, 100]},
+        {"frame_id": "ue.world", "unit": "centimeter", "components": [200, 0, 100]},
+    ],
+    "radius_cm": 34,
+    "half_height_cm": 88,
+    "step_cm": 50,
+    "trace_channel": "pawn",
+}
+# Replace this example geometry with the intended path in the current world.
+locate_obstruction = True
+if locate_obstruction:
+    path_input["include_first_hit"] = True
+with uai.connect_project() as client:
+    result = client.world.capsule_path(input=path_input)
+    result.raise_for_error()
+    print(result.payload["blocked_segments"])
+    if locate_obstruction:
+        first = result.payload["first_blocking_hit"]  # Explicit None for no blocker.
+        if first is not None:
+            print(first["segment_index"], first["target_ref"], first["start_penetrating"])
+            print(first["shape_location"], first["impact_point"])
+```
+
+`segment_index` is zero-based in the original points array. Positions are world
+centimeters; `shape_location` is the capsule center, while `impact_point` is the
+native hit position. Initial penetration is explicitly marked and does not give
+a precise contact surface. `target_ref` may be null when the native hit has no
+Component; otherwise it is a native Component reference, not a HJSON selector.
+The count still covers all input segments even though only the first blocker is
+returned. A blocked path is a successful query result.
+
+`trace_complex` defaults to false. Set it explicitly only when that collision
+representation answers the current question; asset collision settings still
+apply. A complex-only clear result cannot prove Pawn movement clearance.
+Consume the first hit directly instead of mechanically appending a sweep for
+the same blocker. Use `capsule_sweep` when all hits or its direct segment query
+are needed, and `overlap` for occupancy. These static probes do not verify
+runtime traversal. Full behavior is owned by the Plugin's
+`docs/active/t06_non_hjson_query_migration.md`.
 
 Settings discovery uses `client.project.settings(input={"editor_project_capability":"project_settings.index"})`; optional `parameters.container` narrows the index.
 Use the returned section identity for `project_settings.page` with `parameters.section_id`. The public page retains `properties.property_path`, `kind`, authoring-coded `value` and `availability`; these queries do not write files. Canonical `input={"section_id":...,"field_ids":[...]}` resolves that same page and reads selected values under `fields`; without `field_ids` it returns a count. `include_defaults=True` adds selected UE text defaults, with `null` when an independent default is unavailable. For editing, use the index's `settings_object_path` with the ordinary HJSON workspace.

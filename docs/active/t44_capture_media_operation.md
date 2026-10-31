@@ -20,6 +20,30 @@ handle for the capture lifecycle below. A CLI `exec` invocation of the same comm
 only starts it; it does not wait for the final image. Connection and machine
 metadata remain SDK-owned.
 
+For learning an imported asset pack, use the dedicated folder command:
+
+```python
+with client.operation.named("folder-preview"):
+    started = client.asset.folder_preview(
+        folder="/Game/RuinedCrypt",
+        options={"class_paths": ["/Script/Engine.StaticMesh"], "page_size": 24},
+    )
+started.raise_for_error()
+receipt = started.operation.finish()
+receipt.raise_for_error()
+for index, artifact in enumerate([receipt.primary_artifact, *receipt.additional_artifacts]):
+    saved = artifact.materialize(f"tmp/asset-review/sheet-{index + 1}.png")
+    print(saved.path)
+```
+
+This call reuses cached thumbnails and generates missing previews only for the current page; it does not open individual asset editors. Use `generate_missing=False` for cache-only inspection. Explicit primary/additional artifact roles preserve sheet order.
+Inspect the image receipt's `asset_catalog` for names, paths, classes and missing
+preview states. To continue, pass its `next_after` as `options.after`, retaining the
+folder and filters. `ueagentinterfacecmd describe asset.folder.preview --parameter options`
+exposes the generated options contract. CLI `exec asset.folder.preview` starts the
+same recoverable Operation. The [plugin contract](../../../Plugins/UeAgentInterface/docs/active/t44_capture_media_operation.md#asset-folder-contact-sheets)
+owns cache semantics, pagination and sheet mapping.
+
 Use `subject_ref` for the exact target, `policy_id` for the explicit behavior,
 and `parameters` for only that policy's documented fields. Asset subjects use
 `capture-subject:asset:<object-path>`, actors use
@@ -41,10 +65,52 @@ generated from the plugin registry, including UMG canvas/crop fields. Policy beh
 fields belong to the [plugin capture contract](../../../Plugins/UeAgentInterface/docs/active/t44_capture_media_operation.md),
 not to a second catalog in this SDK guide.
 
-Level viewport capture prepares its existing native window and layout when
-needed, including restoring a minimized window. No separate SDK preparation
-call is required; see the plugin capture contract for policy scope and
-asset-editor window permissions.
+Level viewport capture preserves its native window's foreground, visibility and
+minimized state. `viewport/v1` can initialize a never-laid-out viewport without
+opening its window. Use `parameters={"cold_start_render_size":{"width":1280,
+"height":720}}` when a specific initial render extent is needed; otherwise the
+policy adapts to the window's single-monitor work area, with bounded fallback when
+display information is unavailable. Existing positive extents take precedence.
+Read `capture.viewport_initialization` for the actual source, extent and fixed-size
+restoration, and artifact dimensions for output scaling. See the plugin capture
+contract for limits, policy scope and separate asset-editor window permissions.
+Ordinary scene lighting/material evaluation uses the native viewport policies;
+neither the SDK nor `viewport/v1` automatically substitutes a sequence render on
+failure or a size limit. Match the user's camera and display state when comparing
+brightness; do not set Game View merely as a capture prerequisite.
+The native `capture.display_state` reports editor exposure override and relevant
+show flags, while existing fields report temporary realtime/view-mode/extent
+changes and restoration. It is a bounded observation, not resolved scene exposure
+or proof of equivalence to the foreground display; field meanings belong to the
+plugin contract.
+
+`capture.image_execute` now permits an omitted `policy_id`. The server chooses
+`viewport/v1` for `capture-subject:viewport:active`, or `asset-preview/v1` for an
+asset subject, where the existing preview owner checks actual class/target support.
+Actor and other ambiguous observations require an explicit policy; a map asset
+reference does not switch Levels or capture some other map. Independent sequence
+camera/time rendering and Blueprint graph/window capture retain explicit policies.
+Zero-sized native scene viewports are initialized automatically from their monitor,
+without window activation or switching renderers. Other failures do not select an
+alternate renderer. The successful image capture receipt reports the
+actual `policy_id` and `policy_defaulted`.
+
+```python
+client.capture.image_execute(
+    subject_ref="capture-subject:viewport:active",
+    parameters={"format": "png"},
+)
+client.capture.image_execute(
+    subject_ref="capture-subject:asset:" + asset_path,
+    parameters={"mode": "single"},
+)
+```
+
+Use `parameters=` when omitting the policy. Existing three-position calls
+`image_execute(subject_ref, policy_id, parameters)` keep their meaning. Explicit
+`None`/null, empty/whitespace and unknown policy values are errors; only omission
+selects the default. `parameters` remains required. CLI `exec capture.image.execute`
+uses the same server contract; no client-side route guessing is performed.
 
 Read policy-specific sampling facts from the terminal
 `latest_signal.payload.capture_receipt`. Level Sequence image capture is an independent

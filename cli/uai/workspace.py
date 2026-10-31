@@ -49,22 +49,11 @@ def _finish_hjson_import(client, result, *, recovery_name=None, operation=None):
                 diagnostics.append(diagnostic)
 
     try:
-        receipt = operation.finish(on_observation=collect)
-        collect(receipt)
-        receipt.raise_for_error()
-        signal = receipt._machine_payload.get("latest_signal", {})
-        if signal.get("type_id") != "uai.command.result.v1" or not isinstance(signal.get("payload"), dict):
-            raise ProtocolError.at_source(code="hjson_import_result_unavailable",
-                                message="The import receipt has no command reply.",
-                                facts={"stage": "import_receipt", "expected_value": "uai.command.result.v1",
-                                            "actual_value": signal.get("type_id"), "property_path": "/latest_signal/type_id",
-                                            "recovery_action": f"resume_import:{name}", "retry_safe": False})
-        business_response = dict(signal["payload"])
-        # This is a complete command result, separate from receipt observations.
-        business = Result(business_response)
+        business = operation.finish_result(on_observation=collect)
         collect(business)
         if operation.released and name is not None:
             client.operation.forget_checkpoint(name)
+        business_response = dict(business._machine_response)
         business_response["diagnostics"] = diagnostics
         return client._wrap_result("content_graph.import_workspace", Result(business_response),
                                    allow_operation_handle=False)
@@ -73,6 +62,12 @@ def _finish_hjson_import(client, result, *, recovery_name=None, operation=None):
         failed["diagnostics"] = diagnostics
         raise ServerCommandError(result=Result(failed)) from error
     except ProtocolError as error:
+        if error.code == "operation_command_result_unavailable":
+            raise ProtocolError.at_source(code="hjson_import_result_unavailable",
+                                message="The import receipt has no command reply.",
+                                facts={**error.diagnostic, "stage": "import_receipt",
+                                       "recovery_action": f"resume_import:{name}",
+                                       "diagnostics": diagnostics}) from error
         error.diagnostic.setdefault("diagnostics", []).extend(diagnostics)
         raise
     except TransportError as error:
@@ -127,12 +122,57 @@ class HjsonWorkspaceHandle:
         """Export result, or None when an existing workspace was opened locally."""
         return self._result
 
-    def import_changes(self) -> "Result":
+    def scene_context(self, **options) -> "SceneAnalysisHandle":
+        """Read proposed changes and their neighborhood using the native import preparation."""
+        return self._analyze("world.scene_context", options)
+
+    def geometry_overlap(self, **options) -> "SceneAnalysisHandle":
+        """Analyze proposed geometry; does not require scene_context first."""
+        return self._analyze("world.geometry_overlap", options)
+
+    def _analyze(self, command: str, options) -> "SceneAnalysisHandle":
+        if "workspace_root" in options:
+            raise UsageError(code="scene_analysis_workspace_owned", message="The workspace handle owns workspace_root")
+        result = self._client.execute(command, {"input": {"workspace_root": str(self._absolute_path), **options}})
+        if result.operation is not None:
+            result = result.operation.finish_result()
+        result.raise_for_error()
+        return SceneAnalysisHandle(self._client, result)
+
+    def import_changes(self, *, analysis: "SceneAnalysisHandle | None" = None) -> "Result":
         source = {"kind": "directory", "path": str(self._absolute_path)}
         return self._client._import_hjson_workspace(
             self._target,
             source,
+            analysis_ref=analysis._reference if analysis is not None else OMITTED,
         )
+
+
+class SceneAnalysisHandle:
+    """Versioned native analysis. Pages and both projections reuse the same preparation."""
+
+    __slots__ = ("_client", "_reference", "result")
+
+    def __init__(self, client, result):
+        self._client = client
+        self.result = result
+        self._reference = result.payload["analysis"]["analysis_ref"]
+
+    def __repr__(self):
+        return "SceneAnalysisHandle(status=%r)" % self.result.payload["analysis"].get("status")
+
+    def _query(self, command, options):
+        result = self._client.execute(command, {"input": {**options, "analysis_ref": self._reference}})
+        if result.operation is not None:
+            result = result.operation.finish_result()
+        result.raise_for_error()
+        return SceneAnalysisHandle(self._client, result)
+
+    def scene_context(self, **options):
+        return self._query("world.scene_context", options)
+
+    def geometry_overlap(self, **options):
+        return self._query("world.geometry_overlap", options)
 
 
 class ContentGraphNamespace:

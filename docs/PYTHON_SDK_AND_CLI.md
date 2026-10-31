@@ -383,6 +383,13 @@ apply、compile/settle、save/reload 和内部独立读回；这些执行证据�
 模型结果重复回显。需要确认实际持久状态时，调用方应使用正式 Query 或重新
 Export；失败仍返回稳定的 typed failure，SDK 不补真值或把部分结果升级为成功。
 
+成功的语义目录导入另返回 `execution_timing`（`scope: "server_directory_import"`）：
+`source_prepare_seconds`、`domain_import_seconds`、`workspace_export_seconds`、
+`workspace_refresh_other_seconds`、`total_seconds`。这些秒数由现有服务端入口计时；
+domain_import 包含内部规划、应用、更新、保存和读回，尚不拆分这些内部阶段；refresh_other
+包含刷新目录准备、发布和清理。它们不包含客户端等待/网络或模型时间，不改变成功与恢复语义。
+非目录输入和旧版本结果没有这些字段，不将缺字段解释成零耗时；调用方可另记录本次调用墙钟时间。
+
 `content_graph_import_applied_workspace_refresh_failed` 表示资产已经应用，但目录刷新未完成。
 `Result.error["diagnostic"]` 保留 `asset_applied: true`、`retry_import: false`、
 `retry_safe: false`、`transaction_status: "committed"`、底层 `cause_code` 和

@@ -23,6 +23,13 @@ For unknown command names or parameter shapes, follow [public command discovery]
 Each named method forwards one catalog-bound request and contains no UE
 business logic, retry loop, alias mapping, or transport fallback.
 
+For a minimized zero-size Editor viewport, `ray_deproject` and `ray_trace` accept
+`input.cold_start_render_size={"width":1280,"height":720}`. Use the actual capture
+receipt's dimensions for image coordinates. The explicit dimensions apply only
+when native extent is zero; the temporary fixed-size policy is restored before
+return and the window remains untouched. Omit the option to retain normal
+zero-size failure semantics. Each dimension is an integer from 1 to 4096.
+
 Discover a viewport, retain its exact identity, and read its transient state:
 
 ```python

@@ -304,6 +304,17 @@ class Client(GeneratedClientBindingsMixin):
                 hidden_fields=hidden_fields,
                 model_result_fields=model_result_fields,
             )
+        if command_id == "rig.control.bake.context":
+            from ..rig_bake import RigBakeContextHandle
+            handle = RigBakeContextHandle(self, payload) if result.ok and isinstance(payload, Mapping) else None
+            return Result(
+                result._machine_response,
+                artifacts=artifacts,
+                durable_journals=durable_journals,
+                rig_bake_context=handle,
+                hidden_fields=hidden_fields | frozenset({"controls_input", "animation_input"}),
+                model_result_fields=model_result_fields,
+            )
         if command_id == "mesh.voxel_grid.begin":
             handle = (
                 VoxelGridHandle(self, payload)
@@ -437,8 +448,10 @@ class Client(GeneratedClientBindingsMixin):
             durable_journals=(handle,),
         )
 
-    def _import_hjson_workspace(self, target, source):
+    def _import_hjson_workspace(self, target, source, *, analysis_ref=OMITTED):
         params = {"target": target, "source": dict(source)}
+        if analysis_ref is not OMITTED:
+            params["analysis_ref"] = analysis_ref
         binding = self._binding_catalog.find("content_graph.import_workspace")
         if binding is None or binding.status not in {"active", "dormant"}:
             raise UsageError(

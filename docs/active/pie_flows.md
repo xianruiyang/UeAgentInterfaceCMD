@@ -31,6 +31,16 @@ session settings, independent of desktop DPI and saved Editor Play window sizes.
 capture to satisfy a request. Closing the session restores the Play window
 preferences that existed immediately before native PIE shutdown.
 
+PIE startup automatically compiles dirty Blueprints using request-local settings.
+If the native compiler reports an error, UAI cancels before creating a PIE world;
+it does not open a compilation confirmation or continue with broken Blueprints.
+This applies to both `pie-debug/v2` and `pie/v1` runtime-preview policies. The SDK
+preserves the terminal native diagnostic, including `pie_blueprint_compile_failed`,
+the compile stage, full Blueprint paths, and available stored node messages. Use
+`client.pie.recover(name).close()` to collect/release a failed launch's saved receipt;
+inspect `cleanup_complete`. This requires the matching UnrealEd extension documented
+in the Plugin's EnginePatches README; it does not change manual Editor play settings.
+
 `run()` returns after the finite flow and pause/refresh attempt. Check `Result.ok`
 and its `execution`, `results`, `snapshot`, and `diagnostics`. Failure retains
 earlier values/images; it does not roll back game time or replay the flow.

@@ -24,8 +24,18 @@ with uai.connect_project() as client:
         size_cm=[120.0, 80.0, 60.0],
         subdivisions=[2, 2, 1],
         target_ref="UAI/StrictV2/T38/Box_Default",
+        color=[0.22, 0.36, 0.48],  # optional linear RGB; bundled metric grid
     )
 ```
+
+New primitive outputs default to the plugin's metric grid material. Omit `color`
+for its blue-gray base, or use three linear RGB channels in `[0,1]`. Optional
+`material_ref` selects another material; do not combine another material with
+`color`. Voxel-grid handles likewise accept `grid.apply(color=[0.55,0.25,0.07])`;
+editing an existing grid otherwise retains its material and fixed ruler origin.
+Colors are saved per component, without creating a material asset for each object.
+The public Level HJSON component defaults also permit later color changes.
+See the plugin's [material and persistence contract](../../../Plugins/UeAgentInterface/docs/active/t38_modeling_geometry_operation.md#bundled-metric-material).
 
 The same namespace also exposes topology methods such as
 `client.mesh.topology_mirror(...)`. The generic form uses the same generated
@@ -36,6 +46,33 @@ result = client.mesh.modeling_session(
     action="observe_tool",
 )
 ```
+
+`mesh.topology.components.remove` and `mesh.topology.components.translate`
+edit complete edge-connected triangle components of an existing target. Their
+`bounds_min_cm` / `bounds_max_cm` are inclusive AABB limits in
+`ue.mesh.target_local`, in centimeters; supply the existing `space_contract`.
+Every vertex of a component must lie inside these limits. A partly enclosed
+wall is excluded in full: these operations do not clip faces, weld coincident
+positions, or expand a box to a component that merely intersects it.
+`translate` also takes `translation_cm` in that same local frame and moves each
+selected vertex once. Materials, UVs and unselected geometry retain their
+existing data. An empty selection reports
+`modeling_geometry_component_selection_empty` without changing the target.
+The existing ModelingGeometry transaction, persistence and readback owner is
+shared with the other topology operations. Confirm the intended components
+from current geometry before applying bounds; an Actor's world Bounds alone
+does not identify a component or its support surface.
+Independent readback for these two operations compares the complete component
+multiset against the pre-edit selection: removed components are absent,
+translated components retain their shape at the requested offset, and the
+others retain their position and shape. Component bounds use 0.01 cm tolerance;
+the oriented-triangle/material shape digest uses 0.1 cm relative-position
+precision. Boolean edits also use this component observation against the native
+result computed from the actual target, operand, transform and options. They do
+not assume that all boundaries close or that a union grows along a fixed axis.
+The verification state includes expected/actual triangle, vertex, boundary-edge
+and component counts. A top-level `ok` with a partial/mismatch outcome is not
+semantic completion; inspect that outcome before applying dependent edits.
 
 `mesh.modeling_session` owns only Modeling Mode lifecycle, active-tool
 observation, tool properties/actions, session-native actor selection, mesh

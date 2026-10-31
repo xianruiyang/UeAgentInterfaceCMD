@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, overload
 
 from ._runtime import (
     CommandExecutor,
@@ -223,6 +223,13 @@ class AssetCommands:
         confirm: bool = ...,
     ) -> Any: ...
 
+    def folder_preview(
+        self,
+        folder: str,
+        *,
+        options: dict[str, Any] = ...,
+    ) -> Any: ...
+
     def move(
         self,
         target_ref: str,
@@ -383,10 +390,20 @@ class BlueprintCommands:
 
 class CaptureCommands:
 
+    @overload
     def image_execute(
         self,
         subject_ref: str,
         policy_id: str,
+        parameters: dict[str, Any],
+    ) -> Any: ...
+
+    @overload
+    def image_execute(
+        self,
+        subject_ref: str,
+        *,
+        policy_id: str = ...,
         parameters: dict[str, Any],
     ) -> Any: ...
 
@@ -604,6 +621,14 @@ class ExternalCommands:
         options: dict[str, Any] = ...,
     ) -> Any: ...
 
+    def fbx_static_mesh_import(
+        self,
+        source_ref: str,
+        destination_ref: str,
+        *,
+        options: dict[str, Any] = ...,
+    ) -> Any: ...
+
     def geometry_cache_import(
         self,
         source_ref: str,
@@ -656,6 +681,80 @@ class ExternalCommands:
         destination_ref: str,
         *,
         options: dict[str, Any] = ...,
+    ) -> Any: ...
+
+class FabCommands:
+
+    def asset(
+        self,
+        *,
+        scope: str = ...,
+        name: str,
+        select: dict[str, Any] = ...,
+        listing_url: str = ...,
+    ) -> Any: ...
+
+    def categories(
+        self,
+        *,
+        type: str = ...,
+        parent: str = ...,
+        depth: int = ...,
+    ) -> Any: ...
+
+    def download(
+        self,
+        *,
+        scope: str = ...,
+        name: str,
+        select: dict[str, Any] = ...,
+        format: str = ...,
+        file: str = ...,
+        file_select: dict[str, Any] = ...,
+        save_as: str = ...,
+    ) -> Any: ...
+
+    def downloads(
+        self,
+        *,
+        page: int = ...,
+    ) -> Any: ...
+
+    def files(
+        self,
+        download: str,
+        *,
+        query: str = ...,
+        page: int = ...,
+    ) -> Any: ...
+
+    def import_asset(
+        self,
+        download: str,
+        *,
+        destination: str = ...,
+        entry: str = ...,
+    ) -> Any: ...
+
+    def open(
+        self,
+        *,
+        activate: bool = ...,
+    ) -> Any: ...
+
+    def search(
+        self,
+        *,
+        scope: str = ...,
+        query: str = ...,
+        type: str = ...,
+        category: str = ...,
+        styles: list[Any] = ...,
+        page: int = ...,
+    ) -> Any: ...
+
+    def status(
+        self,
     ) -> Any: ...
 
 class GraphCommands:
@@ -816,6 +915,9 @@ class MeshCommands:
     def primitive_box_create(
         self,
         anchor: str,
+        *,
+        color: list[Any] = ...,
+        material_ref: str = ...,
         placement: dict[str, Any],
         size_cm: list[Any],
         subdivisions: list[Any],
@@ -826,8 +928,11 @@ class MeshCommands:
         self,
         anchor: str,
         cap_ends: bool,
+        *,
+        color: list[Any] = ...,
         height_cm: float,
         height_segments: int,
+        material_ref: str = ...,
         placement: dict[str, Any],
         radial_segments: int,
         radius_cm: float,
@@ -836,7 +941,10 @@ class MeshCommands:
 
     def primitive_plane_create(
         self,
+        *,
+        color: list[Any] = ...,
         double_sided: bool,
+        material_ref: str = ...,
         placement: dict[str, Any],
         size_cm: list[Any],
         subdivisions: list[Any],
@@ -845,6 +953,9 @@ class MeshCommands:
 
     def primitive_ramp_create(
         self,
+        *,
+        color: list[Any] = ...,
+        material_ref: str = ...,
         placement: dict[str, Any],
         rise_direction: str,
         size_cm: list[Any],
@@ -854,7 +965,10 @@ class MeshCommands:
 
     def primitive_ramp_corner_create(
         self,
+        *,
+        color: list[Any] = ...,
         high_corner: str,
+        material_ref: str = ...,
         placement: dict[str, Any],
         size_cm: list[Any],
         target_ref: str,
@@ -862,8 +976,11 @@ class MeshCommands:
 
     def primitive_sphere_create(
         self,
+        *,
+        color: list[Any] = ...,
         latitude_segments: int,
         longitude_segments: int,
+        material_ref: str = ...,
         placement: dict[str, Any],
         radius_cm: float,
         target_ref: str,
@@ -871,6 +988,9 @@ class MeshCommands:
 
     def primitive_stairs_create(
         self,
+        *,
+        color: list[Any] = ...,
+        material_ref: str = ...,
         placement: dict[str, Any],
         rise_axis: str,
         rise_direction: str,
@@ -889,6 +1009,23 @@ class MeshCommands:
         simplify_output: bool,
         space_contract: dict[str, Any],
         target_ref: str,
+    ) -> Any: ...
+
+    def topology_components_remove(
+        self,
+        bounds_max_cm: list[Any],
+        bounds_min_cm: list[Any],
+        space_contract: dict[str, Any],
+        target_ref: str,
+    ) -> Any: ...
+
+    def topology_components_translate(
+        self,
+        bounds_max_cm: list[Any],
+        bounds_min_cm: list[Any],
+        space_contract: dict[str, Any],
+        target_ref: str,
+        translation_cm: list[Any],
     ) -> Any: ...
 
     def topology_edges_bevel(
@@ -1265,6 +1402,15 @@ class RigCommands:
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
+    def control_bake_context(
+        self,
+        target: str,
+        input: dict[str, Any],
+        *,
+        context: dict[str, Any] = ...,
+        projection: dict[str, Any] = ...,
+    ) -> Any: ...
+
     def control_bake_controls(
         self,
         target: str,
@@ -1521,7 +1667,23 @@ class WorldCommands:
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
+    def component_candidates(
+        self,
+        target: str,
+        *,
+        query: str = ...,
+        describe: dict[str, Any] = ...,
+    ) -> Any: ...
+
     def data_layers(
+        self,
+        *,
+        input: dict[str, Any] = ...,
+        context: dict[str, Any] = ...,
+        projection: dict[str, Any] = ...,
+    ) -> Any: ...
+
+    def geometry_overlap(
         self,
         *,
         input: dict[str, Any] = ...,
@@ -1671,6 +1833,14 @@ class WorldCommands:
         projection: dict[str, Any] = ...,
     ) -> Any: ...
 
+    def scene_context(
+        self,
+        *,
+        input: dict[str, Any] = ...,
+        context: dict[str, Any] = ...,
+        projection: dict[str, Any] = ...,
+    ) -> Any: ...
+
     def selection(
         self,
         *,
@@ -1719,6 +1889,7 @@ class GeneratedCommandNamespaces:
     editor: EditorCommands
     editor_project: EditorProjectCommands
     external: ExternalCommands
+    fab: FabCommands
     graph: GraphCommands
     job: JobCommands
     landscape: LandscapeCommands
@@ -1790,6 +1961,9 @@ class GeneratedClientBindingsMixin:
 
     @property
     def external(self) -> ExternalCommands: ...
+
+    @property
+    def fab(self) -> FabCommands: ...
 
     @property
     def graph(self) -> GraphCommands: ...

@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from .operation import OperationHandle
     from .runtime_session import RuntimeSessionHandle
     from .voxel_grid import VoxelGridHandle
+    from .rig_bake import RigBakeContextHandle
 
 from .errors import ProtocolError, ServerCommandError
 
@@ -345,6 +346,7 @@ class Result:
         "_durable_journals",
         "_runtime_session",
         "_voxel_grid",
+        "_rig_bake_context",
     )
 
     def __init__(
@@ -357,6 +359,7 @@ class Result:
         durable_journals: "tuple[DurableJournalHandle, ...]" = (),
         runtime_session: "RuntimeSessionHandle | None" = None,
         voxel_grid: "VoxelGridHandle | None" = None,
+        rig_bake_context: "RigBakeContextHandle | None" = None,
         voxel_grid_projection: bool = False,
         hidden_fields: frozenset[str] = frozenset(),
         model_result_fields: tuple[
@@ -438,6 +441,7 @@ class Result:
         self._durable_journals = tuple(durable_journals)
         self._runtime_session = runtime_session
         self._voxel_grid = voxel_grid
+        self._rig_bake_context = rig_bake_context
 
     @property
     def ok(self) -> bool:
@@ -487,6 +491,10 @@ class Result:
     @property
     def voxel_grid(self) -> "VoxelGridHandle | None":
         return self._voxel_grid
+
+    @property
+    def rig_bake_context(self) -> "RigBakeContextHandle | None":
+        return self._rig_bake_context
 
     @property
     def _machine_payload(self) -> Any:

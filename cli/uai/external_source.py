@@ -18,6 +18,7 @@ _FILE_SOURCE_COMMANDS = frozenset(
         "asset.reimport_texture",
         "external.fbx.animation.import",
         "external.fbx.skeletal_mesh.import",
+        "external.fbx.static_mesh.import",
         "external.geometry_cache.import",
         "external.light_profile.import",
         "external.localization.po.import",

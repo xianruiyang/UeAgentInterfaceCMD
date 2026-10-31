@@ -144,6 +144,7 @@ class VoxelGridHandle:
         mesh_build=OMITTED,
         collision=OMITTED,
         material_ref=OMITTED,
+        color=OMITTED,
         keep_session=OMITTED,
     ) -> "Result":
         self._require_open()
@@ -155,6 +156,7 @@ class VoxelGridHandle:
             ("mesh_build", mesh_build),
             ("collision", collision),
             ("material_ref", material_ref),
+            ("color", color),
             ("keep_session", keep_session),
         ):
             if value is not OMITTED:

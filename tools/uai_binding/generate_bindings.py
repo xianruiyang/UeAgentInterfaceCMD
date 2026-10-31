@@ -311,6 +311,8 @@ def _type_hint(parameter: Mapping[str, Any]) -> str:
 
 def _signature_parts(
     parameters: Sequence[Mapping[str, Any]],
+    *,
+    preserve_positional_order: bool = False,
 ) -> tuple[list[str], list[str]]:
     positional: list[str] = []
     keyword_only: list[str] = []
@@ -322,6 +324,9 @@ def _signature_parts(
             positional.append(f"{name}: {annotation}")
             continue
         seen_optional = seen_optional or not parameter["required"]
+        if preserve_positional_order:
+            positional.append(f"{name}: {annotation} | object = OMITTED")
+            continue
         if parameter["required"]:
             keyword_only.append(f"{name}: {annotation}")
         else:
@@ -333,7 +338,12 @@ def _signature_parts(
 
 def _method_lines(command: Mapping[str, Any]) -> list[str]:
     parameters = list(command["parameters"])
-    positional, keyword_only = _signature_parts(parameters)
+    # This method historically accepted (subject_ref, policy_id, parameters).
+    # Making the middle argument optional must not reinterpret those calls.
+    preserve_order = command["command_id"] == "capture.image.execute"
+    positional, keyword_only = _signature_parts(
+        parameters, preserve_positional_order=preserve_order
+    )
     signature = ["self", *positional]
     if keyword_only:
         signature.extend(["*", *keyword_only])
@@ -343,11 +353,18 @@ def _method_lines(command: Mapping[str, Any]) -> list[str]:
         "    ):",
         "        params: dict[str, Any] = {}",
     ]
+    seen_optional = False
     for parameter in parameters:
         name = parameter["name"]
         if parameter["required"]:
+            if preserve_order and seen_optional:
+                lines.extend([
+                    f"        if {name} is OMITTED:",
+                    f"            raise TypeError(\"{command['method']}() missing required argument: '{name}'\")",
+                ])
             lines.append(f'        params["{name}"] = {name}')
         else:
+            seen_optional = True
             lines.extend(
                 [
                     f"        if {name} is not OMITTED:",
@@ -367,6 +384,22 @@ def _method_lines(command: Mapping[str, Any]) -> list[str]:
 
 
 def _stub_method_lines(command: Mapping[str, Any]) -> list[str]:
+    if command["command_id"] == "capture.image.execute" and any(
+        parameter["name"] == "policy_id" and not parameter["required"]
+        for parameter in command["parameters"]
+    ):
+        # The original positional call and the new omitted-policy keyword call
+        # both keep parameters required to static consumers.
+        explicit = dict(command)
+        explicit["command_id"] = ""
+        explicit["parameters"] = [
+            {**parameter, "required": True}
+            if parameter["name"] == "policy_id" else parameter
+            for parameter in command["parameters"]
+        ]
+        omitted = {**command, "command_id": ""}
+        return ["    @overload", *_stub_method_lines(explicit),
+                "    @overload", *_stub_method_lines(omitted)]
     positional, keyword_only = _signature_parts(command["parameters"])
     keyword_only = [
         item.replace(" | object = OMITTED", " = ...")
@@ -601,7 +634,7 @@ def _render_stub(
     lines = [
         "from __future__ import annotations",
         "",
-        "from typing import Any",
+        "from typing import Any, overload",
         "",
         "from ._runtime import (",
         "    CommandExecutor,",

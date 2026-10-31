@@ -20,13 +20,14 @@ from .pie import PieSession
 from .asset_durable import DurableJournalHandle
 from .artifact import ArtifactHandle
 from .external_source import ExternalSourceNamespace, ProjectFileHandle
-from .workspace import HjsonWorkspaceHandle
+from .workspace import HjsonWorkspaceHandle, SceneAnalysisHandle
 from .voxel_grid import VoxelGridHandle
+from .rig_bake import RigBakeContextHandle
 from .uai_client import Client
 from .command_metadata import describe_command
 
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = [
     "__version__",
@@ -42,8 +43,10 @@ __all__ = [
     "ArtifactHandle",
     "ExternalSourceNamespace",
     "HjsonWorkspaceHandle",
+    "SceneAnalysisHandle",
     "ProjectFileHandle",
     "VoxelGridHandle",
+    "RigBakeContextHandle",
     "Error",
     "UsageError",
     "SerializationError",

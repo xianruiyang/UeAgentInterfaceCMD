@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from copy import deepcopy
 
-from .errors import UsageError
+from .errors import Error, UsageError
 from .operation import _recovery_path
 from .result import Result
 from .artifact import _from_payload as _artifacts_from_payload
@@ -150,6 +150,13 @@ class PieNamespace:
         terminal = ready.payload.get("schema") == "uai.long_running.receipt.v1"
         if not ready.ok or operation.runtime_session is None or terminal:
             ready.raise_for_error()
+            diagnostic = ready.payload.get("diagnostic")
+            if terminal and isinstance(diagnostic, Mapping) and diagnostic:
+                raise Error(
+                    code=ready.payload.get("error_code") or diagnostic.get("code") or "pie_start_failed",
+                    message=f"PIE launch failed; inspect or close the saved result with client.pie.recover({name!r})",
+                    diagnostic=diagnostic,
+                )
             raise UsageError.at_source(code="pie_start_not_ready", message="PIE did not become ready; recover the saved session to inspect or close it",
                              facts={"stage": "session_ready", "terminal_status": "terminal" if terminal else "pending",
                                          "recovery_action": f"client.pie.recover({name!r})"})

@@ -23,6 +23,11 @@ also requires `parent_material_ref` in `root.create`, pointing to its existing
 parent Material or Material Instance. The name and package fields must agree
 with the independent destination argument.
 
+Material authoring also accepts the mounted `/UeAgentInterface/Materials/`
+namespace for maintaining the plugin's bundled materials. This is plugin source
+content: normal user scene assets remain under `/Game`. It does not grant a
+general writable `/Engine` or arbitrary-plugin namespace.
+
 Layer and Blend use the public `asset.object.create` factory candidate; they
 do not have this inline creation branch. Export a created asset before editing
 its ordinary workspace.

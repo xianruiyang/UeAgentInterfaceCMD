@@ -54,6 +54,7 @@ class OperationHandle:
         "_runtime_session",
         "_terminal_receipt",
         "_recovery_records",
+        "_unobserved_accept",
     )
 
     def __init__(
@@ -69,6 +70,7 @@ class OperationHandle:
         self._runtime_session = None
         self._terminal_receipt = None
         self._recovery_records = {}
+        self._unobserved_accept = False
         if generation is not None:
             self._set_generation(generation)
 
@@ -143,6 +145,9 @@ class OperationHandle:
                 code="operation_handle_released",
                 message="operation handle has already been released",
             )
+        # Only a fresh submission may skip the initial read in completion-only
+        # waits. Any lifecycle use consumes that opportunity, including failures.
+        self._unobserved_accept = False
         return self._update(
             self._client._execute_operation_lifecycle(command_id, dict(params))
         )
@@ -251,7 +256,19 @@ class OperationHandle:
         if self._released:
             return self.receipt()
         deadline = None if timeout is None else time.monotonic() + timeout
-        result = self.status()
+        if self._unobserved_accept and self._generation is not None and until is None and on_observation is None:
+            # resume validates custody/generation before native work. Terminal
+            # operations return their snapshot without replaying work.
+            result = self.resume()
+            error = result.error
+            if not result.ok and isinstance(error, Mapping) and error.get("code") == "operation_generation_mismatch":
+                # The owner rejects this mismatch before mutation; refresh once
+                # and continue through the ordinary observed-state loop.
+                result = self.status()
+            elif result.ok and not result._machine_payload.get("terminal"):
+                time.sleep(poll_seconds)
+        else:
+            result = self.status()
         while result.ok:
             payload = result._machine_payload
             if on_observation is not None:
@@ -278,6 +295,50 @@ class OperationHandle:
             return receipt
         released = self.release()
         return receipt if released.ok else released
+
+    def finish_result(self, *, timeout=None, poll_seconds=0.1, on_observation=None):
+        """Finish a deferred command and return its original public Result.
+
+        Unlike finish(), this consumes the shared uai.command.result.v1 signal.
+        Non-command jobs keep using finish() and their domain-specific receipt.
+        A timeout keeps the same recovery record; this never resubmits the command.
+        """
+        from .errors import ProtocolError
+        from .result import Result
+
+        diagnostics = []
+
+        def collect(observation):
+            for diagnostic in observation.diagnostics:
+                if diagnostic not in diagnostics:
+                    diagnostics.append(diagnostic)
+            if on_observation is not None:
+                on_observation(observation)
+
+        receipt = self.finish(timeout=timeout, poll_seconds=poll_seconds, on_observation=collect)
+        collect(receipt)
+        receipt.raise_for_error()
+        signal = receipt._machine_payload.get("latest_signal", {})
+        response = signal.get("payload") if isinstance(signal, Mapping) else None
+        if (not isinstance(signal, Mapping) or signal.get("type_id") != "uai.command.result.v1"
+                or not isinstance(response, Mapping) or not isinstance(response.get("command_id"), str)):
+            raise ProtocolError.at_source(
+                code="operation_command_result_unavailable",
+                message="The operation receipt has no deferred command result.",
+                facts={"stage": "command_receipt", "expected_value": "uai.command.result.v1",
+                       "actual_value": signal.get("type_id") if isinstance(signal, Mapping) else None,
+                       "property_path": "/latest_signal/type_id", "retry_safe": False,
+                       "recovery_action": f"client.operation.recover({self.recovery_name!r})",
+                       "diagnostics": diagnostics},
+            )
+        business_response = deepcopy(dict(response))
+        business = Result(business_response)
+        for diagnostic in business.diagnostics:
+            if diagnostic not in diagnostics:
+                diagnostics.append(diagnostic)
+        business_response["diagnostics"] = diagnostics
+        return self._client._wrap_result(response["command_id"], Result(business_response),
+                                         allow_operation_handle=False)
 
     def close(self, reason="operation close", *, timeout=None, poll_seconds=0.1, on_observation=None):
         """Cancel owned work, drain it, preserve its receipt and release custody."""
@@ -327,6 +388,12 @@ class OperationNamespace:
             return
         result.operation._recovery_records[name] = record
         result.operation._persist(result._machine_payload)
+        payload = result._machine_payload
+        result.operation._unobserved_accept = (
+            result.ok and isinstance(payload, Mapping)
+            and payload.get("phase") == "accepted" and payload.get("terminal") is False
+            and result.operation._generation is not None
+        )
 
     def from_result(self, result: "Result") -> OperationHandle:
         if not isinstance(result, object) or not hasattr(result, "_machine_payload"):

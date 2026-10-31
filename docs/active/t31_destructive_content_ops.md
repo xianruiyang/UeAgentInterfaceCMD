@@ -11,11 +11,30 @@ minimal call, then call the default generated SDK method. The active set is:
 `ueagentinterfacecmd ... exec <command-name>` uses the same exact binding. There is no
 task-specific generated SDK authority.
 
-Persistent mesh, material-slot, Data Layer, and streaming-level edits use the
-current HJSON workspace. `modeling.actor.mesh.replace`,
+Persistent authoring is assigned to the current HJSON workspace, but this does
+not mean every former typed operation has an implemented HJSON successor.
+On applicable partitioned-World import paths, Level HJSON supports Data Layer
+creation, initial state and membership addition. This is not unconditional
+coverage for ordinary updates to any existing Level, nor a complete
+existing-layer unload/restore workflow.
+Legacy streaming relations, cross-Level Actor migration and initial-state
+save/reload use the Level HJSON fields documented in [T26](t26_level_world_domain.md).
+Set a streaming map row to explicit `null` to unlink it while retaining its asset
+and contents; omission is not deletion. Runtime streaming is a separate boundary.
+`modeling.actor.mesh.replace`,
 `modeling.asset.material_slot.remove`, `world.data_layer.delete`,
 `world.level_streaming.move_actors`, and `world.level_streaming.remove` are dormant
-compatibility bindings, not current discovery or authoring entries.
+compatibility bindings, not current discovery or authoring entries. Their exact
+native handlers remain executable; that compatibility does not make them the
+normal authoring workflow or fill the HJSON coverage gaps.
+
+The dormant mesh-replacement command does not prohibit editing an existing
+StaticMeshComponent's `StaticMesh`/`OverrideMaterials` references through Level
+HJSON. Exact Actor replacement likewise uses additions/removals in the captured
+`actors` collection; it need not become a folder-wide purge. See
+[T26 replacement examples](t26_level_world_domain.md#component-properties-and-same-actor-replacement).
+Changing an instance's material overrides is distinct from deleting slots on the
+shared mesh asset; do not infer the latter capability from the former.
 
 `client.asset.object_clone(source_ref, target_ref)` accepts package paths
 (`/Game/Folder/Asset`) and matching object paths (`/Game/Folder/Asset.Asset`).

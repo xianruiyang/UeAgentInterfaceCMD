@@ -508,6 +508,21 @@ class AssetCommands:
             params,
         )
 
+    def folder_preview(
+        self,
+        folder: str,
+        *,
+        options: dict[str, Any] | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        params["folder"] = folder
+        if options is not OMITTED:
+            params["options"] = options
+        return self._client.execute(
+            "asset.folder.preview",
+            params,
+        )
+
     def move(
         self,
         target_ref: str,
@@ -885,12 +900,15 @@ class CaptureCommands:
     def image_execute(
         self,
         subject_ref: str,
-        policy_id: str,
-        parameters: dict[str, Any],
+        policy_id: str | object = OMITTED,
+        parameters: dict[str, Any] | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["subject_ref"] = subject_ref
-        params["policy_id"] = policy_id
+        if policy_id is not OMITTED:
+            params["policy_id"] = policy_id
+        if parameters is OMITTED:
+            raise TypeError("image_execute() missing required argument: 'parameters'")
         params["parameters"] = parameters
         return self._client.execute(
             "capture.image.execute",
@@ -1047,10 +1065,14 @@ class ContentGraphCommands:
         self,
         target: str,
         source: dict[str, Any],
+        *,
+        analysis_ref: str | object = OMITTED,
     ):
         params: dict[str, Any] = {}
         params["target"] = target
         params["source"] = source
+        if analysis_ref is not OMITTED:
+            params["analysis_ref"] = analysis_ref
         return self._client.execute(
             "content_graph.import_workspace",
             params,
@@ -1434,6 +1456,23 @@ class ExternalCommands:
             params,
         )
 
+    def fbx_static_mesh_import(
+        self,
+        source_ref: str,
+        destination_ref: str,
+        *,
+        options: dict[str, Any] | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        params["source_ref"] = source_ref
+        params["destination_ref"] = destination_ref
+        if options is not OMITTED:
+            params["options"] = options
+        return self._client.execute(
+            "external.fbx.static_mesh.import",
+            params,
+        )
+
     def geometry_cache_import(
         self,
         source_ref: str,
@@ -1546,6 +1585,184 @@ class ExternalCommands:
             params["options"] = options
         return self._client.execute(
             "external.texture.import",
+            params,
+        )
+
+class FabCommands:
+    __slots__ = ("_client",)
+
+    def __init__(
+        self,
+        client: CommandExecutor,
+    ) -> None:
+        self._client = client
+
+    def asset(
+        self,
+        *,
+        scope: str | object = OMITTED,
+        name: str,
+        select: dict[str, Any] | object = OMITTED,
+        listing_url: str | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        if scope is not OMITTED:
+            params["scope"] = scope
+        params["name"] = name
+        if select is not OMITTED:
+            params["select"] = select
+        if listing_url is not OMITTED:
+            params["listing_url"] = listing_url
+        return self._client.execute(
+            "fab.asset",
+            params,
+        )
+
+    def categories(
+        self,
+        *,
+        type: str | object = OMITTED,
+        parent: str | object = OMITTED,
+        depth: int | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        if type is not OMITTED:
+            params["type"] = type
+        if parent is not OMITTED:
+            params["parent"] = parent
+        if depth is not OMITTED:
+            params["depth"] = depth
+        return self._client.execute(
+            "fab.categories",
+            params,
+        )
+
+    def download(
+        self,
+        *,
+        scope: str | object = OMITTED,
+        name: str,
+        select: dict[str, Any] | object = OMITTED,
+        format: str | object = OMITTED,
+        file: str | object = OMITTED,
+        file_select: dict[str, Any] | object = OMITTED,
+        save_as: str | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        if scope is not OMITTED:
+            params["scope"] = scope
+        params["name"] = name
+        if select is not OMITTED:
+            params["select"] = select
+        if format is not OMITTED:
+            params["format"] = format
+        if file is not OMITTED:
+            params["file"] = file
+        if file_select is not OMITTED:
+            params["file_select"] = file_select
+        if save_as is not OMITTED:
+            params["save_as"] = save_as
+        return self._client.execute(
+            "fab.download",
+            params,
+        )
+
+    def downloads(
+        self,
+        *,
+        page: int | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        if page is not OMITTED:
+            params["page"] = page
+        return self._client.execute(
+            "fab.downloads",
+            params,
+        )
+
+    def files(
+        self,
+        download: str,
+        *,
+        query: str | object = OMITTED,
+        page: int | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        params["download"] = download
+        if query is not OMITTED:
+            params["query"] = query
+        if page is not OMITTED:
+            params["page"] = page
+        return self._client.execute(
+            "fab.files",
+            params,
+        )
+
+    def import_asset(
+        self,
+        download: str,
+        *,
+        destination: str | object = OMITTED,
+        entry: str | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        params["download"] = download
+        if destination is not OMITTED:
+            params["destination"] = destination
+        if entry is not OMITTED:
+            params["entry"] = entry
+        return self._client.execute(
+            "fab.import_asset",
+            params,
+        )
+
+    def open(
+        self,
+        *,
+        activate: bool | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        if activate is not OMITTED:
+            params["activate"] = activate
+        return self._client.execute(
+            "fab.open",
+            params,
+        )
+
+    def search(
+        self,
+        *,
+        scope: str | object = OMITTED,
+        query: str | object = OMITTED,
+        type: str | object = OMITTED,
+        category: str | object = OMITTED,
+        styles: list[Any] | object = OMITTED,
+        page: int | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        if scope is not OMITTED:
+            params["scope"] = scope
+        if query is not OMITTED:
+            params["query"] = query
+        if type is not OMITTED:
+            params["type"] = type
+        if category is not OMITTED:
+            params["category"] = category
+        if styles is not OMITTED:
+            params["styles"] = styles
+        if page is not OMITTED:
+            params["page"] = page
+        return self._client.execute(
+            "fab.search",
+            params,
+        )
+
+    def status(
+        self,
+    ):
+        params: dict[str, Any] = {}
+        return self._client.execute(
+            "fab.status",
             params,
         )
 
@@ -1916,6 +2133,9 @@ class MeshCommands:
     def primitive_box_create(
         self,
         anchor: str,
+        *,
+        color: list[Any] | object = OMITTED,
+        material_ref: str | object = OMITTED,
         placement: dict[str, Any],
         size_cm: list[Any],
         subdivisions: list[Any],
@@ -1923,6 +2143,10 @@ class MeshCommands:
     ):
         params: dict[str, Any] = {}
         params["anchor"] = anchor
+        if color is not OMITTED:
+            params["color"] = color
+        if material_ref is not OMITTED:
+            params["material_ref"] = material_ref
         params["placement"] = placement
         params["size_cm"] = size_cm
         params["subdivisions"] = subdivisions
@@ -1936,8 +2160,11 @@ class MeshCommands:
         self,
         anchor: str,
         cap_ends: bool,
+        *,
+        color: list[Any] | object = OMITTED,
         height_cm: float,
         height_segments: int,
+        material_ref: str | object = OMITTED,
         placement: dict[str, Any],
         radial_segments: int,
         radius_cm: float,
@@ -1946,8 +2173,12 @@ class MeshCommands:
         params: dict[str, Any] = {}
         params["anchor"] = anchor
         params["cap_ends"] = cap_ends
+        if color is not OMITTED:
+            params["color"] = color
         params["height_cm"] = height_cm
         params["height_segments"] = height_segments
+        if material_ref is not OMITTED:
+            params["material_ref"] = material_ref
         params["placement"] = placement
         params["radial_segments"] = radial_segments
         params["radius_cm"] = radius_cm
@@ -1959,14 +2190,21 @@ class MeshCommands:
 
     def primitive_plane_create(
         self,
+        *,
+        color: list[Any] | object = OMITTED,
         double_sided: bool,
+        material_ref: str | object = OMITTED,
         placement: dict[str, Any],
         size_cm: list[Any],
         subdivisions: list[Any],
         target_ref: str,
     ):
         params: dict[str, Any] = {}
+        if color is not OMITTED:
+            params["color"] = color
         params["double_sided"] = double_sided
+        if material_ref is not OMITTED:
+            params["material_ref"] = material_ref
         params["placement"] = placement
         params["size_cm"] = size_cm
         params["subdivisions"] = subdivisions
@@ -1978,6 +2216,9 @@ class MeshCommands:
 
     def primitive_ramp_create(
         self,
+        *,
+        color: list[Any] | object = OMITTED,
+        material_ref: str | object = OMITTED,
         placement: dict[str, Any],
         rise_direction: str,
         size_cm: list[Any],
@@ -1985,6 +2226,10 @@ class MeshCommands:
         target_ref: str,
     ):
         params: dict[str, Any] = {}
+        if color is not OMITTED:
+            params["color"] = color
+        if material_ref is not OMITTED:
+            params["material_ref"] = material_ref
         params["placement"] = placement
         params["rise_direction"] = rise_direction
         params["size_cm"] = size_cm
@@ -1997,13 +2242,20 @@ class MeshCommands:
 
     def primitive_ramp_corner_create(
         self,
+        *,
+        color: list[Any] | object = OMITTED,
         high_corner: str,
+        material_ref: str | object = OMITTED,
         placement: dict[str, Any],
         size_cm: list[Any],
         target_ref: str,
     ):
         params: dict[str, Any] = {}
+        if color is not OMITTED:
+            params["color"] = color
         params["high_corner"] = high_corner
+        if material_ref is not OMITTED:
+            params["material_ref"] = material_ref
         params["placement"] = placement
         params["size_cm"] = size_cm
         params["target_ref"] = target_ref
@@ -2014,15 +2266,22 @@ class MeshCommands:
 
     def primitive_sphere_create(
         self,
+        *,
+        color: list[Any] | object = OMITTED,
         latitude_segments: int,
         longitude_segments: int,
+        material_ref: str | object = OMITTED,
         placement: dict[str, Any],
         radius_cm: float,
         target_ref: str,
     ):
         params: dict[str, Any] = {}
+        if color is not OMITTED:
+            params["color"] = color
         params["latitude_segments"] = latitude_segments
         params["longitude_segments"] = longitude_segments
+        if material_ref is not OMITTED:
+            params["material_ref"] = material_ref
         params["placement"] = placement
         params["radius_cm"] = radius_cm
         params["target_ref"] = target_ref
@@ -2033,6 +2292,9 @@ class MeshCommands:
 
     def primitive_stairs_create(
         self,
+        *,
+        color: list[Any] | object = OMITTED,
+        material_ref: str | object = OMITTED,
         placement: dict[str, Any],
         rise_axis: str,
         rise_direction: str,
@@ -2043,6 +2305,10 @@ class MeshCommands:
         target_ref: str,
     ):
         params: dict[str, Any] = {}
+        if color is not OMITTED:
+            params["color"] = color
+        if material_ref is not OMITTED:
+            params["material_ref"] = material_ref
         params["placement"] = placement
         params["rise_axis"] = rise_axis
         params["rise_direction"] = rise_direction
@@ -2074,6 +2340,42 @@ class MeshCommands:
         params["target_ref"] = target_ref
         return self._client.execute(
             "mesh.topology.boolean",
+            params,
+        )
+
+    def topology_components_remove(
+        self,
+        bounds_max_cm: list[Any],
+        bounds_min_cm: list[Any],
+        space_contract: dict[str, Any],
+        target_ref: str,
+    ):
+        params: dict[str, Any] = {}
+        params["bounds_max_cm"] = bounds_max_cm
+        params["bounds_min_cm"] = bounds_min_cm
+        params["space_contract"] = space_contract
+        params["target_ref"] = target_ref
+        return self._client.execute(
+            "mesh.topology.components.remove",
+            params,
+        )
+
+    def topology_components_translate(
+        self,
+        bounds_max_cm: list[Any],
+        bounds_min_cm: list[Any],
+        space_contract: dict[str, Any],
+        target_ref: str,
+        translation_cm: list[Any],
+    ):
+        params: dict[str, Any] = {}
+        params["bounds_max_cm"] = bounds_max_cm
+        params["bounds_min_cm"] = bounds_min_cm
+        params["space_contract"] = space_contract
+        params["target_ref"] = target_ref
+        params["translation_cm"] = translation_cm
+        return self._client.execute(
+            "mesh.topology.components.translate",
             params,
         )
 
@@ -2938,6 +3240,26 @@ class RigCommands:
             params,
         )
 
+    def control_bake_context(
+        self,
+        target: str,
+        input: dict[str, Any],
+        *,
+        context: dict[str, Any] | object = OMITTED,
+        projection: dict[str, Any] | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        params["target"] = target
+        params["input"] = input
+        if context is not OMITTED:
+            params["context"] = context
+        if projection is not OMITTED:
+            params["projection"] = projection
+        return self._client.execute(
+            "rig.control.bake.context",
+            params,
+        )
+
     def control_bake_controls(
         self,
         target: str,
@@ -3532,6 +3854,24 @@ class WorldCommands:
             params,
         )
 
+    def component_candidates(
+        self,
+        target: str,
+        *,
+        query: str | object = OMITTED,
+        describe: dict[str, Any] | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        params["target"] = target
+        if query is not OMITTED:
+            params["query"] = query
+        if describe is not OMITTED:
+            params["describe"] = describe
+        return self._client.execute(
+            "world.component.candidates",
+            params,
+        )
+
     def data_layers(
         self,
         *,
@@ -3548,6 +3888,25 @@ class WorldCommands:
             params["projection"] = projection
         return self._client.execute(
             "world.data_layers",
+            params,
+        )
+
+    def geometry_overlap(
+        self,
+        *,
+        input: dict[str, Any] | object = OMITTED,
+        context: dict[str, Any] | object = OMITTED,
+        projection: dict[str, Any] | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        if input is not OMITTED:
+            params["input"] = input
+        if context is not OMITTED:
+            params["context"] = context
+        if projection is not OMITTED:
+            params["projection"] = projection
+        return self._client.execute(
+            "world.geometry_overlap",
             params,
         )
 
@@ -3868,6 +4227,25 @@ class WorldCommands:
             params["projection"] = projection
         return self._client.execute(
             "world.ray_trace",
+            params,
+        )
+
+    def scene_context(
+        self,
+        *,
+        input: dict[str, Any] | object = OMITTED,
+        context: dict[str, Any] | object = OMITTED,
+        projection: dict[str, Any] | object = OMITTED,
+    ):
+        params: dict[str, Any] = {}
+        if input is not OMITTED:
+            params["input"] = input
+        if context is not OMITTED:
+            params["context"] = context
+        if projection is not OMITTED:
+            params["projection"] = projection
+        return self._client.execute(
+            "world.scene_context",
             params,
         )
 
@@ -5677,6 +6055,31 @@ _BINDING_CATALOG = CommandBindingCatalog(
             status="active",
         ),
         CommandBinding(
+            command_id="asset.folder.preview",
+            binding_hash="sha256:1c89b9f0bcc12d83749048ed7babd4a9731e67c0527d874f2dd54d41ac999f13",
+            namespace="asset",
+            method="folder_preview",
+            parameters=(
+                CommandParameterBinding(
+                    name="folder",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="options",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"additionalProperties":false,"properties":{"after":{"type":"string"},"class_paths":{"items":{"minLength":1,"type":"string"},"type":"array"},"generate_missing":{"type":"boolean"},"page_size":{"minimum":1,"type":"integer"},"recursive":{"type":"boolean"}},"type":"object"}',
+                ),
+            ),
+            supports_operation_recovery=True,
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
             command_id="asset.input_action.update",
             binding_hash="sha256:57ee1102c105467ec8777c870cc87434eb6949b8ac250018ce7bd936acd6d313",
             namespace="asset",
@@ -6142,7 +6545,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.reimport_sound_wave",
-            binding_hash="sha256:4d3ef538d857b21b876c41f8f519427d3a9a8f21b71694b63f6f47860b27a34c",
+            binding_hash="sha256:e590f397d15a899f102d59fe9783f5237d934d42d4619286a293173152ead557",
             namespace="asset",
             method="reimport_sound_wave",
             parameters=(
@@ -6171,7 +6574,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.reimport_sparse_volume_texture",
-            binding_hash="sha256:b19c2244b9a4c8392567a998360f834ad3b3542162cbe06cce58fcdff947ba36",
+            binding_hash="sha256:cd8fe833f80e3c09d9c961e20234bf8b0193b427e6d7b710234b224bb3f2ba2e",
             namespace="asset",
             method="reimport_sparse_volume_texture",
             parameters=(
@@ -6200,7 +6603,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.reimport_static_mesh",
-            binding_hash="sha256:f01fdbf69565d44e913b70edbd9556efbdcf7ccfcdb166a8a36e8f80c5cc86bc",
+            binding_hash="sha256:ef6ff5f67689a86aee91d17a90a67223184e36094d5b4ee19a0f7280ccd6dc4a",
             namespace="asset",
             method="reimport_static_mesh",
             parameters=(
@@ -6229,7 +6632,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.reimport_texture",
-            binding_hash="sha256:c4f2a8ab9fc3d3fc28776b2210a3066a8a4847a01cf58135af336c44cc663312",
+            binding_hash="sha256:4e855b5cdc728b4711f9ad8e8c06aa33ca0d9c8f0b3c8c0d2c5af6a1a53b89cf",
             namespace="asset",
             method="reimport_texture",
             parameters=(
@@ -6344,7 +6747,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="asset.sample",
-            binding_hash="sha256:3a33c43c0fdea12e3378d51dc93952a408f14890350d298f229019f095ff7172",
+            binding_hash="sha256:19ea67c67557ebf15358f2cd5e33b2e2c268bc1d4d360ce82fc58109e6410527",
             namespace="asset",
             method="sample",
             parameters=(
@@ -6359,7 +6762,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     wire_type="object",
                     required=True,
                     nullable=False,
-                    schema_json='{"additionalProperties":false,"properties":{"index":{"minimum":0,"type":"integer"},"sample_kind":{"enum":["bounds","vertex"],"type":"string"}},"required":["sample_kind"],"type":"object"}',
+                    schema_json='{"additionalProperties":false,"properties":{"index":{"minimum":0,"type":"integer"},"sample_kind":{"enum":["bounds","vertex","section"],"type":"string"}},"required":["sample_kind"],"type":"object"}',
                 ),
                 CommandParameterBinding(
                     name="context",
@@ -7094,7 +7497,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="capture.image.execute",
-            binding_hash="sha256:1214fc766a657fd47497199b44a946fe678eccc34c27a4f3011f9d268ce97994",
+            binding_hash="sha256:9f7b6fd582d79ee9d6d8f770dc395d99251ba41f5a6347fa9abb7d89601029b8",
             namespace="capture",
             method="image_execute",
             parameters=(
@@ -7107,9 +7510,9 @@ _BINDING_CATALOG = CommandBindingCatalog(
                 CommandParameterBinding(
                     name="policy_id",
                     wire_type="string",
-                    required=True,
+                    required=False,
                     nullable=False,
-                    schema_json='{"enum":["policy:image-capture:anim-blueprint/v1","policy:image-capture:asset-preview/v1","policy:image-capture:behavior-tree/v1","policy:image-capture:blueprint/v1","policy:image-capture:control-rig/v1","policy:image-capture:level-sequence/v1","policy:image-capture:metasound/v1","policy:image-capture:pcg-viewport/v1","policy:image-capture:sound-cue/v1","policy:image-capture:state-tree/v1","policy:image-capture:texture/v1","policy:image-capture:transform-candidates/v1","policy:image-capture:umg/v1","policy:image-capture:viewport-buffer/v1","policy:image-capture:viewport-sequence/v1","policy:image-capture:viewport/v1"],"type":"string"}',
+                    schema_json='{"enum":["policy:image-capture:anim-blueprint/v1","policy:image-capture:asset-folder-thumbnail/v1","policy:image-capture:asset-preview/v1","policy:image-capture:behavior-tree/v1","policy:image-capture:blueprint/v1","policy:image-capture:control-rig/v1","policy:image-capture:level-sequence/v1","policy:image-capture:metasound/v1","policy:image-capture:pcg-viewport/v1","policy:image-capture:sound-cue/v1","policy:image-capture:state-tree/v1","policy:image-capture:texture/v1","policy:image-capture:transform-candidates/v1","policy:image-capture:umg/v1","policy:image-capture:viewport-buffer/v1","policy:image-capture:viewport-sequence/v1","policy:image-capture:viewport/v1"],"type":"string"}',
                 ),
                 CommandParameterBinding(
                     name="parameters",
@@ -7126,6 +7529,14 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     parameter_guidance='Capture an Animation Blueprint editor viewport or graph. Opening defaults false; graph or window changes require explicit mutation flags. This captures editor UI, not a PIE animation test.',
                     result_guidance='Finish the returned operation, inspect its native result and materialize the image artifacts, then release. Read reported capture scope and any native editor changes.',
                     minimum_example="client.capture.image_execute(subject_ref='capture-subject:asset:/Game/Anim/ABP_Example.ABP_Example', policy_id='policy:image-capture:anim-blueprint/v1', parameters={'open_editor_if_needed': True})",
+                ),
+                CommandVariantBinding(
+                    variant_id='policy:image-capture:asset-folder-thumbnail/v1',
+                    request_schema_json='{"additionalProperties":false,"properties":{"parameters":{"additionalProperties":false,"properties":{"after":{"type":"string"},"class_paths":{"items":{"minLength":1,"type":"string"},"type":"array"},"generate_missing":{"type":"boolean"},"page_size":{"minimum":1,"type":"integer"},"recursive":{"type":"boolean"}},"type":"object"},"policy_id":{"const":"policy:image-capture:asset-folder-thumbnail/v1","type":"string"},"subject_ref":{"pattern":"^capture-subject:asset-folder:.+","type":"string"}},"required":["subject_ref","policy_id","parameters"],"type":"object"}',
+                    summary="Read a content folder's registry and native cached thumbnails into named contact sheets; no asset editors or implicit asset loading.",
+                    parameter_guidance="Read a content folder's registry and native cached thumbnails into named contact sheets; no asset editors or implicit asset loading.",
+                    result_guidance='Finish and materialize the sheets; asset_catalog retains complete identities and missing-thumbnail states, with next_after for continuation.',
+                    minimum_example="client.asset.folder_preview(folder='/Game/RuinedCrypt')",
                 ),
                 CommandVariantBinding(
                     variant_id='policy:image-capture:asset-preview/v1',
@@ -7241,7 +7652,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandVariantBinding(
                     variant_id='policy:image-capture:viewport/v1',
-                    request_schema_json='{"additionalProperties":false,"properties":{"parameters":{"additionalProperties":false,"properties":{"debug_mode":{"type":"string"},"debug_view_mode":{"type":"string"},"editor_view_mode":{"type":"string"},"format":{"default":"png","enum":["png","jpg","jpeg"],"type":"string"},"max_size":{"minimum":1,"type":"integer"},"mode":{"type":"string"},"mode_key":{"type":"string"},"output_file":{"type":"string"},"quality":{"default":85,"maximum":100,"minimum":1,"type":"integer"},"render_warmup_frames":{"maximum":2147483647,"minimum":0,"type":"integer"},"restore_view_mode":{"type":"boolean"},"restore_view_mode_after_capture":{"default":true,"type":"boolean"},"view_mode":{"type":"string"},"view_mode_family":{"type":"string"},"visualization_family":{"type":"string"},"visualization_mode":{"type":"string"},"visualizer":{"type":"string"},"visualizer_mode":{"type":"string"},"warmup_frames":{"default":2,"maximum":2147483647,"minimum":0,"type":"integer"}},"type":"object"},"policy_id":{"const":"policy:image-capture:viewport/v1","type":"string"},"subject_ref":{"const":"capture-subject:viewport:active","type":"string"}},"required":["subject_ref","policy_id","parameters"],"type":"object"}',
+                    request_schema_json='{"additionalProperties":false,"properties":{"parameters":{"additionalProperties":false,"properties":{"cold_start_render_size":{"additionalProperties":false,"description":"Optional explicit extent for a zero-sized Editor viewport. Omission adapts to its window\'s single-monitor work area, bounded to 4096 per edge; display lookup failure uses primary monitor then 1280x720. Existing positive viewport extents take precedence. No native window geometry changes; max_size remains output downscaling.","properties":{"height":{"maximum":4096,"minimum":1,"type":"integer"},"width":{"maximum":4096,"minimum":1,"type":"integer"}},"required":["width","height"],"type":"object"},"debug_mode":{"type":"string"},"debug_view_mode":{"type":"string"},"editor_view_mode":{"type":"string"},"format":{"default":"png","enum":["png","jpg","jpeg"],"type":"string"},"max_size":{"minimum":1,"type":"integer"},"mode":{"type":"string"},"mode_key":{"type":"string"},"output_file":{"type":"string"},"quality":{"default":85,"maximum":100,"minimum":1,"type":"integer"},"render_warmup_frames":{"maximum":2147483647,"minimum":0,"type":"integer"},"restore_view_mode":{"type":"boolean"},"restore_view_mode_after_capture":{"default":true,"type":"boolean"},"view_mode":{"type":"string"},"view_mode_family":{"type":"string"},"visualization_family":{"type":"string"},"visualization_mode":{"type":"string"},"visualizer":{"type":"string"},"visualizer_mode":{"type":"string"},"warmup_frames":{"default":2,"maximum":2147483647,"minimum":0,"type":"integer"}},"type":"object"},"policy_id":{"const":"policy:image-capture:viewport/v1","type":"string"},"subject_ref":{"const":"capture-subject:viewport:active","type":"string"}},"required":["subject_ref","policy_id","parameters"],"type":"object"}',
                     summary='Use exact subject_ref capture-subject:viewport:active. Optional parameters select png/jpg/jpeg output, quality, maximum size, output path, warmup frames and a temporary view mode that is restored after capture.',
                     parameter_guidance='Use exact subject_ref capture-subject:viewport:active. Optional parameters select png/jpg/jpeg output, quality, maximum size, output path, warmup frames and a temporary view mode that is restored after capture.',
                     result_guidance='Poll operation.status until terminal, read latest_signal.payload.artifact_ref, then verify the published image artifact before releasing the operation.',
@@ -7483,7 +7894,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="content_graph.import_workspace",
-            binding_hash="sha256:18cbd6733dc287d25222670d8069f8861e8e79aded6cd4e31172cac3fed6f928",
+            binding_hash="sha256:d531aa6a51fe2838e4d238dc80c222b52bbe5d0bfbe13b55b315d91b36a64916",
             namespace="content_graph",
             method="import_workspace",
             parameters=(
@@ -7499,6 +7910,12 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     required=True,
                     nullable=False,
                     schema_json='{"oneOf":[{"additionalProperties":false,"properties":{"document":{"minLength":1,"type":"string"},"kind":{"const":"inline"}},"required":["kind","document"],"type":"object"},{"additionalProperties":false,"properties":{"kind":{"const":"single_file"},"path":{"minLength":1,"type":"string"}},"required":["kind","path"],"type":"object"},{"additionalProperties":false,"properties":{"kind":{"const":"directory"},"path":{"minLength":1,"type":"string"}},"required":["kind","path"],"type":"object"}]}',
+                ),
+                CommandParameterBinding(
+                    name="analysis_ref",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
                 ),
             ),
             supports_operation_recovery=True,
@@ -7907,7 +8324,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="editor.session",
-            binding_hash="sha256:7628a6cffa51b3b2b3aa48ad46f234e4d99d28dc9b96a9bc246c1de11760a4e5",
+            binding_hash="sha256:ea23d57cf3fb11a52d52a47123a1e1fc2abb9ccbaaa5c40ec777698dc75e0e7f",
             namespace="editor",
             method="session",
             parameters=(
@@ -8000,6 +8417,14 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     parameter_guidance='Use an exact world:/Game/... destination package. fail rejects an existing map, reuse activates it, and replace creates and saves a new blank map at that path. save_existing_map defaults true; create_world_partition affects newly created maps.',
                     result_guidance='Finish the operation and inspect its receipt, then read the current world and dirty resources. The saved map remains after release; reuse does not recreate it.',
                     minimum_example="client.editor.session(family_id='world_context', subject_ref='world:/Game/Maps/L_New', policy_id='policy:world-context:create-blank/v1', parameters={'overwrite_policy': 'fail', 'save_existing_map': True})",
+                ),
+                CommandVariantBinding(
+                    variant_id='policy:world-context:data-layer-editor-state/v1',
+                    request_schema_json='{"additionalProperties":false,"properties":{"family_id":{"const":"world_context","type":"string"},"parameters":{"additionalProperties":false,"properties":{"asset_path":{"minLength":1,"type":"string"},"loaded_in_editor":{"type":"boolean"},"visible":{"type":"boolean"}},"required":["asset_path"],"type":"object"},"policy_id":{"const":"policy:world-context:data-layer-editor-state/v1","type":"string"},"subject_ref":{"minLength":12,"pattern":"^world:/Game/.+","type":"string"}},"required":["family_id","subject_ref","policy_id","parameters"],"type":"object"}',
+                    summary='Use the current partitioned world and an existing DataLayerAsset instance. Supply loaded_in_editor and/or visible. This temporary session does not change initial runtime state or saved user loading preferences.',
+                    parameter_guidance='Use the current partitioned world and an existing DataLayerAsset instance. Supply loaded_in_editor and/or visible. This temporary session does not change initial runtime state or saved user loading preferences.',
+                    result_guidance='Wait for active, inspect Data Layer flags and Actor descriptors, then close to restore both original Editor flags and refresh loaders. Close before switching maps or editing the same layer elsewhere.',
+                    minimum_example="client.editor.session('world_context', 'world:/Game/Maps/L_WP', 'policy:world-context:data-layer-editor-state/v1', {'asset_path': '/Game/Layers/DL_Stage.DL_Stage', 'loaded_in_editor': False})",
                 ),
                 CommandVariantBinding(
                     variant_id='policy:world-context:partition-actor-loader/v1',
@@ -8208,7 +8633,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.fbx.animation.import",
-            binding_hash="sha256:958b4b07be89af4885f0bdfce1ece3456c87bc08c90e6638adf32696dca41265",
+            binding_hash="sha256:3fb28d548dce3fc45408f0050a45a3ee0764b6419512645e9826130d86cce78c",
             namespace="external",
             method="fbx_animation_import",
             parameters=(
@@ -8243,7 +8668,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.fbx.skeletal_mesh.import",
-            binding_hash="sha256:1c2f15809ba58efe9f02a477bee7e6f51b5feabcc42fcfd24f09bd41f18f0b6a",
+            binding_hash="sha256:29f5b2c3f76dddbd9eb027e61ec1ee1e5743eaf33457225ace6e85ecd8c156c4",
             namespace="external",
             method="fbx_skeletal_mesh_import",
             parameters=(
@@ -8271,8 +8696,37 @@ _BINDING_CATALOG = CommandBindingCatalog(
             status="active",
         ),
         CommandBinding(
+            command_id="external.fbx.static_mesh.import",
+            binding_hash="sha256:7f829d51df54990498068bd29108d58af0d438bdea35e7e2c2c663f30c4b7e08",
+            namespace="external",
+            method="fbx_static_mesh_import",
+            parameters=(
+                CommandParameterBinding(
+                    name="source_ref",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="destination_ref",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="options",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
             command_id="external.geometry_cache.import",
-            binding_hash="sha256:b0d8ffe4e033b72a4770da1eab27e7e692ae60b9bc1c74713b7b076d7fe8c212",
+            binding_hash="sha256:17ee6c69c9d5d3ca6f89fa3e8bfded8e5e0635d1dfcdd91710e5315372c9ec2c",
             namespace="external",
             method="geometry_cache_import",
             parameters=(
@@ -8301,7 +8755,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.light_profile.import",
-            binding_hash="sha256:e6140373d12bab488578f984f630208deb0ceb4bd967c7f71ba2dea4d0505299",
+            binding_hash="sha256:b2e69f1bb29c93035203139331f97ae1d2ffc7b677e4a35a487663cad6349b83",
             namespace="external",
             method="light_profile_import",
             parameters=(
@@ -8388,7 +8842,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.sound_wave.import",
-            binding_hash="sha256:8ddc7c7c3d19cfc8412130d74a0d80993ab9d133b6b321659f5178ce7db7dabe",
+            binding_hash="sha256:82be0fd1c38e4459cda16490dae8f2d8186176cdd13f3d16f6963a809285d5c2",
             namespace="external",
             method="sound_wave_import",
             parameters=(
@@ -8417,7 +8871,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.sparse_volume_texture.import",
-            binding_hash="sha256:9afe5df6c4bb146b5fa35413c754783c1625ffe58f4dfe76682b4c929db1f102",
+            binding_hash="sha256:5902bbc43cdffb630402c6e9dfa1e92904a50b95fd81988c738141d253116e1c",
             namespace="external",
             method="sparse_volume_texture_import",
             parameters=(
@@ -8446,7 +8900,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="external.texture.import",
-            binding_hash="sha256:ec83e1cb635cc3b5e864a400915490d3c0b2782a6057b5129cb519c9a018736f",
+            binding_hash="sha256:09e1fe077a5c7d6df2c1609e8167c87bfc5f2e26427f75a99897627eb7d16dfe",
             namespace="external",
             method="texture_import",
             parameters=(
@@ -8469,6 +8923,290 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     nullable=False,
                 ),
             ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="fab.asset",
+            binding_hash="sha256:4c99268e57d606c905beb8f1eb5c8a1853446cae495c5f856aa88851dfea89bb",
+            namespace="fab",
+            method="asset",
+            parameters=(
+                CommandParameterBinding(
+                    name="scope",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"enum":["library","free"],"type":"string"}',
+                ),
+                CommandParameterBinding(
+                    name="name",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="select",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="listing_url",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            supports_operation_recovery=True,
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="fab.categories",
+            binding_hash="sha256:1a0419db452bf5965b16dde17e307b01240f86965e285971f5292b764f1e4c6a",
+            namespace="fab",
+            method="categories",
+            parameters=(
+                CommandParameterBinding(
+                    name="type",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="parent",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="depth",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"minimum":0,"type":"integer"}',
+                ),
+            ),
+            supports_operation_recovery=True,
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="fab.download",
+            binding_hash="sha256:dc9a2497a1442755d6b7530c90270ecfe48e0751c81f57d4eb5ec8c472934c98",
+            namespace="fab",
+            method="download",
+            parameters=(
+                CommandParameterBinding(
+                    name="scope",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"enum":["library","free"],"type":"string"}',
+                ),
+                CommandParameterBinding(
+                    name="name",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="select",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="format",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="file",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="file_select",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="save_as",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            supports_operation_recovery=True,
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="fab.downloads",
+            binding_hash="sha256:3bc8d58785ccc471f7a9d324a4f0541fac927dcee366eb52601374d5bb565775",
+            namespace="fab",
+            method="downloads",
+            parameters=(
+                CommandParameterBinding(
+                    name="page",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"minimum":1,"type":"integer"}',
+                ),
+            ),
+            supports_operation_recovery=True,
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="fab.files",
+            binding_hash="sha256:fe6d5cd07dd83a1b301f9335d82b83f9497f61b21b51d7f2789608b4c77b92de",
+            namespace="fab",
+            method="files",
+            parameters=(
+                CommandParameterBinding(
+                    name="download",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="query",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="page",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"minimum":1,"type":"integer"}',
+                ),
+            ),
+            supports_operation_recovery=True,
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="fab.import_asset",
+            binding_hash="sha256:7456689373adeda468aa09e439ebb45206b21a4a02f30e2ef28c02b8cd647ea0",
+            namespace="fab",
+            method="import_asset",
+            parameters=(
+                CommandParameterBinding(
+                    name="download",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="destination",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="entry",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            supports_operation_recovery=True,
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="fab.open",
+            binding_hash="sha256:741bf2a78d2a4e08d6a932bd28f4f39edbcffa96a70505df850e4bac98ddc356",
+            namespace="fab",
+            method="open",
+            parameters=(
+                CommandParameterBinding(
+                    name="activate",
+                    wire_type="boolean",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            supports_operation_recovery=True,
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="fab.search",
+            binding_hash="sha256:ccfa542f5c515f88c5229f75b3753c2535ae0fb46a860dfcc6faed7f1e1a0750",
+            namespace="fab",
+            method="search",
+            parameters=(
+                CommandParameterBinding(
+                    name="scope",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"enum":["library","free"],"type":"string"}',
+                ),
+                CommandParameterBinding(
+                    name="query",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="type",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="category",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="styles",
+                    wire_type="array",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"items":{"minLength":1,"type":"string"},"type":"array","uniqueItems":true}',
+                ),
+                CommandParameterBinding(
+                    name="page",
+                    wire_type="integer",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"minimum":1,"type":"integer"}',
+                ),
+            ),
+            supports_operation_recovery=True,
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="fab.status",
+            binding_hash="sha256:f61c8ccd5a1b50c45d31c4bb4f281bf01ce03b4013b8a55a176ef341a32fb8ed",
+            namespace="fab",
+            method="status",
+            parameters=(
+            ),
+            supports_operation_recovery=True,
             min_wire_version=1,
             max_wire_version=1,
             status="active",
@@ -9241,7 +9979,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.box.create",
-            binding_hash="sha256:5fcd7bb6e15df83a6d272b583f35ac257516fee48624742bb8cf539980e10669",
+            binding_hash="sha256:de8986d9e24173fd4048f4c675eab0537eafbe44a5dd989da63f49455c2fcd5b",
             namespace="mesh",
             method="primitive_box_create",
             parameters=(
@@ -9251,6 +9989,20 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     required=True,
                     nullable=False,
                     schema_json='{"enum":["center","base_center"],"type":"string"}',
+                ),
+                CommandParameterBinding(
+                    name="color",
+                    wire_type="array",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"items":{"maximum":1,"minimum":0,"type":"number"},"maxItems":3,"minItems":3,"type":"array"}',
+                ),
+                CommandParameterBinding(
+                    name="material_ref",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"minLength":1,"type":"string"}',
                 ),
                 CommandParameterBinding(
                     name="placement",
@@ -9297,7 +10049,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.cylinder.create",
-            binding_hash="sha256:4055070022043abccc7911c405b8cda2de9cc2a0ea3ab3f8596c032ad06ebeb5",
+            binding_hash="sha256:e212a49935966cf49ccfe97fc18020953bc4605470bd907fa59cedb4fd85a347",
             namespace="mesh",
             method="primitive_cylinder_create",
             parameters=(
@@ -9316,6 +10068,13 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     schema_json='{"type":"boolean"}',
                 ),
                 CommandParameterBinding(
+                    name="color",
+                    wire_type="array",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"items":{"maximum":1,"minimum":0,"type":"number"},"maxItems":3,"minItems":3,"type":"array"}',
+                ),
+                CommandParameterBinding(
                     name="height_cm",
                     wire_type="number",
                     required=True,
@@ -9328,6 +10087,13 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     required=True,
                     nullable=False,
                     schema_json='{"maximum":256,"minimum":1,"type":"integer"}',
+                ),
+                CommandParameterBinding(
+                    name="material_ref",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"minLength":1,"type":"string"}',
                 ),
                 CommandParameterBinding(
                     name="placement",
@@ -9374,16 +10140,30 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.plane.create",
-            binding_hash="sha256:d8443bd759e5fc7df86055484bbee19c7d85a761066fc3ec5428ea55c86cfff0",
+            binding_hash="sha256:12533143a191e011256ea78323117b283d3780c1c5e35501d8725a208846fcaa",
             namespace="mesh",
             method="primitive_plane_create",
             parameters=(
+                CommandParameterBinding(
+                    name="color",
+                    wire_type="array",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"items":{"maximum":1,"minimum":0,"type":"number"},"maxItems":3,"minItems":3,"type":"array"}',
+                ),
                 CommandParameterBinding(
                     name="double_sided",
                     wire_type="boolean",
                     required=True,
                     nullable=False,
                     schema_json='{"type":"boolean"}',
+                ),
+                CommandParameterBinding(
+                    name="material_ref",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"minLength":1,"type":"string"}',
                 ),
                 CommandParameterBinding(
                     name="placement",
@@ -9430,10 +10210,24 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.ramp.create",
-            binding_hash="sha256:a6e92560e378ccf69b8b5dd1ba2412bb88261c74d0609b7e22c024eb323a903d",
+            binding_hash="sha256:e8d145a30da74d0c622837d2ed4d07ee23b2b968f7520ca97926d15a1090179e",
             namespace="mesh",
             method="primitive_ramp_create",
             parameters=(
+                CommandParameterBinding(
+                    name="color",
+                    wire_type="array",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"items":{"maximum":1,"minimum":0,"type":"number"},"maxItems":3,"minItems":3,"type":"array"}',
+                ),
+                CommandParameterBinding(
+                    name="material_ref",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"minLength":1,"type":"string"}',
+                ),
                 CommandParameterBinding(
                     name="placement",
                     wire_type="object",
@@ -9486,16 +10280,30 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.ramp_corner.create",
-            binding_hash="sha256:b5192e930a58b61acd145e4dcd3634266e7eb692e30fc7b69f5bcfd89e904fd9",
+            binding_hash="sha256:3fb5e8538139efe7c7f06eb65ba275f295399eefe2e63210f0a44f4ea6738129",
             namespace="mesh",
             method="primitive_ramp_corner_create",
             parameters=(
+                CommandParameterBinding(
+                    name="color",
+                    wire_type="array",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"items":{"maximum":1,"minimum":0,"type":"number"},"maxItems":3,"minItems":3,"type":"array"}',
+                ),
                 CommandParameterBinding(
                     name="high_corner",
                     wire_type="string",
                     required=True,
                     nullable=False,
                     schema_json='{"enum":["positive_x_positive_y","positive_x_negative_y","negative_x_positive_y","negative_x_negative_y"],"type":"string"}',
+                ),
+                CommandParameterBinding(
+                    name="material_ref",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"minLength":1,"type":"string"}',
                 ),
                 CommandParameterBinding(
                     name="placement",
@@ -9535,10 +10343,17 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.sphere.create",
-            binding_hash="sha256:09e5d88905f4e8a2cb8c2c849705e09f8d18a2bff8f733ea378edd9be413c00c",
+            binding_hash="sha256:65fce6f00631a1e4261172f11c04ca459267e665e3d27b7711ed3f1162679284",
             namespace="mesh",
             method="primitive_sphere_create",
             parameters=(
+                CommandParameterBinding(
+                    name="color",
+                    wire_type="array",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"items":{"maximum":1,"minimum":0,"type":"number"},"maxItems":3,"minItems":3,"type":"array"}',
+                ),
                 CommandParameterBinding(
                     name="latitude_segments",
                     wire_type="integer",
@@ -9552,6 +10367,13 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     required=True,
                     nullable=False,
                     schema_json='{"maximum":512,"minimum":3,"type":"integer"}',
+                ),
+                CommandParameterBinding(
+                    name="material_ref",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"minLength":1,"type":"string"}',
                 ),
                 CommandParameterBinding(
                     name="placement",
@@ -9591,10 +10413,24 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.primitive.stairs.create",
-            binding_hash="sha256:05b1bd9c9cfc104615c3efaacee361f6a90ec2d511a1861a1d4f393fc0afa478",
+            binding_hash="sha256:52294feee8557c0344920937739bc2e4c56e300c49dd827a908e616e344b7e6f",
             namespace="mesh",
             method="primitive_stairs_create",
             parameters=(
+                CommandParameterBinding(
+                    name="color",
+                    wire_type="array",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"items":{"maximum":1,"minimum":0,"type":"number"},"maxItems":3,"minItems":3,"type":"array"}',
+                ),
+                CommandParameterBinding(
+                    name="material_ref",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"minLength":1,"type":"string"}',
+                ),
                 CommandParameterBinding(
                     name="placement",
                     wire_type="object",
@@ -9713,6 +10549,91 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     required=True,
                     nullable=False,
                     schema_json='{"minLength":1,"type":"string"}',
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="mesh.topology.components.remove",
+            binding_hash="sha256:3ac38caca6f1421c0f7a1ff846761bd5d5b6b0b4858c3bfad81ac01af5cbc982",
+            namespace="mesh",
+            method="topology_components_remove",
+            parameters=(
+                CommandParameterBinding(
+                    name="bounds_max_cm",
+                    wire_type="array",
+                    required=True,
+                    nullable=False,
+                    schema_json='{"items":{"type":"number"},"maxItems":3,"minItems":3,"type":"array"}',
+                ),
+                CommandParameterBinding(
+                    name="bounds_min_cm",
+                    wire_type="array",
+                    required=True,
+                    nullable=False,
+                    schema_json='{"items":{"type":"number"},"maxItems":3,"minItems":3,"type":"array"}',
+                ),
+                CommandParameterBinding(
+                    name="space_contract",
+                    wire_type="object",
+                    required=True,
+                    nullable=False,
+                    schema_json='{"additionalProperties":false,"properties":{"basis_evidence":{"minLength":1,"type":"string"},"conversion_chain":{"minLength":1,"type":"string"},"read_frame_id":{"const":"ue.mesh.target_local"},"semantic_frame_id":{"minLength":1,"type":"string"},"unit":{"enum":["centimeter","meter"],"type":"string"},"verify_frame_id":{"minLength":1,"type":"string"},"write_frame_id":{"const":"ue.mesh.target_local"}},"required":["semantic_frame_id","write_frame_id","read_frame_id","verify_frame_id","unit","basis_evidence","conversion_chain"],"type":"object"}',
+                ),
+                CommandParameterBinding(
+                    name="target_ref",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                    schema_json='{"minLength":1,"type":"string"}',
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="mesh.topology.components.translate",
+            binding_hash="sha256:be138b5d9e3ae8331733357874e9f61f3783888dde020a08d8f61d28e38d26b7",
+            namespace="mesh",
+            method="topology_components_translate",
+            parameters=(
+                CommandParameterBinding(
+                    name="bounds_max_cm",
+                    wire_type="array",
+                    required=True,
+                    nullable=False,
+                    schema_json='{"items":{"type":"number"},"maxItems":3,"minItems":3,"type":"array"}',
+                ),
+                CommandParameterBinding(
+                    name="bounds_min_cm",
+                    wire_type="array",
+                    required=True,
+                    nullable=False,
+                    schema_json='{"items":{"type":"number"},"maxItems":3,"minItems":3,"type":"array"}',
+                ),
+                CommandParameterBinding(
+                    name="space_contract",
+                    wire_type="object",
+                    required=True,
+                    nullable=False,
+                    schema_json='{"additionalProperties":false,"properties":{"basis_evidence":{"minLength":1,"type":"string"},"conversion_chain":{"minLength":1,"type":"string"},"read_frame_id":{"const":"ue.mesh.target_local"},"semantic_frame_id":{"minLength":1,"type":"string"},"unit":{"enum":["centimeter","meter"],"type":"string"},"verify_frame_id":{"minLength":1,"type":"string"},"write_frame_id":{"const":"ue.mesh.target_local"}},"required":["semantic_frame_id","write_frame_id","read_frame_id","verify_frame_id","unit","basis_evidence","conversion_chain"],"type":"object"}',
+                ),
+                CommandParameterBinding(
+                    name="target_ref",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                    schema_json='{"minLength":1,"type":"string"}',
+                ),
+                CommandParameterBinding(
+                    name="translation_cm",
+                    wire_type="array",
+                    required=True,
+                    nullable=False,
+                    schema_json='{"items":{"type":"number"},"maxItems":3,"minItems":3,"type":"array"}',
                 ),
             ),
             min_wire_version=1,
@@ -10493,7 +11414,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="mesh.voxel_grid.apply",
-            binding_hash="sha256:f535576cbac7be45ac5d2debf0d7f01078a3f191ac938838076c873fa69c2bc9",
+            binding_hash="sha256:d0518d8cf4cfc05b5f16e8e293c9a8fc3dfb60e42304c2f67291b2cdce26d40b",
             namespace="mesh",
             method="voxel_grid_apply",
             parameters=(
@@ -10524,6 +11445,12 @@ _BINDING_CATALOG = CommandBindingCatalog(
                 CommandParameterBinding(
                     name="material_ref",
                     wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="color",
+                    wire_type="array",
                     required=False,
                     nullable=False,
                 ),
@@ -12018,6 +12945,51 @@ _BINDING_CATALOG = CommandBindingCatalog(
             status="active",
         ),
         CommandBinding(
+            command_id="rig.control.bake.context",
+            binding_hash="sha256:2c7e02b276099f843f868fb6ceb5453ce51bf3249a01170fae6abc889935537c",
+            namespace="rig",
+            method="control_bake_context",
+            parameters=(
+                CommandParameterBinding(
+                    name="target",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                    schema_json='{"description":"Exact readable viewport_ref/target or graph_ref. Viewport targets must equal the viewport_ref returned by viewport.instance.list.","minLength":1,"type":"string"}',
+                ),
+                CommandParameterBinding(
+                    name="input",
+                    wire_type="object",
+                    required=True,
+                    nullable=False,
+                    schema_json='{"additionalProperties":false,"properties":{"binding_name":{"minLength":1,"type":"string"},"rig_ref":{"minLength":1,"type":"string"},"sequence_ref":{"minLength":1,"type":"string"},"target_animation_ref":{"minLength":1,"type":"string"}},"required":["sequence_ref","binding_name","rig_ref"],"type":"object"}',
+                ),
+                CommandParameterBinding(
+                    name="context",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"additionalProperties":false,"description":"Model-writable execution context. project_instance_id, editor_instance_id, context_revision, and resolved_from_current are server-owned and excluded.","properties":{"asset_editor":{"minLength":1,"type":"string"},"data_layers":{"items":{"minLength":1,"type":"string"},"type":"array"},"level":{"type":"string"},"net_mode":{"type":"string"},"net_role":{"type":"string"},"pie_instance":{"type":"integer"},"selection":{"items":{"minLength":1,"type":"string"},"type":"array"},"state_plane":{"enum":["authoring_memory","persisted"],"type":"string"},"viewport":{"description":"Readable viewport_ref returned by viewport.instance.list; for viewport commands it must equal target.","minLength":1,"type":"string"},"viewport_role":{"type":"string"},"viewport_scope":{"type":"string"},"world":{"type":"string"},"world_partition":{"type":"string"},"world_type":{"enum":["editor","pie","simulate_in_editor","game","preview"],"type":"string"}},"type":"object"}',
+                ),
+                CommandParameterBinding(
+                    name="projection",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"additionalProperties":false,"properties":{"include_defaults":{"type":"boolean"},"include_details":{"type":"boolean"},"include_provenance":{"type":"boolean"},"profile_id":{"minLength":1,"type":"string"}},"type":"object"}',
+                ),
+            ),
+            model_result_fields=(
+                ModelResultFieldBinding(
+                    name="bake_context",
+                    source_path=('bake_context',),
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
             command_id="rig.control.bake.controls",
             binding_hash="sha256:44f2f60492d5a0f7e0068cdef895e60db36250b6a793d6f6f13590a92b56ee14",
             namespace="rig",
@@ -13111,7 +14083,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.ray.deproject",
-            binding_hash="sha256:9f86c01b6ca619e57a39d075da676b2315e5681ebe928c6340b81a8822ffa681",
+            binding_hash="sha256:534432f546d88b38f6313f10f79785f0338eaeba112e93371c5bc84770016a11",
             namespace="viewport",
             method="ray_deproject",
             parameters=(
@@ -13127,7 +14099,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     wire_type="object",
                     required=True,
                     nullable=False,
-                    schema_json='{"additionalProperties":false,"properties":{"screen_point":{"anyOf":[{"additionalProperties":false,"properties":{"components":{"items":{"minLength":1,"type":"string"},"maxItems":2,"minItems":2,"type":"array"},"conversion_evidence_ids":{"items":{"minLength":1,"type":"string"},"type":"array","uniqueItems":true},"frame":{"additionalProperties":false,"properties":{"basis_evidence_id":{"minLength":1,"type":"string"},"basis_frame_id":{"minLength":1,"type":"string"},"dimension":{"const":2,"type":"integer"},"frame_id":{"minLength":1,"type":"string"},"observed_at":{"additionalProperties":false,"properties":{"clock_id":{"minLength":1,"type":"string"},"rate_denominator":{"minLength":1,"type":"string"},"rate_numerator":{"minLength":1,"type":"string"},"state":{"enum":["captured","frozen"],"type":"string"},"tick":{"minLength":1,"type":"string"}},"required":["clock_id","tick","rate_numerator","rate_denominator","state"],"type":"object"},"unit":{"minLength":1,"type":"string"}},"required":["frame_id","dimension","unit"],"type":"object"},"quantity":{"const":"point","type":"string"},"subject":{"minLength":1,"type":"string"}},"required":["subject","quantity","frame","components","conversion_evidence_ids"],"type":"object"},{"additionalProperties":false,"properties":{"components":{"items":{"anyOf":[{"type":"number"},{"minLength":1,"type":"string"}]},"maxItems":2,"minItems":2,"type":"array"},"dimension":{"const":2,"type":"integer"},"frame_id":{"minLength":1,"type":"string"},"quantity":{"const":"point","type":"string"},"unit":{"minLength":1,"type":"string"}},"required":["quantity","frame_id","dimension","unit","components"],"type":"object"}]}},"required":["screen_point"],"type":"object"}',
+                    schema_json='{"additionalProperties":false,"properties":{"cold_start_render_size":{"additionalProperties":false,"properties":{"height":{"maximum":4096,"minimum":1,"type":"integer"},"width":{"maximum":4096,"minimum":1,"type":"integer"}},"required":["width","height"],"type":"object"},"screen_point":{"anyOf":[{"additionalProperties":false,"properties":{"components":{"items":{"minLength":1,"type":"string"},"maxItems":2,"minItems":2,"type":"array"},"conversion_evidence_ids":{"items":{"minLength":1,"type":"string"},"type":"array","uniqueItems":true},"frame":{"additionalProperties":false,"properties":{"basis_evidence_id":{"minLength":1,"type":"string"},"basis_frame_id":{"minLength":1,"type":"string"},"dimension":{"const":2,"type":"integer"},"frame_id":{"minLength":1,"type":"string"},"observed_at":{"additionalProperties":false,"properties":{"clock_id":{"minLength":1,"type":"string"},"rate_denominator":{"minLength":1,"type":"string"},"rate_numerator":{"minLength":1,"type":"string"},"state":{"enum":["captured","frozen"],"type":"string"},"tick":{"minLength":1,"type":"string"}},"required":["clock_id","tick","rate_numerator","rate_denominator","state"],"type":"object"},"unit":{"minLength":1,"type":"string"}},"required":["frame_id","dimension","unit"],"type":"object"},"quantity":{"const":"point","type":"string"},"subject":{"minLength":1,"type":"string"}},"required":["subject","quantity","frame","components","conversion_evidence_ids"],"type":"object"},{"additionalProperties":false,"properties":{"components":{"items":{"anyOf":[{"type":"number"},{"minLength":1,"type":"string"}]},"maxItems":2,"minItems":2,"type":"array"},"dimension":{"const":2,"type":"integer"},"frame_id":{"minLength":1,"type":"string"},"quantity":{"const":"point","type":"string"},"unit":{"minLength":1,"type":"string"}},"required":["quantity","frame_id","dimension","unit","components"],"type":"object"}]}},"required":["screen_point"],"type":"object"}',
                 ),
                 CommandParameterBinding(
                     name="context",
@@ -13150,7 +14122,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="viewport.ray.trace",
-            binding_hash="sha256:767574a89f752112d2f610fdcaeb8645daf88d20608ff24c48fc1628daaf1f75",
+            binding_hash="sha256:c02f7d60175cd6a509c318348c5ede35684d4306af4d6a167e9771dca18dd695",
             namespace="viewport",
             method="ray_trace",
             parameters=(
@@ -13166,7 +14138,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     wire_type="object",
                     required=True,
                     nullable=False,
-                    schema_json='{"additionalProperties":false,"properties":{"screen_point":{"anyOf":[{"additionalProperties":false,"properties":{"components":{"items":{"minLength":1,"type":"string"},"maxItems":2,"minItems":2,"type":"array"},"conversion_evidence_ids":{"items":{"minLength":1,"type":"string"},"type":"array","uniqueItems":true},"frame":{"additionalProperties":false,"properties":{"basis_evidence_id":{"minLength":1,"type":"string"},"basis_frame_id":{"minLength":1,"type":"string"},"dimension":{"const":2,"type":"integer"},"frame_id":{"minLength":1,"type":"string"},"observed_at":{"additionalProperties":false,"properties":{"clock_id":{"minLength":1,"type":"string"},"rate_denominator":{"minLength":1,"type":"string"},"rate_numerator":{"minLength":1,"type":"string"},"state":{"enum":["captured","frozen"],"type":"string"},"tick":{"minLength":1,"type":"string"}},"required":["clock_id","tick","rate_numerator","rate_denominator","state"],"type":"object"},"unit":{"minLength":1,"type":"string"}},"required":["frame_id","dimension","unit"],"type":"object"},"quantity":{"const":"point","type":"string"},"subject":{"minLength":1,"type":"string"}},"required":["subject","quantity","frame","components","conversion_evidence_ids"],"type":"object"},{"additionalProperties":false,"properties":{"components":{"items":{"anyOf":[{"type":"number"},{"minLength":1,"type":"string"}]},"maxItems":2,"minItems":2,"type":"array"},"dimension":{"const":2,"type":"integer"},"frame_id":{"minLength":1,"type":"string"},"quantity":{"const":"point","type":"string"},"unit":{"minLength":1,"type":"string"}},"required":["quantity","frame_id","dimension","unit","components"],"type":"object"}]},"trace_query":{"additionalProperties":false,"properties":{"ignore_target_refs":{"items":{"minLength":1,"type":"string"},"type":"array","uniqueItems":true},"max_distance_cm":{"exclusiveMinimum":0,"type":"number"},"trace_channel":{"minLength":1,"type":"string"},"trace_complex":{"type":"boolean"}},"required":["max_distance_cm","trace_channel","trace_complex","ignore_target_refs"],"type":"object"}},"required":["screen_point","trace_query"],"type":"object"}',
+                    schema_json='{"additionalProperties":false,"properties":{"cold_start_render_size":{"additionalProperties":false,"properties":{"height":{"maximum":4096,"minimum":1,"type":"integer"},"width":{"maximum":4096,"minimum":1,"type":"integer"}},"required":["width","height"],"type":"object"},"screen_point":{"anyOf":[{"additionalProperties":false,"properties":{"components":{"items":{"minLength":1,"type":"string"},"maxItems":2,"minItems":2,"type":"array"},"conversion_evidence_ids":{"items":{"minLength":1,"type":"string"},"type":"array","uniqueItems":true},"frame":{"additionalProperties":false,"properties":{"basis_evidence_id":{"minLength":1,"type":"string"},"basis_frame_id":{"minLength":1,"type":"string"},"dimension":{"const":2,"type":"integer"},"frame_id":{"minLength":1,"type":"string"},"observed_at":{"additionalProperties":false,"properties":{"clock_id":{"minLength":1,"type":"string"},"rate_denominator":{"minLength":1,"type":"string"},"rate_numerator":{"minLength":1,"type":"string"},"state":{"enum":["captured","frozen"],"type":"string"},"tick":{"minLength":1,"type":"string"}},"required":["clock_id","tick","rate_numerator","rate_denominator","state"],"type":"object"},"unit":{"minLength":1,"type":"string"}},"required":["frame_id","dimension","unit"],"type":"object"},"quantity":{"const":"point","type":"string"},"subject":{"minLength":1,"type":"string"}},"required":["subject","quantity","frame","components","conversion_evidence_ids"],"type":"object"},{"additionalProperties":false,"properties":{"components":{"items":{"anyOf":[{"type":"number"},{"minLength":1,"type":"string"}]},"maxItems":2,"minItems":2,"type":"array"},"dimension":{"const":2,"type":"integer"},"frame_id":{"minLength":1,"type":"string"},"quantity":{"const":"point","type":"string"},"unit":{"minLength":1,"type":"string"}},"required":["quantity","frame_id","dimension","unit","components"],"type":"object"}]},"trace_query":{"additionalProperties":false,"properties":{"ignore_target_refs":{"items":{"minLength":1,"type":"string"},"type":"array","uniqueItems":true},"max_distance_cm":{"exclusiveMinimum":0,"type":"number"},"trace_channel":{"minLength":1,"type":"string"},"trace_complex":{"type":"boolean"}},"required":["max_distance_cm","trace_channel","trace_complex","ignore_target_refs"],"type":"object"}},"required":["screen_point","trace_query"],"type":"object"}',
                 ),
                 CommandParameterBinding(
                     name="context",
@@ -13578,7 +14550,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.capsule_path",
-            binding_hash="sha256:dc0117b6c8a461edbfbc552fe24f14bb85e27c73254f1806b115c430e78ad0c5",
+            binding_hash="sha256:52e066c10383c955c88f99fc7df2a6d282e253f209eb8b4fa9e800bd2e40c908",
             namespace="world",
             method="capsule_path",
             parameters=(
@@ -13587,7 +14559,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     wire_type="object",
                     required=True,
                     nullable=False,
-                    schema_json='{"additionalProperties":false,"properties":{"half_height_cm":{"exclusiveMinimum":0,"type":"number"},"points":{"items":{"additionalProperties":false,"properties":{"components":{"items":{"type":"number"},"maxItems":3,"minItems":3,"type":"array"},"frame_id":{"const":"ue.world","type":"string"},"unit":{"const":"centimeter","type":"string"}},"required":["frame_id","unit","components"],"type":"object"},"minItems":2,"type":"array"},"radius_cm":{"exclusiveMinimum":0,"type":"number"},"step_cm":{"exclusiveMinimum":0,"type":"number"},"trace_channel":{"minLength":1,"type":"string"}},"required":["points","radius_cm","half_height_cm","step_cm"],"type":"object"}',
+                    schema_json='{"additionalProperties":false,"properties":{"half_height_cm":{"exclusiveMinimum":0,"type":"number"},"include_first_hit":{"type":"boolean"},"points":{"items":{"additionalProperties":false,"properties":{"components":{"items":{"type":"number"},"maxItems":3,"minItems":3,"type":"array"},"frame_id":{"const":"ue.world","type":"string"},"unit":{"const":"centimeter","type":"string"}},"required":["frame_id","unit","components"],"type":"object"},"minItems":2,"type":"array"},"radius_cm":{"exclusiveMinimum":0,"type":"number"},"step_cm":{"exclusiveMinimum":0,"type":"number"},"trace_channel":{"minLength":1,"type":"string"},"trace_complex":{"type":"boolean"}},"required":["points","radius_cm","half_height_cm","step_cm"],"type":"object"}',
                 ),
                 CommandParameterBinding(
                     name="context",
@@ -13627,6 +14599,35 @@ _BINDING_CATALOG = CommandBindingCatalog(
                 ),
                 CommandParameterBinding(
                     name="projection",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="world.component.candidates",
+            binding_hash="sha256:e5577443fc16ab8273a7b4ce2736c71f2d0382483d5d413fc6d1b30b505f5060",
+            namespace="world",
+            method="component_candidates",
+            parameters=(
+                CommandParameterBinding(
+                    name="target",
+                    wire_type="string",
+                    required=True,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="query",
+                    wire_type="string",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="describe",
                     wire_type="object",
                     required=False,
                     nullable=False,
@@ -13835,6 +14836,37 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     nullable=False,
                 ),
             ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="world.geometry_overlap",
+            binding_hash="sha256:26a07c1696b1036175133704fbe26d41bf6e16efadb9909060ed164fb6114b8f",
+            namespace="world",
+            method="geometry_overlap",
+            parameters=(
+                CommandParameterBinding(
+                    name="input",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"additionalProperties":false,"properties":{"analysis_ref":{"type":"string"},"limit":{"maximum":200,"minimum":1,"type":"integer"},"margin_cm":{"minimum":0,"type":"number"},"near_distance_cm":{"maximum":10,"minimum":0,"type":"number"},"object_ref":{"type":"string"},"offset":{"minimum":0,"type":"integer"},"regions":{"items":{"additionalProperties":false,"properties":{"max_cm":{"items":{"type":"number"},"maxItems":3,"minItems":3,"type":"array"},"min_cm":{"items":{"type":"number"},"maxItems":3,"minItems":3,"type":"array"}},"required":["min_cm","max_cm"],"type":"object"},"type":"array"},"targets":{"items":{"type":"string"},"type":"array"},"workspace_root":{"type":"string"}},"type":"object"}',
+                ),
+                CommandParameterBinding(
+                    name="context",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="projection",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            supports_operation_recovery=True,
             min_wire_version=1,
             max_wire_version=1,
             status="active",
@@ -14336,7 +15368,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
         ),
         CommandBinding(
             command_id="world.partition",
-            binding_hash="sha256:b033714526221704f202c5b192bd0fdd39208f52a9bad527fe2a376dabae2d5b",
+            binding_hash="sha256:0bd9914c9f22d22e3aebb16df0eed1de1be454db804ffe3e81f4c3d262c23970",
             namespace="world",
             method="partition",
             parameters=(
@@ -14345,7 +15377,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     wire_type="object",
                     required=False,
                     nullable=False,
-                    schema_json='{"additionalProperties":false,"properties":{"include_loaded_regions":{"type":"boolean"}},"type":"object"}',
+                    schema_json='{"additionalProperties":false,"properties":{"include_actor_descriptors":{"type":"boolean"},"include_loaded_regions":{"type":"boolean"}},"type":"object"}',
                 ),
                 CommandParameterBinding(
                     name="context",
@@ -14557,6 +15589,37 @@ _BINDING_CATALOG = CommandBindingCatalog(
                     nullable=False,
                 ),
             ),
+            min_wire_version=1,
+            max_wire_version=1,
+            status="active",
+        ),
+        CommandBinding(
+            command_id="world.scene_context",
+            binding_hash="sha256:c845c6f4ba00e6436a294dd3bc3b5d5c9b791aca82e88fbf578281fa95742695",
+            namespace="world",
+            method="scene_context",
+            parameters=(
+                CommandParameterBinding(
+                    name="input",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                    schema_json='{"additionalProperties":false,"properties":{"analysis_ref":{"type":"string"},"limit":{"maximum":200,"minimum":1,"type":"integer"},"margin_cm":{"minimum":0,"type":"number"},"near_distance_cm":{"maximum":10,"minimum":0,"type":"number"},"object_ref":{"type":"string"},"offset":{"minimum":0,"type":"integer"},"regions":{"items":{"additionalProperties":false,"properties":{"max_cm":{"items":{"type":"number"},"maxItems":3,"minItems":3,"type":"array"},"min_cm":{"items":{"type":"number"},"maxItems":3,"minItems":3,"type":"array"}},"required":["min_cm","max_cm"],"type":"object"},"type":"array"},"targets":{"items":{"type":"string"},"type":"array"},"workspace_root":{"type":"string"}},"type":"object"}',
+                ),
+                CommandParameterBinding(
+                    name="context",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+                CommandParameterBinding(
+                    name="projection",
+                    wire_type="object",
+                    required=False,
+                    nullable=False,
+                ),
+            ),
+            supports_operation_recovery=True,
             min_wire_version=1,
             max_wire_version=1,
             status="active",
@@ -14789,7 +15852,7 @@ _BINDING_CATALOG = CommandBindingCatalog(
 )
 
 class GeneratedCommandNamespaces:
-    __slots__ = ("ai", "animation", "animation_rig_graph", "asset", "audio", "audio_media", "blueprint", "capture", "config", "content_graph", "deformer", "editor", "editor_project", "external", "graph", "job", "landscape", "material", "material_instance", "mesh", "metasound", "modeling", "niagara", "operation", "pcg", "physics", "project", "query", "reference", "rig", "skeletal_mesh", "sound_cue", "texture_graph", "timeline", "umg", "viewport", "world")
+    __slots__ = ("ai", "animation", "animation_rig_graph", "asset", "audio", "audio_media", "blueprint", "capture", "config", "content_graph", "deformer", "editor", "editor_project", "external", "fab", "graph", "job", "landscape", "material", "material_instance", "mesh", "metasound", "modeling", "niagara", "operation", "pcg", "physics", "project", "query", "reference", "rig", "skeletal_mesh", "sound_cue", "texture_graph", "timeline", "umg", "viewport", "world")
 
     def __init__(
         self,
@@ -14809,6 +15872,7 @@ class GeneratedCommandNamespaces:
         self.editor = EditorCommands(client)
         self.editor_project = EditorProjectCommands(client)
         self.external = ExternalCommands(client)
+        self.fab = FabCommands(client)
         self.graph = GraphCommands(client)
         self.job = JobCommands(client)
         self.landscape = LandscapeCommands(client)
@@ -14892,6 +15956,10 @@ class GeneratedClientBindingsMixin:
     @property
     def external(self) -> ExternalCommands:
         return self._generated_commands.external
+
+    @property
+    def fab(self) -> FabCommands:
+        return self._generated_commands.fab
 
     @property
     def graph(self) -> GraphCommands:

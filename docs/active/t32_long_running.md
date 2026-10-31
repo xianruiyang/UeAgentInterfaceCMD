@@ -48,6 +48,28 @@ replay work. `native_stop_pending_deadline_exceeded` remains pending.
 `cleanup_complete` separately confirms native Join/Release. An unknown result
 without cleanup proof cannot be released as if cleanup had succeeded.
 
+A newly accepted handle can start directly in completion-only `wait()`/`finish()`
+calls, avoiding a redundant initial status round trip. This applies only before
+any lifecycle call, with a known generation and without `until` or
+`on_observation`. The server still validates custody and generation; a generation
+mismatch refreshes status before continuing. Recovered/existing handles and
+calls requiring an initial observation keep the status-first path. No accepted
+snapshot is cached as a later server observation.
+
+For a command that explicitly returns its business reply through
+`uai.command.result.v1`, use `finish_result()` instead of manually unpacking the
+receipt. It waits, retains the receipt, releases the operation, and returns the
+original command `Result` with its diagnostics and normal public projection:
+
+```python
+result = start_result.operation.finish_result(timeout=120)
+result.raise_for_error()  # Check the command outcome, not just the lifecycle.
+```
+
+This method does not resubmit the command. After a timeout or disconnect, recover
+the same operation and call it again. Use ordinary `finish()` for jobs whose
+receipt contains a domain report rather than a deferred command reply.
+
 When Start is rejected before native work, a port may explicitly confirm that
 no native resource needs cleanup. Such rejection returns a failed, releasable
 operation. A failed native start attempt without that proof remains unknown;
